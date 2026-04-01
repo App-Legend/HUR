@@ -1,0 +1,59 @@
+############
+# Flutter
+############
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+
+############
+# Android / iOS
+############
+android/.gradle/
+android/local.properties
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/
+macos/Pods/
+windows/flutter/ephemeral/
+linux/flutter/ephemeral/
+
+############
+# Node.js
+############
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+.cache/
+
+############
+# Env (중요)
+############
+.env
+.env.*
+
+############
+# IDE
+############
+.idea/
+.vscode/
+*.iml
+
+############
+# OS
+############
+.DS_Store
+Thumbs.db
+
+############
+# Logs
+############
+logs/
+*.log
+coverage/

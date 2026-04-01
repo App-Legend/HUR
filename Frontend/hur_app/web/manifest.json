@@ -1,6 +1,6 @@
 {
-    "name": "lookpick_app",
-    "short_name": "lookpick_app",
+    "name": "hur_app",
+    "short_name": "hur_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
