@@ -21,7 +21,7 @@ class RankingPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
-              padding: EdgeInsets.fromLTRB(16, 5, 16, 12),
+              padding: EdgeInsets.fromLTRB(16, 15, 16, 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -61,7 +61,7 @@ class RankingPage extends StatelessWidget {
             ),
 
             const Padding(
-              padding: EdgeInsets.fromLTRB(16, 18, 16, 10),
+              padding: EdgeInsets.fromLTRB(16, 5, 16, 10),
               child: Text(
                 'TOP3',
                 style: TextStyle(
