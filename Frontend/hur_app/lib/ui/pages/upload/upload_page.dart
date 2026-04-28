@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/common/headers/upload_header.dart';
 
 class UploadPage extends StatelessWidget {
   const UploadPage({super.key});
@@ -10,21 +11,7 @@ class UploadPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(18, 0, 18, 24),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '게시물 작성',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-
+            UploadHeader(),
             Container(height: 1, color: const Color(0xffdddddd)),
 
             Expanded(

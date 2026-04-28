@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/common/headers/ranking_header.dart';
 
 import 'detail_ranking_page.dart';
 
@@ -20,29 +21,7 @@ class RankingPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 15, 16, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '내 추구미 랭킹',
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    '피드 기반으로 측정됩니다',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-
-            Container(height: 1, color: const Color(0xffdddddd)),
+            const RankingHeader(),
 
             const SizedBox(height: 14),
 
@@ -142,7 +121,10 @@ class RankingPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const DetailRankingPage(),
+                          builder: (_) => DetailRankingPage(
+                            brand: item[2],
+                            productName: item[3],
+                          ),
                         ),
                       );
                     },

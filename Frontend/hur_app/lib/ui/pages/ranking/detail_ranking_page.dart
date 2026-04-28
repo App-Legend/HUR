@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/common/headers/detail_ranking_header.dart';
 
 class DetailRankingPage extends StatelessWidget {
-  const DetailRankingPage({super.key});
+  final String brand;
+  final String productName;
+
+  const DetailRankingPage({
+    super.key,
+    required this.brand,
+    required this.productName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,38 +25,7 @@ class DetailRankingPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 18, 16, 0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, size: 24),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  const SizedBox(width: 4),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '헤라',
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        '센슈얼 누드 글로스',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            DetailRankingHeader(brand: brand, productName: productName),
 
             const SizedBox(height: 28),
 

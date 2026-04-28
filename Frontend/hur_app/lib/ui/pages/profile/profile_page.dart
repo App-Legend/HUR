@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/common/headers/profile_header.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -12,33 +13,7 @@ class ProfilePage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // 상단 헤더
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 18, 18),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    '프로필',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.settings_outlined,
-                      color: Colors.purple,
-                      size: 28,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            Container(height: 1, color: const Color(0xffdddddd)),
+            const ProfileHeader(),
 
             const SizedBox(height: 32),
 

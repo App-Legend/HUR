@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/common/headers/home_header.dart';
 
 import 'detail_home_page.dart';
 
@@ -28,42 +29,8 @@ class HomePage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 18),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Hur',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
+              HomeHeader(),
               const SizedBox(height: 18),
-
-              // 검색창
-              TextField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: const Color(0xfff1f1f1),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                    size: 26,
-                  ),
-                  hintText: '제품, 브랜드, 메이크업 검색...',
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-              ),
-
-              const SizedBox(height: 26),
               // 이미지 그리드
               Expanded(
                 child: SingleChildScrollView(
