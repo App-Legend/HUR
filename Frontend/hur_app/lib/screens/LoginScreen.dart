@@ -10,7 +10,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -18,7 +17,6 @@ class _LoginPageState extends State<LoginPage> {
   String message = "";
 
   Future<void> login() async {
-
     setState(() {
       isLoading = true;
       message = "";
@@ -34,27 +32,20 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     if (user != null) {
-
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
-
     } else {
-
       setState(() {
         message = "Login failed";
       });
-
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: AppBar(title: const Text("Login")),
 
       body: Padding(
@@ -62,7 +53,6 @@ class _LoginPageState extends State<LoginPage> {
 
         child: Column(
           children: [
-
             TextField(
               controller: emailController,
               decoration: const InputDecoration(
@@ -97,11 +87,7 @@ class _LoginPageState extends State<LoginPage> {
 
             const SizedBox(height: 20),
 
-            Text(
-              message,
-              style: const TextStyle(color: Colors.red),
-            )
-
+            Text(message, style: const TextStyle(color: Colors.red)),
           ],
         ),
       ),

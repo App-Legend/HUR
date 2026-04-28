@@ -1,4 +1,4 @@
-package com.example.lookpick_app
+package com.example.hur_app
 
 import io.flutter.embedding.android.FlutterActivity
 

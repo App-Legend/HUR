@@ -15,13 +15,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   String message = "Loading...";
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: LoginPage(),
-    );
+    return const MaterialApp(home: LoginPage());
   }
 }
