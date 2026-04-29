@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/pages/profile/profile_page.dart';
 import 'package:hur_app/ui/pages/ranking/ranking_page.dart';
+import 'package:hur_app/ui/pages/search/search_page.dart';
+import 'package:hur_app/ui/pages/upload/upload_page.dart';
 
 import '../common/navigation/bottom_nav.dart';
 import 'home/home_page.dart';
@@ -17,9 +20,9 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _pages = [
     const HomePage(),
     const RankingPage(),
-    const _PlaceholderPage(label: '업로드'),
-    const _PlaceholderPage(label: '검색'),
-    const _PlaceholderPage(label: '프로필'),
+    const UploadPage(),
+    const SearchPage(),
+    const ProfilePage(),
   ];
 
   @override

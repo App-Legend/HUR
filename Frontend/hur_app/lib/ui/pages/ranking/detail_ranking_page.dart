@@ -1,7 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/common/widget/category_chip.dart';
 
-class DetailRankingPage extends StatelessWidget {
-  const DetailRankingPage({super.key});
+class DetailRankingPage extends StatefulWidget {
+  final String rank;
+  final String imagePath;
+  final String brand;
+  final String name;
+
+  const DetailRankingPage({
+    super.key,
+    required this.rank,
+    required this.imagePath,
+    required this.brand,
+    required this.name,
+  });
+
+  @override
+  State<DetailRankingPage> createState() => _DetailRankingPageState();
+}
+
+class _DetailRankingPageState extends State<DetailRankingPage> {
+  String selectedCategory = '전체';
+  String selectedTab = '사진';
 
   @override
   Widget build(BuildContext context) {
@@ -28,17 +48,20 @@ class DetailRankingPage extends StatelessWidget {
                     },
                   ),
                   const SizedBox(width: 4),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '헤라',
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                        widget.brand,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
                       ),
-                      SizedBox(height: 6),
+                      const SizedBox(height: 6),
                       Text(
-                        '센슈얼 누드 글로스',
-                        style: TextStyle(
+                        widget.name,
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
@@ -54,8 +77,26 @@ class DetailRankingPage extends StatelessWidget {
 
             Row(
               children: [
-                Expanded(child: _TabText(text: '사진', selected: true)),
-                Expanded(child: _TabText(text: '후기', selected: false)),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedTab = '사진';
+                      });
+                    },
+                    child: _TabText(text: '사진', selected: selectedTab == '사진'),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedTab = '후기';
+                      });
+                    },
+                    child: _TabText(text: '후기', selected: selectedTab == '후기'),
+                  ),
+                ),
               ],
             ),
 
@@ -63,83 +104,145 @@ class DetailRankingPage extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                children: const [
-                  _ToneChip(text: '전체', selected: true),
-                  _ToneChip(text: '봄 웜'),
-                  _ToneChip(text: '가을 웜'),
-                  _ToneChip(text: '여름 쿨'),
-                  _ToneChip(text: '겨울 쿨'),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 20, 18),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      'assets/images/ranking/rank6.jpg',
-                      width: 84,
-                      height: 84,
-                      fit: BoxFit.cover,
+            if (selectedTab == '사진') ...[
+              SizedBox(
+                height: 36,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  children: [
+                    CategoryChip(
+                      text: '전체',
+                      selected: selectedCategory == '전체',
+                      onTap: () {
+                        setState(() {
+                          selectedCategory = '전체';
+                        });
+                      },
                     ),
-                  ),
-                  const SizedBox(width: 18),
-                  const CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Color(0xffefc6f2),
-                    child: Text(
-                      '6',
-                      style: TextStyle(
-                        color: Colors.purple,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    CategoryChip(
+                      text: '봄 웜',
+                      selected: selectedCategory == '봄 웜',
+                      onTap: () {
+                        setState(() {
+                          selectedCategory = '봄 웜';
+                        });
+                      },
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '오늘 조회 3206',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        '총 47회 사용',
-                        style: TextStyle(fontSize: 13, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                itemCount: images.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 14,
-                  crossAxisSpacing: 14,
-                  childAspectRatio: 0.7,
+                    CategoryChip(
+                      text: '가을 웜',
+                      selected: selectedCategory == '가을 웜',
+                      onTap: () {
+                        setState(() {
+                          selectedCategory = '가을 웜';
+                        });
+                      },
+                    ),
+                    CategoryChip(
+                      text: '여름 쿨',
+                      selected: selectedCategory == '여름 쿨',
+                      onTap: () {
+                        setState(() {
+                          selectedCategory = '여름 쿨';
+                        });
+                      },
+                    ),
+                    CategoryChip(
+                      text: '겨울 쿨',
+                      selected: selectedCategory == '겨울 쿨',
+                      onTap: () {
+                        setState(() {
+                          selectedCategory = '겨울 쿨';
+                        });
+                      },
+                    ),
+                  ],
                 ),
-                itemBuilder: (context, index) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(images[index], fit: BoxFit.cover),
-                  );
-                },
               ),
-            ),
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 20, 18),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        widget.imagePath,
+                        width: 84,
+                        height: 84,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: const Color(0xffefc6f2),
+                      child: Text(
+                        widget.rank,
+                        style: const TextStyle(
+                          color: Colors.purple,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '오늘 조회 3206',
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          '총 47회 사용',
+                          style: TextStyle(fontSize: 13, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  itemCount: images.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 14,
+                    crossAxisSpacing: 14,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemBuilder: (context, index) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(images[index], fit: BoxFit.cover),
+                    );
+                  },
+                ),
+              ),
+            ] else ...[
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  children: const [
+                    _ReviewItem(
+                      userName: 'user_01',
+                      review: '색감이 예쁘고 데일리로 쓰기 좋아요.',
+                    ),
+                    _ReviewItem(
+                      userName: 'user_02',
+                      review: '발림성이 부드럽고 광택감이 마음에 들어요.',
+                    ),
+                    _ReviewItem(
+                      userName: 'user_03',
+                      review: '생각보다 지속력도 괜찮았습니다.',
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -175,25 +278,38 @@ class _TabText extends StatelessWidget {
   }
 }
 
-class _ToneChip extends StatelessWidget {
-  final String text;
-  final bool selected;
+class _ReviewItem extends StatelessWidget {
+  final String userName;
+  final String review;
 
-  const _ToneChip({required this.text, this.selected = false});
+  const _ReviewItem({required this.userName, required this.review});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 72,
-      margin: const EdgeInsets.only(right: 8),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: selected ? const Color(0xffcfcfcf) : const Color(0xfff5f5f5),
-        borderRadius: BorderRadius.circular(18),
+        color: const Color(0xfff7f7f7),
+        borderRadius: BorderRadius.circular(14),
       ),
-      alignment: Alignment.center,
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 12, color: Colors.black),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            userName,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            review,
+            style: const TextStyle(fontSize: 13, color: Colors.black87),
+          ),
+        ],
       ),
     );
   }
