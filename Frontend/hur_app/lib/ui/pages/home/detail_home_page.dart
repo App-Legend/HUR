@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hur_app/ui/common/headers/detail_home_header.dart';
+import 'package:hur_app/ui/common/headers/main_header.dart';
 
 class DetailPage extends StatelessWidget {
   const DetailPage({super.key});
@@ -12,7 +12,18 @@ class DetailPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            DetailHomeHeader(),
+            MainHeader(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+                onPressed: () => Navigator.pop(context),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.share_outlined, color: Colors.black),
+                onPressed: () {},
+              ),
+              showDivider: false,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            ),
 
             Image.asset(
               'assets/images/home/home1.jpg',

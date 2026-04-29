@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hur_app/ui/common/headers/ranking_header.dart';
+import 'package:hur_app/ui/common/headers/main_header.dart';
 
 import 'detail_ranking_page.dart';
 
@@ -21,9 +21,13 @@ class RankingPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const RankingHeader(),
+            const MainHeader(
+              title: '내 추구미 랭킹',
+              subtitle: '피드 기반으로 측정됩니다',
+              padding: EdgeInsets.fromLTRB(18, 23, 18, 10),
+            ),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: 10),
 
             SizedBox(
               height: 36,
@@ -39,6 +43,7 @@ class RankingPage extends StatelessWidget {
               ),
             ),
 
+            SizedBox(height: 15),
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 5, 16, 10),
               child: Text(

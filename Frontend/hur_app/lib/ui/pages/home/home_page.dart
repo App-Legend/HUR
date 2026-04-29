@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hur_app/ui/common/headers/home_header.dart';
+import 'package:hur_app/ui/common/headers/main_header.dart';
 
 import 'detail_home_page.dart';
 
@@ -29,8 +29,15 @@ class HomePage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 18),
           child: Column(
             children: [
-              HomeHeader(),
-              const SizedBox(height: 18),
+              SizedBox(height: 10),
+              const MainHeader(
+                title: 'Hur',
+                titleFontSize: 32,
+                padding: EdgeInsets.fromLTRB(5, 14, 18, 8),
+                height: 80,
+              ),
+              SizedBox(height: 7),
+
               // 이미지 그리드
               Expanded(
                 child: SingleChildScrollView(

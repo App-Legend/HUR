@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hur_app/ui/common/headers/detail_ranking_header.dart';
+import 'package:hur_app/ui/common/headers/main_header.dart';
 
 class DetailRankingPage extends StatelessWidget {
   final String brand;
@@ -25,7 +25,18 @@ class DetailRankingPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            DetailRankingHeader(brand: brand, productName: productName),
+            MainHeader(
+              title: productName,
+              titleFontSize: 22,
+              subtitle: brand,
+              subtitleAbove: true,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios, size: 24),
+                onPressed: () => Navigator.pop(context),
+              ),
+              showDivider: false,
+              padding: const EdgeInsets.fromLTRB(8, 18, 16, 0),
+            ),
 
             const SizedBox(height: 28),
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hur_app/ui/common/headers/upload_header.dart';
+import 'package:hur_app/ui/common/headers/main_header.dart';
 
 class UploadPage extends StatelessWidget {
   const UploadPage({super.key});
@@ -11,9 +11,9 @@ class UploadPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            UploadHeader(),
-            Container(height: 1, color: const Color(0xffdddddd)),
-
+            SizedBox(height: 10),
+            const MainHeader(title: '게시물 작성'),
+            SizedBox(height: 7),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(30, 36, 30, 24),
