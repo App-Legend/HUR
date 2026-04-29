@@ -13,7 +13,11 @@ class UploadPage extends StatelessWidget {
           children: [
             SizedBox(height: 10),
             const MainHeader(title: '게시물 작성'),
-            SizedBox(height: 7),
+            SizedBox(height: 10),
+            Container(
+              height: 1,
+              color: const Color.fromARGB(255, 206, 206, 206),
+            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(30, 36, 30, 24),

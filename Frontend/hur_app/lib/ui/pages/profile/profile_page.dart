@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 
-class ProfilePage extends StatelessWidget {
+import 'tabs/likes_tab.dart';
+import 'tabs/posts_tab.dart';
+import 'tabs/saved_tab.dart';
+
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final posts = List.generate(9, (index) => index);
+  State<ProfilePage> createState() => _ProfilePageState();
+}
 
+class _ProfilePageState extends State<ProfilePage> {
+  int _selectedTab = 0;
+
+  static const _tabs = ['게시물', '좋아요', '저장됨'];
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             MainHeader(
               title: '프로필',
               trailing: IconButton(
@@ -24,6 +35,11 @@ class ProfilePage extends StatelessWidget {
                   size: 28,
                 ),
               ),
+            ),
+            const SizedBox(height: 5),
+            Container(
+              height: 1,
+              color: const Color.fromARGB(255, 206, 206, 206),
             ),
             const SizedBox(height: 32),
 
@@ -108,55 +124,60 @@ class ProfilePage extends StatelessWidget {
             Container(height: 1, color: const Color(0xffeeeeee)),
 
             Row(
-              children: const [
-                Expanded(
-                  child: _ProfileTab(
-                    icon: Icons.grid_on_outlined,
-                    text: '게시물',
-                    selected: false,
+              children: List.generate(_tabs.length, (i) {
+                final selected = _selectedTab == i;
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _selectedTab = i),
+                    child: _ProfileTabItem(text: _tabs[i], selected: selected),
                   ),
-                ),
-                Expanded(
-                  child: _ProfileTab(
-                    icon: Icons.favorite_border,
-                    text: '좋아요',
-                    selected: true,
-                  ),
-                ),
-                Expanded(
-                  child: _ProfileTab(
-                    icon: Icons.bookmark_border,
-                    text: '저장됨',
-                    selected: false,
-                  ),
-                ),
-              ],
+                );
+              }),
             ),
 
             Container(height: 1, color: const Color(0xffeeeeee)),
 
             Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.fromLTRB(6, 10, 6, 0),
-                itemCount: posts.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 5,
-                  crossAxisSpacing: 5,
-                  childAspectRatio: 1,
-                ),
-                itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xffd9d9d9),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  );
-                },
+              child: IndexedStack(
+                index: _selectedTab,
+                children: const [PostsTab(), LikesTab(), SavedTab()],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ProfileTabItem extends StatelessWidget {
+  final String text;
+  final bool selected;
+
+  const _ProfileTabItem({required this.text, required this.selected});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 48,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              color: selected ? Colors.black : const Color(0xffcfcfcf),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            height: 2,
+            width: 56,
+            color: selected ? Colors.black : Colors.transparent,
+          ),
+        ],
       ),
     );
   }
@@ -183,54 +204,6 @@ class _ProfileCount extends StatelessWidget {
         const SizedBox(height: 8),
         Text(label, style: const TextStyle(fontSize: 12, color: Colors.black)),
       ],
-    );
-  }
-}
-
-class _ProfileTab extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final bool selected;
-
-  const _ProfileTab({
-    required this.icon,
-    required this.text,
-    required this.selected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 54,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 22,
-                color: selected ? Colors.black : const Color(0xffcfcfcf),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                text,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: selected ? Colors.black : const Color(0xffcfcfcf),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 13),
-          Container(
-            height: 3,
-            width: 90,
-            color: selected ? Colors.black : Colors.transparent,
-          ),
-        ],
-      ),
     );
   }
 }

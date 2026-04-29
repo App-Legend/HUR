@@ -24,11 +24,15 @@ class RankingPage extends StatelessWidget {
             const MainHeader(
               title: '내 추구미 랭킹',
               subtitle: '피드 기반으로 측정됩니다',
-              padding: EdgeInsets.fromLTRB(18, 23, 18, 10),
+              padding: EdgeInsets.fromLTRB(18, 20, 18, 7),
             ),
 
-            const SizedBox(height: 10),
-
+            const SizedBox(height: 5),
+            Container(
+              height: 1,
+              color: const Color.fromARGB(255, 206, 206, 206),
+            ),
+            const SizedBox(height: 15),
             SizedBox(
               height: 36,
               child: ListView(

@@ -6,8 +6,8 @@
 | **Session ID** | `a9054ae1-deb7-4a10-ba9d-7e2b6cdaf8af` |
 | **Working Dir** | `c:\Hur\HUR` |
 | **Started** | 2026. 4. 29. 오전 10:14:05 |
-| **Last Updated** | 2026. 4. 29. 오후 12:02:09 |
-| **Messages** | 120 |
+| **Last Updated** | 2026. 4. 29. 오후 12:37:41 |
+| **Messages** | 167 |
 
 ---
 
@@ -2278,6 +2278,708 @@ Todos have been modified successfully. Ensure that you continue to use the todo 
 | `height` | `double?` | 고정 높이 (홈 헤더용) |
 
 기존 7개 헤더 파일은 모두 삭제되고 `main_header.dart` 하나로 통합됐습니다.
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:29:45</sup>
+
+<ide_opened_file>The user opened the file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\home\home_page.dart in the IDE. This may or may not be related to the current task.</ide_opened_file>
+
+다 헤더 밑에 컨테이너로 그레이 선이나 그림자를 줬음 좋겠어 전체 패딩에 연관되지 않고 헤더 맨 밑에
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:32:17</sup>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:32:18</sup>
+
+현재 home_page에서 MainHeader가 `Padding(horizontal: 18)` 안에 들어있어서 선이 양쪽 18px 안에 갇혀있습니다. MainHeader를 Padding 밖으로 꺼내고, 이미지 그리드에만 패딩을 주면 됩니다.
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:32:19</sup>
+
+<details>
+<summary>Tool: <code>Read</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\home\\home_page.dart"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:32:19</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+File unchanged since last read. The content from the earlier Read tool_result in this conversation is still current — refer to that instead of re-reading.
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:32:26</sup>
+
+<details>
+<summary>Tool: <code>Edit</code></summary>
+
+```json
+{
+  "replace_all": false,
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\home\\home_page.dart",
+  "old_string": "        body: Padding(\n          padding: const EdgeInsets.symmetric(horizontal: 18),\n          child: Column(\n            children: [\n              SizedBox(height: 10),\n              const MainHeader(\n                title: 'Hur',\n                titleFontSize: 32,\n                padding: EdgeInsets.fromLTRB(5, 14, 18, 8),\n                height: 80,\n              ),\n              SizedBox(height: 5),\n\n              // 이미지 그리드\n              Expanded(\n                child: SingleChildScrollView(\n                  child: Row(",
+  "new_string": "        body: Column(\n          children: [\n            const SizedBox(height: 10),\n            const MainHeader(\n              title: 'Hur',\n              titleFontSize: 32,\n              padding: EdgeInsets.fromLTRB(18, 14, 18, 8),\n              height: 80,\n            ),\n            const SizedBox(height: 5),\n\n            // 이미지 그리드\n            Expanded(\n              child: Padding(\n                padding: const EdgeInsets.symmetric(horizontal: 18),\n                child: SingleChildScrollView(\n                  child: Row("
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:32:26</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+The file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\home\home_page.dart has been updated successfully.
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:32:28</sup>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:32:29</sup>
+
+닫는 괄호들이 맞지 않아서 생긴 오류입니다. 전체 파일을 확인하겠습니다.
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:32:30</sup>
+
+<details>
+<summary>Tool: <code>Read</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\home\\home_page.dart"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:32:30</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+1	import 'package:flutter/material.dart';
+2	import 'package:hur_app/ui/common/headers/main_header.dart';
+3	
+4	import 'detail_home_page.dart';
+5	
+6	class HomePage extends StatelessWidget {
+7	  const HomePage({super.key});
+8	
+9	  @override
+10	  Widget build(BuildContext context) {
+11	    final leftImages = [
+12	      'assets/images/home/home1.jpg',
+13	      'AD',
+14	      'assets/images/home/home2.jpg',
+15	      'assets/images/home/home3.jpg',
+16	    ];
+17	
+18	    final rightImages = [
+19	      'assets/images/home/home4.jpg',
+20	      'assets/images/home/home5.jpg',
+21	      'assets/images/home/home6.jpg',
+22	      'assets/images/home/home7.jpg',
+23	    ];
+24	
+25	    return SafeArea(
+26	      child: Scaffold(
+27	        backgroundColor: Colors.white,
+28	        body: Column(
+29	          children: [
+30	            const SizedBox(height: 10),
+31	            const MainHeader(
+32	              title: 'Hur',
+33	              titleFontSize: 32,
+34	              padding: EdgeInsets.fromLTRB(18
+...(truncated)
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:32:55</sup>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:32:56</sup>
+
+`Expanded` 닫는 괄호가 빠졌네요. 고치겠습니다.
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:32:57</sup>
+
+<details>
+<summary>Tool: <code>Edit</code></summary>
+
+```json
+{
+  "replace_all": false,
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\home\\home_page.dart",
+  "old_string": "              ),\n            ],\n          ),\n        ),\n      ),\n    );",
+  "new_string": "              ),\n            ),\n          ],\n        ),\n      ),\n    );"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:32:58</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+The file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\home\home_page.dart has been updated successfully.
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:33:02</sup>
+
+<details>
+<summary>Tool: <code>Read</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\home\\home_page.dart",
+  "offset": 88,
+  "limit": 15
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:33:02</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+88	                              ),
+89	                            );
+90	                          }).toList(),
+91	                        ),
+92	                      ),
+93	                    ],
+94	                  ),
+95	                ),
+96	              ),
+97	            ),
+98	          ],
+99	        ),
+100	      ),
+101	    );
+102	  }
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:33:07</sup>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:33:07</sup>
+
+구조가 올바른지 전체 흐름을 확인해볼게요.
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:33:08</sup>
+
+<details>
+<summary>Tool: <code>Read</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\home\\home_page.dart",
+  "offset": 25,
+  "limit": 76
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:33:08</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+25	    return SafeArea(
+26	      child: Scaffold(
+27	        backgroundColor: Colors.white,
+28	        body: Column(
+29	          children: [
+30	            const SizedBox(height: 10),
+31	            const MainHeader(
+32	              title: 'Hur',
+33	              titleFontSize: 32,
+34	              padding: EdgeInsets.fromLTRB(18, 14, 18, 8),
+35	              height: 80,
+36	            ),
+37	            const SizedBox(height: 5),
+38	
+39	            // 이미지 그리드
+40	            Expanded(
+41	              child: Padding(
+42	                padding: const EdgeInsets.symmetric(horizontal: 18),
+43	                child: SingleChildScrollView(
+44	                  child: Row(
+45	                    crossAxisAlignment: CrossAxisAlignment.start,
+46	                    children: [
+47	                      Expanded(
+48	                        child: Column(
+49	                          children: leftImages.map((item) {
+50	                            if (item == 'AD') {
+51	                        
+...(truncated)
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:33:14</sup>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:33:16</sup>
+
+구조가 정확합니다. 수정 결과:
+
+- `MainHeader`가 `Padding(horizontal: 18)` 바깥에 위치 → 구분선이 화면 전체 너비로 그려짐
+- 이미지 그리드만 `Padding(horizontal: 18)` 적용 → 기존과 동일하게 인덴트 유지
+
+이제 홈 헤더의 `Hur` 아래 선도 다른 페이지들처럼 가장자리에서 가장자리까지 이어집니다.
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:36:13</sup>
+
+<ide_opened_file>The user opened the file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\home\home_page.dart in the IDE. This may or may not be related to the current task.</ide_opened_file>
+
+프로필 화면페이지에 게시물 좋아요 저장됨 이렇게 세 탭이 있잖아 이걸 누를 수 있는 텍스트로 바꿔주고 이걸 눌렀을때 다른 탭으로 들어가 글자가 진해지고 이런식으로 파일 나눠서 만들어줄래?
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:36:36</sup>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:36:36</sup>
+
+현재 프로필 페이지를 먼저 확인하겠습니다.
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:36:37</sup>
+
+<details>
+<summary>Tool: <code>Read</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\profile\\profile_page.dart"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:36:37</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+File unchanged since last read. The content from the earlier Read tool_result in this conversation is still current — refer to that instead of re-reading.
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:36:45</sup>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:36:45</sup>
+
+<details>
+<summary>Tool: <code>TodoWrite</code></summary>
+
+```json
+{
+  "todos": [
+    {
+      "content": "posts_tab.dart, likes_tab.dart, saved_tab.dart 탭 콘텐츠 파일 생성",
+      "activeForm": "탭 콘텐츠 파일 생성 중",
+      "status": "in_progress"
+    },
+    {
+      "content": "profile_page.dart를 StatefulWidget으로 변환 + 탭 클릭 로직 추가",
+      "activeForm": "profile_page.dart 수정 중",
+      "status": "pending"
+    }
+  ]
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:36:45</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+Todos have been modified successfully. Ensure that you continue to use the todo list to track your progress. Please proceed with the current tasks if applicable
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:36:47</sup>
+
+<details>
+<summary>Tool: <code>Bash</code></summary>
+
+```json
+{
+  "command": "mkdir -p \"c:/Hur/HUR/Frontend/hur_app/lib/ui/pages/profile/tabs\"",
+  "description": "tabs 폴더 생성"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:36:48</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+(Bash completed with no output)
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:36:52</sup>
+
+<details>
+<summary>Tool: <code>Write</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\profile\\tabs\\posts_tab.dart",
+  "content": "import 'package:flutter/material.dart';\n\nclass PostsTab extends StatelessWidget {\n  const PostsTab({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return GridView.builder(\n      padding: const EdgeInsets.fromLTRB(6, 10, 6, 0),\n      itemCount: 9,\n      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(\n        crossAxisCount: 3,\n        mainAxisSpacing: 5,\n        crossAxisSpacing: 5,\n        childAspectRatio: 1,\n      ),\n      itemBuilder: (context, index) {\n        return Container(\n          decoration: BoxDecoration(\n            color: const Color(0xffd9d9d9),\n            borderRadius: BorderRadius.circular(6),\n          ),\n        );\n      },\n    );\n  }\n}\n"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:36:53</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+File created successfully at: c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\profile\tabs\posts_tab.dart
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:36:57</sup>
+
+<details>
+<summary>Tool: <code>Write</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\profile\\tabs\\likes_tab.dart",
+  "content": "import 'package:flutter/material.dart';\n\nclass LikesTab extends StatelessWidget {\n  const LikesTab({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return GridView.builder(\n      padding: const EdgeInsets.fromLTRB(6, 10, 6, 0),\n      itemCount: 6,\n      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(\n        crossAxisCount: 3,\n        mainAxisSpacing: 5,\n        crossAxisSpacing: 5,\n        childAspectRatio: 1,\n      ),\n      itemBuilder: (context, index) {\n        return Container(\n          decoration: BoxDecoration(\n            color: const Color(0xffefc6f2),\n            borderRadius: BorderRadius.circular(6),\n          ),\n        );\n      },\n    );\n  }\n}\n"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:36:59</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+File created successfully at: c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\profile\tabs\likes_tab.dart
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:37:03</sup>
+
+<details>
+<summary>Tool: <code>Write</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\profile\\tabs\\saved_tab.dart",
+  "content": "import 'package:flutter/material.dart';\n\nclass SavedTab extends StatelessWidget {\n  const SavedTab({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return GridView.builder(\n      padding: const EdgeInsets.fromLTRB(6, 10, 6, 0),\n      itemCount: 3,\n      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(\n        crossAxisCount: 3,\n        mainAxisSpacing: 5,\n        crossAxisSpacing: 5,\n        childAspectRatio: 1,\n      ),\n      itemBuilder: (context, index) {\n        return Container(\n          decoration: BoxDecoration(\n            color: const Color(0xffd0e8ff),\n            borderRadius: BorderRadius.circular(6),\n          ),\n        );\n      },\n    );\n  }\n}\n"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:37:04</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+File created successfully at: c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\profile\tabs\saved_tab.dart
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:37:09</sup>
+
+<details>
+<summary>Tool: <code>TodoWrite</code></summary>
+
+```json
+{
+  "todos": [
+    {
+      "content": "posts_tab.dart, likes_tab.dart, saved_tab.dart 탭 콘텐츠 파일 생성",
+      "activeForm": "탭 콘텐츠 파일 생성 중",
+      "status": "completed"
+    },
+    {
+      "content": "profile_page.dart를 StatefulWidget으로 변환 + 탭 클릭 로직 추가",
+      "activeForm": "profile_page.dart 수정 중",
+      "status": "in_progress"
+    }
+  ]
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:37:09</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+Todos have been modified successfully. Ensure that you continue to use the todo list to track your progress. Please proceed with the current tasks if applicable
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:37:12</sup>
+
+이제 `profile_page.dart`를 `StatefulWidget`으로 교체합니다.
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:37:29</sup>
+
+<details>
+<summary>Tool: <code>Write</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\profile\\profile_page.dart",
+  "content": "import 'package:flutter/material.dart';\nimport 'package:hur_app/ui/common/headers/main_header.dart';\nimport 'tabs/posts_tab.dart';\nimport 'tabs/likes_tab.dart';\nimport 'tabs/saved_tab.dart';\n\nclass ProfilePage extends StatefulWidget {\n  const ProfilePage({super.key});\n\n  @override\n  State<ProfilePage> createState() => _ProfilePageState();\n}\n\nclass _ProfilePageState extends State<ProfilePage> {\n  int _selectedTab = 0;\n\n  static const _tabs = ['게시물', '좋아요', '저장됨'];\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      backgroundColor: Colors.white,\n      body: SafeArea(\n        child: Column(\n          children: [\n            const SizedBox(height: 5),\n            MainHeader(\n              title: '프로필',\n              trailing: IconButton(\n                onPressed: () {},\n                icon: const Icon(\n                  Icons.settings_outlined,\n                  color: Colors.purple,\n                  size: 28,\n                ),\n              ),\n            ),\n\n            const SizedBox(height: 32),\n\n            Padding(\n              padding: const EdgeInsets.symmetric(horizontal: 24),\n              child: Row(\n                children: [\n                  Container(\n                    width: 74,\n                    height: 74,\n                    decoration: const BoxDecoration(\n                      color: Color(0xffd9d9d9),\n                      shape: BoxShape.circle,\n                    ),\n                  ),\n\n                  const Spacer(),\n\n                  const _ProfileCount(number: '24', label: '게시물'),\n                  const SizedBox(width: 32),\n                  const _ProfileCount(number: '1234', label: '팔로워'),\n                  const SizedBox(width: 32),\n                  const _ProfileCount(number: '567', label: '팔로잉'),\n                ],\n           
+...(truncated)
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:37:30</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+The file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\profile\profile_page.dart has been updated successfully.
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:37:35</sup>
+
+<details>
+<summary>Tool: <code>TodoWrite</code></summary>
+
+```json
+{
+  "todos": [
+    {
+      "content": "posts_tab.dart, likes_tab.dart, saved_tab.dart 탭 콘텐츠 파일 생성",
+      "activeForm": "탭 콘텐츠 파일 생성 중",
+      "status": "completed"
+    },
+    {
+      "content": "profile_page.dart를 StatefulWidget으로 변환 + 탭 클릭 로직 추가",
+      "activeForm": "profile_page.dart 수정 중",
+      "status": "completed"
+    }
+  ]
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 4. 29. 오후 12:37:35</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+Todos have been modified successfully. Ensure that you continue to use the todo list to track your progress. Please proceed with the current tasks if applicable
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 4. 29. 오후 12:37:41</sup>
+
+완료됐습니다. 파일 구조:
+
+```
+lib/ui/pages/profile/
+├── profile_page.dart       ← StatefulWidget, 탭 상태 관리
+└── tabs/
+    ├── posts_tab.dart      ← 게시물 (9개 회색 그리드)
+    ├── likes_tab.dart      ← 좋아요 (6개 보라 그리드)
+    └── saved_tab.dart      ← 저장됨 (3개 파랑 그리드)
+```
+
+탭 동작:
+- 탭 누르면 `setState`로 `_selectedTab` 인덱스 변경
+- 선택된 탭: 글자 **굵게** + 검정색 + 아래 밑줄
+- 미선택 탭: 글자 보통 굵기 + 회색
+- 콘텐츠는 `IndexedStack`으로 전환 (탭마다 상태 유지)
 
 
 ---

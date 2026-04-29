@@ -25,21 +25,23 @@ class HomePage extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18),
-          child: Column(
-            children: [
-              SizedBox(height: 10),
-              const MainHeader(
-                title: 'Hur',
-                titleFontSize: 32,
-                padding: EdgeInsets.fromLTRB(5, 14, 18, 8),
-                height: 80,
-              ),
-              SizedBox(height: 7),
-
-              // 이미지 그리드
-              Expanded(
+        body: Column(
+          children: [
+            const SizedBox(height: 7),
+            const MainHeader(
+              title: 'Hur',
+              titleFontSize: 32,
+              padding: EdgeInsets.fromLTRB(18, 14, 18, 8),
+              height: 80,
+            ),
+            Container(
+              height: 1,
+              color: const Color.fromARGB(255, 206, 206, 206),
+            ),
+            // 이미지 그리드
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: SingleChildScrollView(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,8 +96,8 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
