@@ -1,27 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'screens/LoginScreen.dart';
+import 'package:hur_app/ui/pages/main_page.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'HUR',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.black),
+      home: const MainPage(),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
+class _PlaceholderPage extends StatelessWidget {
+  final String label;
 
-  String message = "Loading...";
+  const _PlaceholderPage({required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: LoginPage(),
+    return Center(
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 24, color: Colors.grey),
+      ),
     );
   }
 }
