@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide RankingPage;
 import 'package:hur_app/ui/pages/profile/profile_page.dart';
 import 'package:hur_app/ui/pages/ranking/ranking_page.dart';
 import 'package:hur_app/ui/pages/search/search_page.dart';
