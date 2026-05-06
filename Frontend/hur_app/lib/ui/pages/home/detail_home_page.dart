@@ -103,6 +103,7 @@ class DetailPage extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
+                  // TODO: 여기서부터 Overflow 발생 (건우)
                   const Text(
                     '봄 웜톤에게 잘 어울리는 따뜻한 복숭아 컬러 메이크업이에요! 데일리로 하기 좋은 자연스러운 룩입니다 💕',
                     style: TextStyle(

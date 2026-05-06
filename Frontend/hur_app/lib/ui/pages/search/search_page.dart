@@ -43,6 +43,7 @@ class SearchPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
+            // 검색 창
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
               child: TextField(
@@ -65,6 +66,7 @@ class SearchPage extends StatelessWidget {
               ),
             ),
 
+            // 메뉴 탭
             Row(
               children: const [
                 Expanded(child: _SearchTab(text: '화장품', selected: true)),
@@ -75,6 +77,7 @@ class SearchPage extends StatelessWidget {
 
             Container(height: 1, color: const Color(0xffdddddd)),
 
+            // TODO: List 내용들 Overflow 발생 (건우)
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),

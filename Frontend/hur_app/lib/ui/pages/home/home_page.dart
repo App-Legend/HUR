@@ -3,6 +3,7 @@ import 'package:hur_app/ui/common/headers/main_header.dart';
 
 import 'detail_home_page.dart';
 
+// TODO: 타이틀 바와 이미지들 사이 margin 조정 필요 (건우)
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
