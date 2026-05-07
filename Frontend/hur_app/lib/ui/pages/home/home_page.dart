@@ -42,7 +42,7 @@ class HomePage extends StatelessWidget {
             // 이미지 그리드
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18),
+                padding: .symmetric(vertical: 12, horizontal: 10),
                 child: SingleChildScrollView(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,9 +115,9 @@ class _ImageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height,
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(5),
         image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
       ),
     );
@@ -134,7 +134,7 @@ class _AdBox extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: const Color(0xffd9d9d9),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: const Center(
         child: Text(

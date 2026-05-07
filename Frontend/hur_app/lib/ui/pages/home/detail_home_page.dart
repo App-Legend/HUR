@@ -1,8 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
+import 'package:hur_app/ui/pages/home/comment_popup.dart';
 
-class DetailPage extends StatelessWidget {
+class DetailPage extends StatefulWidget {
   const DetailPage({super.key});
+
+  @override
+  State<DetailPage> createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+  bool isLiked = false;
+  int likeCount = 234;
+
+  void _toggleLike() {
+    setState(() {
+      isLiked = !isLiked;
+      likeCount += isLiked ? 1 : -1;
+    });
+  }
+
+  void _showCommentPopup() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.25),
+      isScrollControlled: true,
+      builder: (context) {
+        return const CommentPopup();
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,111 +53,169 @@ class DetailPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             ),
 
-            Image.asset(
-              'assets/images/home/home1.jpg',
-              width: double.infinity,
-              height: 460,
-              fit: BoxFit.cover,
-            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/images/home/home1.jpg',
+                      width: double.infinity,
+                      height: 460,
+                      fit: BoxFit.cover,
+                    ),
 
-            Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 56,
-                        height: 56,
-                        decoration: const BoxDecoration(
-                          color: Color(0xffdddddd),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
+                    Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 56,
+                                height: 56,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xffdddddd),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
 
-                      const SizedBox(width: 12),
+                              const SizedBox(width: 12),
 
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '닉네임',
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '닉네임',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      '2시간 전',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  foregroundColor: Colors.white,
+                                  shape: const StadiumBorder(),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 10,
+                                  ),
+                                ),
+                                child: const Text('팔로우'),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          const Text(
+                            '봄 웜톤 데일리 메이크업',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 21,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          // TODO: 여기서부터 Overflow 발생 (건우)
+                          const Text(
+                            '봄 웜톤에게 잘 어울리는 따뜻한 복숭아 컬러 메이크업이에요! 데일리로 하기 좋은 자연스러운 룩입니다 💕',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              height: 1.4,
+                            ),
+                          ),
+
+                          const SizedBox(height: 14),
+
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xffeeeeee),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text(
+                              '#봄웜톤',
                               style: TextStyle(
                                 color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
                               ),
                             ),
-                            SizedBox(height: 4),
-                            Text(
-                              '2시간 전',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          shape: const StadiumBorder(),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
                           ),
-                        ),
-                        child: const Text('팔로우'),
+                          const SizedBox(height: 14),
+
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: _toggleLike,
+                                child: Icon(
+                                  isLiked
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: Colors.black,
+                                  size: 22,
+                                ),
+                              ),
+
+                              const SizedBox(width: 6),
+
+                              Text(
+                                '$likeCount',
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
+                              ),
+
+                              const SizedBox(width: 18),
+
+                              GestureDetector(
+                                onTap: _showCommentPopup,
+                                child: const Icon(
+                                  Icons.mode_comment_outlined,
+                                  color: Colors.black,
+                                  size: 22,
+                                ),
+                              ),
+
+                              const SizedBox(width: 6),
+
+                              const Text(
+                                '56',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  const Text(
-                    '봄 웜톤 데일리 메이크업',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 21,
-                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // TODO: 여기서부터 Overflow 발생 (건우)
-                  const Text(
-                    '봄 웜톤에게 잘 어울리는 따뜻한 복숭아 컬러 메이크업이에요! 데일리로 하기 좋은 자연스러운 룩입니다 💕',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      height: 1.4,
-                    ),
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffeeeeee),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      '#봄웜톤',
-                      style: TextStyle(color: Colors.black, fontSize: 13),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

@@ -38,9 +38,13 @@ class SearchPage extends StatelessWidget {
       ],
     ];
 
-    return Scaffold(
-      backgroundColor: const Color(0xfffafafa),
-      body: SafeArea(
+    // Scaffold 삭제!!
+    // MainPage 안의 Scaffold + BottomNavigation 사용
+
+    return Container(
+      color: const Color(0xfffafafa),
+
+      child: SafeArea(
         child: Column(
           children: [
             // 검색 창
@@ -50,38 +54,46 @@ class SearchPage extends StatelessWidget {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color(0xfff1f1f1),
+
                   prefixIcon: const Icon(
                     Icons.search,
                     color: Colors.grey,
-                    size: 34,
+                    size: 24,
                   ),
+
                   hintText: '제품, 계정, 피드 검색',
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 24),
+
+                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 15),
+
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(28),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 18),
+
+                  contentPadding: const EdgeInsets.symmetric(vertical: 6),
                 ),
               ),
             ),
 
-            // 메뉴 탭
+            // 탭
             Row(
               children: const [
                 Expanded(child: _SearchTab(text: '화장품', selected: true)),
+
                 Expanded(child: _SearchTab(text: '계정')),
+
                 Expanded(child: _SearchTab(text: '피드')),
               ],
             ),
 
             Container(height: 1, color: const Color(0xffdddddd)),
 
-            // TODO: List 내용들 Overflow 발생 (건우)
+            // 리스트
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
                 itemCount: products.length,
+
                 itemBuilder: (context, index) {
                   final item = products[index];
 
@@ -89,8 +101,6 @@ class SearchPage extends StatelessWidget {
                     imagePath: item[0],
                     brand: item[1],
                     name: item[2],
-                    category: item[3],
-                    price: item[4],
                   );
                 },
               ),
@@ -115,12 +125,14 @@ class _SearchTab extends StatelessWidget {
         Text(
           text,
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 14,
             color: selected ? Colors.purple : Colors.black54,
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 24),
+
+        const SizedBox(height: 10),
+
         Container(
           height: 3,
           color: selected ? Colors.purple : Colors.transparent,
@@ -134,35 +146,35 @@ class _ProductItem extends StatelessWidget {
   final String imagePath;
   final String brand;
   final String name;
-  final String category;
-  final String price;
 
   const _ProductItem({
     required this.imagePath,
     required this.brand,
     required this.name,
-    required this.category,
-    required this.price,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 164,
+      height: 100,
       margin: const EdgeInsets.only(bottom: 20),
+
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
+
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(26),
       ),
+
       child: Row(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(18),
+
             child: Image.asset(
               imagePath,
-              width: 112,
-              height: 112,
+              width: 50,
+              height: 50,
               fit: BoxFit.cover,
             ),
           ),
@@ -175,52 +187,20 @@ class _ProductItem extends StatelessWidget {
               children: [
                 Text(
                   brand,
-                  style: const TextStyle(fontSize: 23, color: Colors.black54),
+                  style: const TextStyle(fontSize: 13, color: Colors.black54),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 3),
 
                 Text(
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 25, color: Colors.black),
+
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
                 ),
 
                 const Spacer(),
-
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xfff4f4f4),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: Text(
-                        category,
-                        style: const TextStyle(
-                          fontSize: 19,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 14),
-
-                    Text(
-                      price,
-                      style: const TextStyle(
-                        fontSize: 23,
-                        color: Colors.purple,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
