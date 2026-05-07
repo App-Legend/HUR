@@ -31,6 +31,10 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
       'assets/images/ranking/detail2.jpg',
       'assets/images/ranking/detail3.jpg',
       'assets/images/ranking/detail4.jpg',
+      'assets/images/ranking/detail1.jpg',
+      'assets/images/ranking/detail2.jpg',
+      'assets/images/ranking/detail3.jpg',
+      'assets/images/ranking/detail4.jpg',
     ];
 
     return Scaffold(
@@ -57,6 +61,8 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
               children: [
                 Expanded(
                   child: GestureDetector(
+                    //텍스트 주변을 눌러도 선택 가능
+                    behavior: HitTestBehavior.opaque,
                     onTap: () {
                       setState(() {
                         selectedTab = '사진';
@@ -67,6 +73,7 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
                 ),
                 Expanded(
                   child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () {
                       setState(() {
                         selectedTab = '후기';
@@ -87,7 +94,7 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
                 height: 36,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: [
                     CategoryChip(
                       text: '전체',
@@ -138,58 +145,85 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
                 ),
               ),
 
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 20, 18),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        widget.imagePath,
-                        width: 84,
-                        height: 84,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(width: 18),
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: const Color(0xffefc6f2),
-                      child: Text(
-                        widget.rank,
-                        style: const TextStyle(
-                          color: Colors.purple,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '오늘 조회 3206',
-                          style: TextStyle(fontSize: 16, color: Colors.black),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          '총 47회 사용',
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
-                        ),
-                      ],
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
                   ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 20, 12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          widget.imagePath,
+                          width: 84,
+                          height: 84,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+
+                      const SizedBox(width: 24),
+
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 1),
+                            child: Text(
+                              widget.rank,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 24),
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                '오늘 조회 3206',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Text(
+                                '총 47회 사용',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
               Expanded(
                 child: GridView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.fromLTRB(10, 14, 10, 10),
                   itemCount: images.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
+                    crossAxisSpacing: 6,
                     childAspectRatio: 0.7,
                   ),
                   itemBuilder: (context, index) {
