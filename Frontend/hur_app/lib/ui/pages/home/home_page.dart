@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 
-import 'detail_home_page.dart';
+import 'detail/detail_home_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
