@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class DetailIconActionBar extends StatelessWidget {
   final bool isLiked;
@@ -29,9 +30,11 @@ class DetailIconActionBar extends StatelessWidget {
           GestureDetector(
             onTap: onLikeTap,
             child: Icon(
-              isLiked ? Icons.favorite : Icons.favorite_border,
+              Symbols.favorite,
               color: Colors.black,
               size: 26,
+              weight: 400,
+              fill: isLiked ? 1 : 0,
             ),
           ),
           const SizedBox(width: 3),
@@ -40,27 +43,30 @@ class DetailIconActionBar extends StatelessWidget {
             style: const TextStyle(color: Colors.grey, fontSize: 14),
           ),
 
-          const SizedBox(width: 18),
+          const SizedBox(width: 12),
 
           GestureDetector(
             onTap: onCommentTap,
-            child: const Icon(
-              Icons.mode_comment_outlined,
+            child: Icon(
+              Symbols.mode_comment,
               color: Colors.black,
-              size: 25,
+              size: 26,
+              weight: 400,
             ),
           ),
           const SizedBox(width: 3),
           const Text('12', style: TextStyle(color: Colors.grey, fontSize: 14)),
 
-          const SizedBox(width: 18),
+          const SizedBox(width: 12),
 
           GestureDetector(
             onTap: onBookmarkTap,
             child: Icon(
-              isBookmark ? Icons.bookmark_outline : Icons.bookmark,
+              Symbols.bookmarks,
               color: Colors.black,
               size: 26,
+              weight: 400,
+              fill: isBookmark ? 0 : 1,
             ),
           ),
           const SizedBox(width: 3),

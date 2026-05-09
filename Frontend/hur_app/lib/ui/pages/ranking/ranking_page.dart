@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
+import 'package:hur_app/ui/pages/ranking/widgets/ranking_more_popup.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import 'detail_ranking_page.dart';
 
@@ -371,6 +373,22 @@ class _RankingItem extends StatefulWidget {
 class _RankingItemState extends State<_RankingItem> {
   bool isMoreSelected = false;
 
+  void _showMorePopup() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.25),
+      isScrollControlled: true,
+      builder: (context) {
+        return RankingMorePopup(
+          imagePath: widget.imagePath,
+          brand: widget.brand,
+          name: widget.name,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -441,17 +459,18 @@ class _RankingItemState extends State<_RankingItem> {
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
-                setState(() {
-                  isMoreSelected = !isMoreSelected;
-                });
-
-                debugPrint('더보기 버튼 클릭');
+                _showMorePopup();
               },
               child: SizedBox(
                 width: 32,
                 height: 32,
                 child: Center(
-                  child: Icon(Icons.more_horiz, size: 24, color: Colors.black),
+                  child: Icon(
+                    Symbols.more_horiz,
+                    size: 24,
+                    color: Colors.black,
+                    weight: 400,
+                  ),
                 ),
               ),
             ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
+import 'package:hur_app/ui/pages/home/detail/popup/purchase_popup.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class DetailRankingPage extends StatefulWidget {
   final String rank;
@@ -23,6 +25,18 @@ class DetailRankingPage extends StatefulWidget {
 class _DetailRankingPageState extends State<DetailRankingPage> {
   String selectedCategory = '전체';
   String selectedTab = '사진';
+
+  void _showPurchasePopup() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.35),
+      isScrollControlled: true,
+      builder: (context) {
+        return const PurchasePopup();
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +176,7 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                         child: Image.asset(
                           widget.imagePath,
                           width: 84,
@@ -208,6 +222,15 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
                                 ),
                               ),
                             ],
+                          ),
+                          SizedBox(width: 30),
+                          GestureDetector(
+                            onTap: _showPurchasePopup,
+                            child: Icon(
+                              Symbols.open_in_new,
+                              weight: 400,
+                              color: Color(0xffbfbfbf),
+                            ),
                           ),
                         ],
                       ),

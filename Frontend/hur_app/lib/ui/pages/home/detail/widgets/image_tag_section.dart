@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/product_tag_popup.dart';
 
 class ImageTagSection extends StatefulWidget {
-  const ImageTagSection({super.key});
+  final String imagePath;
+
+  const ImageTagSection({super.key, required this.imagePath});
 
   @override
-  State<ImageTagSection> createState() => _ImageTagSection();
+  State<ImageTagSection> createState() => _ImageTagSectionState();
 }
 
-class _ImageTagSection extends State<ImageTagSection> {
+class _ImageTagSectionState extends State<ImageTagSection> {
   bool showProductIcons = false;
   bool showProductPopup = false;
 
@@ -35,7 +37,7 @@ class _ImageTagSection extends State<ImageTagSection> {
           GestureDetector(
             onTap: _toggleProductIcons,
             child: Image.asset(
-              'assets/images/home/home1.jpg',
+              widget.imagePath,
               width: double.infinity,
               height: 460,
               fit: BoxFit.cover,

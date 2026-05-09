@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
-
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'detail/detail_home_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -73,7 +73,8 @@ class _HomePageState extends State<HomePage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => const DetailPage(),
+                                          builder: (_) =>
+                                              DetailHomePage(imagePath: item),
                                         ),
                                       );
                                     },
@@ -101,7 +102,8 @@ class _HomePageState extends State<HomePage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => const DetailPage(),
+                                          builder: (_) =>
+                                              DetailHomePage(imagePath: item),
                                         ),
                                       );
                                     },
@@ -148,7 +150,12 @@ class _HomeHeader extends StatelessWidget {
             padding: const EdgeInsets.only(left: 10),
             child: IconButton(
               onPressed: () {},
-              icon: const Icon(Icons.menu, size: 25, color: Colors.black),
+              icon: const Icon(
+                Symbols.menu,
+                size: 25,
+                color: Colors.black,
+                weight: 400,
+              ),
             ),
           ),
 
@@ -179,9 +186,10 @@ class _HomeHeader extends StatelessWidget {
                 IconButton(
                   onPressed: () {},
                   icon: const Icon(
-                    Icons.notifications_none,
+                    Symbols.notifications_none,
                     size: 28,
                     color: Colors.black,
+                    weight: 400,
                   ),
                 ),
                 Positioned(

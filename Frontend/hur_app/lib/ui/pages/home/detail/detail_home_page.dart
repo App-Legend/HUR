@@ -10,14 +10,16 @@ import 'package:hur_app/ui/pages/home/detail/widgets/used_product_header.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/used_product_list.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
 
-class DetailPage extends StatefulWidget {
-  const DetailPage({super.key});
+class DetailHomePage extends StatefulWidget {
+  final String imagePath;
+
+  const DetailHomePage({super.key, required this.imagePath});
 
   @override
-  State<DetailPage> createState() => _DetailPageState();
+  State<DetailHomePage> createState() => _DetailHomePage();
 }
 
-class _DetailPageState extends State<DetailPage> {
+class _DetailHomePage extends State<DetailHomePage> {
   bool isLiked = false;
   bool isBookmark = true;
   int likeCount = 234;
@@ -75,11 +77,14 @@ class _DetailPageState extends State<DetailPage> {
                 onPressed: () => Navigator.pop(context),
               ),
               trailing: IconButton(
-                icon: const Icon(Icons.share_outlined, color: Colors.black),
+                icon: const Icon(
+                  Icons.share_outlined,
+                  color: Color(0xff747474),
+                ),
                 onPressed: () {},
               ),
               showDivider: false,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             ),
 
             Expanded(
@@ -90,7 +95,7 @@ class _DetailPageState extends State<DetailPage> {
 
                     const SizedBox(height: 12),
 
-                    const ImageTagSection(),
+                    ImageTagSection(imagePath: widget.imagePath),
 
                     DetailIconActionBar(
                       isLiked: isLiked,

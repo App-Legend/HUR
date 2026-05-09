@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class UsedProductHeader extends StatelessWidget {
   final int count;
@@ -9,7 +10,7 @@ class UsedProductHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(Icons.sell_outlined, color: Colors.black, size: 25),
+        const Icon(Symbols.sell, color: Colors.black, size: 25, weight: 400),
         const SizedBox(width: 6),
         const Text(
           '사용한 제품',
