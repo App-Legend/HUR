@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class UsedProductItem extends StatelessWidget {
+class ProductItemContainer extends StatelessWidget {
   final String imagePath;
   final String brandName;
   final String productName;
   final String price;
   final VoidCallback onOpenTap;
 
-  const UsedProductItem({
+  const ProductItemContainer({
     super.key,
     required this.imagePath,
     required this.brandName,

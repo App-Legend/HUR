@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hur_app/ui/pages/home/detail/widgets/used_product_item.dart';
+import 'package:hur_app/ui/common/widget/product_item_container.dart';
 
 class UsedProductList extends StatelessWidget {
   final VoidCallback onOpenTap;
@@ -37,7 +37,7 @@ class UsedProductList extends StatelessWidget {
       itemBuilder: (context, index) {
         final product = products[index];
 
-        return UsedProductItem(
+        return ProductItemContainer(
           imagePath: product['imagePath']!,
           brandName: product['brandName']!,
           productName: product['productName']!,
