@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
+import 'package:hur_app/ui/pages/ranking/widgets/ranking_more_popup.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import 'detail_ranking_page.dart';
 
+// 랭킹 상품 데이터 모델
 class RankingProduct {
   final String rank;
   final String imagePath;
@@ -27,6 +30,7 @@ class RankingProduct {
   }
 }
 
+// 전체 랭킹 페이지
 class RankingPage extends StatefulWidget {
   const RankingPage({super.key});
 
@@ -62,171 +66,49 @@ class _RankingPageState extends State<RankingPage> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const MainHeader(
-                    title: '내 추구미 랭킹',
-                    subtitle: '피드 기반으로 측정됩니다',
-                    padding: EdgeInsets.fromLTRB(18, 20, 18, 7),
-                  ),
+            // 헤더 영역
+            const SliverToBoxAdapter(child: _RankingHeader()),
 
-                  const SizedBox(height: 5),
+            // 헤더 아래부터 TOP20 제목까지: 화면 양옆 padding 16 적용
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 15),
 
-                  Container(
-                    height: 1,
-                    color: const Color.fromARGB(255, 206, 206, 206),
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  SizedBox(
-                    height: 36,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      children: [
-                        CategoryChip(
-                          text: '틴트',
-                          selected: selectedCategory == '틴트',
-                          onTap: () {
-                            setState(() {
-                              selectedCategory = '틴트';
-                            });
-                          },
-                        ),
-                        CategoryChip(
-                          text: '렌즈',
-                          selected: selectedCategory == '렌즈',
-                          onTap: () {
-                            setState(() {
-                              selectedCategory = '렌즈';
-                            });
-                          },
-                        ),
-                        CategoryChip(
-                          text: '볼터치',
-                          selected: selectedCategory == '볼터치',
-                          onTap: () {
-                            setState(() {
-                              selectedCategory = '볼터치';
-                            });
-                          },
-                        ),
-                        CategoryChip(
-                          text: '섀도우 팔레트',
-                          selected: selectedCategory == '섀도우 팔레트',
-                          onTap: () {
-                            setState(() {
-                              selectedCategory = '섀도우 팔레트';
-                            });
-                          },
-                        ),
-                      ],
+                    // 카테고리
+                    _CategorySection(
+                      selectedCategory: selectedCategory,
+                      onCategorySelected: (category) {
+                        setState(() {
+                          selectedCategory = category;
+                        });
+                      },
                     ),
-                  ),
 
-                  const SizedBox(height: 15),
+                    const SizedBox(height: 15),
 
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(16, 5, 16, 10),
-                    child: Text(
-                      'TOP3',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                    // TOP3 영역
+                    _Top3Section(
+                      top3: top3,
+                      onProductTap: (item) => _goToDetail(context, item),
                     ),
-                  ),
 
-                  SizedBox(
-                    height: 250,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Positioned(
-                          left: 8,
-                          top: 55,
-                          child: GestureDetector(
-                            onTap: () => _goToDetail(context, top3[1]),
-                            child: _TopImage(
-                              imagePath: top3[1].imagePath,
-                              width: 150,
-                              height: 170,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: 8,
-                          top: 55,
-                          child: GestureDetector(
-                            onTap: () => _goToDetail(context, top3[2]),
-                            child: _TopImage(
-                              imagePath: top3[2].imagePath,
-                              width: 150,
-                              height: 170,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 0,
-                          child: GestureDetector(
-                            onTap: () => _goToDetail(context, top3[0]),
-                            child: _TopImage(
-                              imagePath: top3[0].imagePath,
-                              width: 255,
-                              height: 210,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const Center(
-                    child: Text(
-                      '•  •  •',
-                      style: TextStyle(
-                        fontSize: 24,
-                        letterSpacing: 5,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
-                    child: Text(
-                      'TOP20',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ],
+                    // TOP20 제목
+                    const _Top20Title(),
+                  ],
+                ),
               ),
             ),
 
+            // TOP20 리스트 영역
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final item = products[index];
-
-                  return GestureDetector(
-                    onTap: () => _goToDetail(context, item),
-                    child: _RankingItem(
-                      rank: item.rank,
-                      imagePath: item.imagePath,
-                      brand: item.brand,
-                      name: item.name,
-                    ),
-                  );
-                }, childCount: products.length),
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              sliver: _RankingListSection(
+                products: products,
+                onProductTap: (item) => _goToDetail(context, item),
               ),
             ),
           ],
@@ -250,6 +132,171 @@ class _RankingPageState extends State<RankingPage> {
   }
 }
 
+// 헤더 컴포넌트
+class _RankingHeader extends StatelessWidget {
+  const _RankingHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const MainHeader(
+          title: '내 추구미 랭킹',
+          subtitle: '피드 기반으로 측정됩니다',
+          padding: EdgeInsets.fromLTRB(18, 20, 18, 7),
+        ),
+
+        const SizedBox(height: 5),
+
+        Container(height: 1, color: const Color.fromARGB(255, 206, 206, 206)),
+      ],
+    );
+  }
+}
+
+// 카테고리 칩 컴포넌트
+class _CategorySection extends StatelessWidget {
+  final String selectedCategory;
+  final ValueChanged<String> onCategorySelected;
+
+  const _CategorySection({
+    required this.selectedCategory,
+    required this.onCategorySelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final categories = ['틴트', '렌즈', '볼터치', '섀도우'];
+
+    return SizedBox(
+      height: 36,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.zero,
+        itemCount: categories.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+
+          return CategoryChip(
+            text: category,
+            selected: selectedCategory == category,
+            onTap: () {
+              onCategorySelected(category);
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+// TOP3 전체 컴포넌트
+class _Top3Section extends StatelessWidget {
+  final List<RankingProduct> top3;
+  final ValueChanged<RankingProduct> onProductTap;
+
+  const _Top3Section({required this.top3, required this.onProductTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionTitle(title: 'TOP3'),
+
+        SizedBox(
+          height: 250,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                left: 0,
+                top: 55,
+                child: GestureDetector(
+                  onTap: () => onProductTap(top3[1]),
+                  child: _TopImage(
+                    imagePath: top3[1].imagePath,
+                    width: 150,
+                    height: 170,
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 0,
+                top: 55,
+                child: GestureDetector(
+                  onTap: () => onProductTap(top3[2]),
+                  child: _TopImage(
+                    imagePath: top3[2].imagePath,
+                    width: 150,
+                    height: 170,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                child: GestureDetector(
+                  onTap: () => onProductTap(top3[0]),
+                  child: _TopImage(
+                    imagePath: top3[0].imagePath,
+                    width: 255,
+                    height: 210,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const Center(
+          child: Text(
+            '•  •  •',
+            style: TextStyle(
+              fontSize: 24,
+              letterSpacing: 5,
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// TOP20 제목 컴포넌트
+class _Top20Title extends StatelessWidget {
+  const _Top20Title();
+
+  @override
+  Widget build(BuildContext context) {
+    return const _SectionTitle(title: 'TOP20');
+  }
+}
+
+// 공통 섹션 제목 컴포넌트
+class _SectionTitle extends StatelessWidget {
+  final String title;
+
+  const _SectionTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
+}
+
+// TOP3 이미지 컴포넌트
 class _TopImage extends StatelessWidget {
   final String imagePath;
   final double width;
@@ -274,93 +321,161 @@ class _TopImage extends StatelessWidget {
   }
 }
 
-class _RankingItem extends StatelessWidget {
+// TOP20 리스트 컴포넌트
+class _RankingListSection extends StatelessWidget {
+  final List<RankingProduct> products;
+  final ValueChanged<RankingProduct> onProductTap;
+
+  const _RankingListSection({
+    required this.products,
+    required this.onProductTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final item = products[index];
+
+        return _RankingItem(
+          rank: item.rank,
+          imagePath: item.imagePath,
+          brand: item.brand,
+          name: item.name,
+          onTap: () => onProductTap(item),
+        );
+      }, childCount: products.length),
+    );
+  }
+}
+
+// TOP20 개별 아이템 컴포넌트
+// TOP20 개별 아이템 컴포넌트
+class _RankingItem extends StatefulWidget {
   final String rank;
   final String imagePath;
   final String brand;
   final String name;
+  final VoidCallback onTap;
 
   const _RankingItem({
     required this.rank,
     required this.imagePath,
     required this.brand,
     required this.name,
+    required this.onTap,
   });
 
   @override
+  State<_RankingItem> createState() => _RankingItemState();
+}
+
+class _RankingItemState extends State<_RankingItem> {
+  bool isMoreSelected = false;
+
+  void _showMorePopup() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.25),
+      isScrollControlled: true,
+      builder: (context) {
+        return RankingMorePopup(
+          imagePath: widget.imagePath,
+          brand: widget.brand,
+          name: widget.name,
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 60,
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.18),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: const Color(0xffefc6f2),
-            child: Text(
-              rank,
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Container(
+        height: 80,
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.18),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Text(
+              widget.rank,
               style: const TextStyle(
-                color: Colors.purple,
+                fontSize: 16,
+                color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
-          ),
 
-          const SizedBox(width: 14),
+            const SizedBox(width: 14),
 
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
-              imagePath,
-              width: 52,
-              height: 52,
-              fit: BoxFit.cover,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                widget.imagePath,
+                width: 52,
+                height: 52,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
 
-          const SizedBox(width: 14),
+            const SizedBox(width: 14),
 
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  brand,
-                  style: const TextStyle(fontSize: 10, color: Colors.grey),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  name,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.brand,
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                _showMorePopup();
+              },
+              child: SizedBox(
+                width: 32,
+                height: 32,
+                child: Center(
+                  child: Icon(
+                    Symbols.more_horiz,
+                    size: 24,
                     color: Colors.black,
-                    fontWeight: FontWeight.w500,
+                    weight: 400,
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-
-          const CircleAvatar(
-            radius: 18,
-            backgroundColor: Color(0xffeab5ec),
-            child: Icon(Icons.check, color: Colors.white, size: 22),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
