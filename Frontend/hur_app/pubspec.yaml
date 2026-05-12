@@ -76,6 +76,7 @@ flutter:
     - assets/images/home/
     - assets/images/ranking/
     - assets/images/search/
+    - assets/icons/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
