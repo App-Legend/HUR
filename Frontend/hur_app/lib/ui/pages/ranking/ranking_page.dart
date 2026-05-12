@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
+import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:hur_app/ui/pages/ranking/widgets/ranking_more_popup.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'detail_ranking_page.dart';
 
 // 랭킹 상품 데이터 모델
@@ -337,12 +337,28 @@ class _RankingListSection extends StatelessWidget {
       delegate: SliverChildBuilderDelegate((context, index) {
         final item = products[index];
 
-        return _RankingItem(
+        return ProductItemContainer(
           rank: item.rank,
           imagePath: item.imagePath,
-          brand: item.brand,
-          name: item.name,
+          brandName: item.brand,
+          productName: item.name,
+          price: '',
           onTap: () => onProductTap(item),
+          onOpenTap: () {
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              barrierColor: Colors.black.withOpacity(0.25),
+              isScrollControlled: true,
+              builder: (context) {
+                return RankingMorePopup(
+                  imagePath: item.imagePath,
+                  brand: item.brand,
+                  name: item.name,
+                );
+              },
+            );
+          },
         );
       }, childCount: products.length),
     );
@@ -408,6 +424,8 @@ class _RankingItemState extends State<_RankingItem> {
             ),
           ],
         ),
+
+        //Top20 제품 리스트
         child: Row(
           children: [
             Text(

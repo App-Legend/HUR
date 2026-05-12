@@ -21,11 +21,15 @@ class UploadMenuRow extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, size: 28),
+          Icon(icon, size: 28, color: Colors.black),
           const SizedBox(width: 16),
           Text(
             title,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
           const Spacer(),
           if (value != null)
@@ -34,7 +38,7 @@ class UploadMenuRow extends StatelessWidget {
               style: const TextStyle(fontSize: 12, color: Color(0xff777777)),
             ),
           const SizedBox(width: 8),
-          const Icon(Icons.chevron_right, size: 30),
+          const Icon(Icons.chevron_right, size: 30, color: Colors.black),
         ],
       ),
     );
