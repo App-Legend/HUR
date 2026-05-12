@@ -1,108 +1,208 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
-class SearchPage extends StatelessWidget {
+class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
 
   @override
+  State<SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  final FocusNode _searchFocusNode = FocusNode();
+  bool _isSearchFocused = false;
+
+  final searchHoverList = ['000', '000', '000', '000', '000', '000'];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _searchFocusNode.addListener(() {
+      setState(() {
+        _isSearchFocused = _searchFocusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final products = [
-      ['assets/images/search/search1.jpg', '롬앤', '롬앤 쥬시래스팅틴트', '틴트', '8,900원'],
-      [
-        'assets/images/search/search2.jpg',
-        '클리오',
-        '클리오 프로 아이 팔레트',
-        '아이섀도우',
-        '28,000원',
-      ],
-      [
-        'assets/images/search/search3.jpg',
-        '페리페라',
-        '페리페라 잉크 더 에어리 벨벳',
-        '틴트',
-        '7,200원',
-      ],
-      [
-        'assets/images/search/search4.jpg',
-        '3CE',
-        '3CE 무드 레시피 멀티 아이 컬러 팔레트',
-        '아이섀도우',
-        '35,000원',
-      ],
-      ['assets/images/search/search5.jpg', '에뛰드', '에뛰드 블러셔', '블러셔', '9,000원'],
-      [
-        'assets/images/search/search6.jpg',
-        '올리브영',
-        '올리브영 컬러렌즈',
-        '렌즈',
-        '15,000원',
-      ],
+    final recentKeywords = ['틴트', '워터밤 비오틴'];
+
+    final trendingKeywords = [
+      ['1', '선크림', '-'],
+      ['2', '립', 'up'],
+      ['3', '포켓몬', 'down'],
+      ['4', '비디오션', '-'],
+      ['5', '쿠션', '-'],
+      ['6', '클렌징밀크', '-'],
+      ['7', '페리페라', 'up'],
+      ['8', '포켓몬 에디션', 'down'],
+      ['9', '네일', '-'],
+      ['10', '샴푸', '-'],
     ];
 
-    // Scaffold 삭제!!
-    // MainPage 안의 Scaffold + BottomNavigation 사용
-
     return Container(
-      color: const Color(0xfffafafa),
-
+      color: Colors.white,
       child: SafeArea(
         child: Column(
           children: [
-            // 검색 창
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
-              child: TextField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: const Color(0xfff1f1f1),
-
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                    size: 24,
+            // 검색창 영역
+            Container(
+              padding: const EdgeInsets.fromLTRB(28, 12, 28, 14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
+                ],
+              ),
+              child: Container(
+                height: 38,
+                decoration: BoxDecoration(
+                  color: const Color(0xfff4f4f4),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: SizedBox(
+                  height: 38,
+                  child: TextField(
+                    focusNode: _searchFocusNode,
+                    textAlignVertical: TextAlignVertical.center,
 
-                  hintText: '제품, 계정, 피드 검색',
+                    decoration: InputDecoration(
+                      hintText: '검색어를 입력하세요',
 
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 15),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        size: 20,
+                        color: Colors.grey,
+                      ),
 
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(28),
-                    borderSide: BorderSide.none,
+                      filled: true,
+                      fillColor: const Color(0xfff4f4f4),
+
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(22),
+                        borderSide: BorderSide.none,
+                      ),
+
+                      contentPadding: EdgeInsets.zero,
+                    ),
                   ),
-
-                  contentPadding: const EdgeInsets.symmetric(vertical: 6),
                 ),
               ),
             ),
 
-            // 탭
-            Row(
-              children: const [
-                Expanded(child: _SearchTab(text: '화장품', selected: true)),
-
-                Expanded(child: _SearchTab(text: '계정')),
-
-                Expanded(child: _SearchTab(text: '피드')),
-              ],
-            ),
-
-            Container(height: 1, color: const Color(0xffdddddd)),
-
-            // 리스트
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
-                itemCount: products.length,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 최근 검색어 제목
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [
+                        Text(
+                          '최근 검색어',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          '전체 삭제',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Color(0xffc4c4c4),
+                          ),
+                        ),
+                      ],
+                    ),
 
-                itemBuilder: (context, index) {
-                  final item = products[index];
+                    const SizedBox(height: 12),
 
-                  return _ProductItem(
-                    imagePath: item[0],
-                    brand: item[1],
-                    name: item[2],
-                  );
-                },
+                    // 최근 검색어 칩
+                    Wrap(
+                      spacing: 6,
+                      children: recentKeywords.map((keyword) {
+                        return _RecentKeywordChip(text: keyword);
+                      }).toList(),
+                    ),
+
+                    const SizedBox(height: 42),
+
+                    // 급상승 검색어 제목
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [
+                        Text(
+                          '급상승 검색어',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          '00:00 기준',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Color(0xffc4c4c4),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 급상승 검색어 2열
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: trendingKeywords
+                                .take(5)
+                                .map(
+                                  (item) => _TrendingKeywordItem(
+                                    rank: item[0],
+                                    keyword: item[1],
+                                    status: item[2],
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                        const SizedBox(width: 28),
+                        Expanded(
+                          child: Column(
+                            children: trendingKeywords
+                                .skip(5)
+                                .map(
+                                  (item) => _TrendingKeywordItem(
+                                    rank: item[0],
+                                    keyword: item[1],
+                                    status: item[2],
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -112,100 +212,107 @@ class SearchPage extends StatelessWidget {
   }
 }
 
-class _SearchTab extends StatelessWidget {
+class _RecentKeywordChip extends StatelessWidget {
   final String text;
-  final bool selected;
 
-  const _SearchTab({required this.text, this.selected = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 14,
-            color: selected ? Colors.purple : Colors.black54,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-
-        const SizedBox(height: 10),
-
-        Container(
-          height: 3,
-          color: selected ? Colors.purple : Colors.transparent,
-        ),
-      ],
-    );
-  }
-}
-
-class _ProductItem extends StatelessWidget {
-  final String imagePath;
-  final String brand;
-  final String name;
-
-  const _ProductItem({
-    required this.imagePath,
-    required this.brand,
-    required this.name,
-  });
+  const _RecentKeywordChip({required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 100,
-      margin: const EdgeInsets.only(bottom: 20),
-
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
-
+      height: 24,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: const Color(0xffe5e5e5)),
+        borderRadius: BorderRadius.circular(14),
       ),
-
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-
-            child: Image.asset(
-              imagePath,
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
-            ),
+          Text(
+            text,
+            style: const TextStyle(fontSize: 10, color: Color(0xff9b9b9b)),
           ),
-
-          const SizedBox(width: 22),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  brand,
-                  style: const TextStyle(fontSize: 13, color: Colors.black54),
-                ),
-
-                const SizedBox(height: 3),
-
-                Text(
-                  name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
-                ),
-
-                const Spacer(),
-              ],
-            ),
+          const SizedBox(width: 3),
+          const Icon(
+            Symbols.close,
+            size: 12,
+            color: Color(0xffbdbdbd),
+            weight: 400,
           ),
         ],
       ),
+    );
+  }
+}
+
+class _TrendingKeywordItem extends StatelessWidget {
+  final String rank;
+  final String keyword;
+  final String status;
+
+  const _TrendingKeywordItem({
+    required this.rank,
+    required this.keyword,
+    required this.status,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 13),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 18,
+            child: Text(
+              rank,
+              style: const TextStyle(fontSize: 11, color: Colors.black),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              keyword,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 11, color: Colors.black),
+            ),
+          ),
+          _StatusIcon(status: status),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusIcon extends StatelessWidget {
+  final String status;
+
+  const _StatusIcon({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    if (status == 'up') {
+      return const Icon(
+        Symbols.arrow_drop_up,
+        size: 18,
+        color: Colors.red,
+        weight: 700,
+      );
+    }
+
+    if (status == 'down') {
+      return const Icon(
+        Symbols.arrow_drop_down,
+        size: 18,
+        color: Colors.blue,
+        weight: 700,
+      );
+    }
+
+    return const Text(
+      '-',
+      style: TextStyle(fontSize: 11, color: Color(0xffbdbdbd)),
     );
   }
 }
