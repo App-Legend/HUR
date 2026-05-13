@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/common/widget/follow_button.dart';
 
 class SearchResultAccountsTab extends StatefulWidget {
   const SearchResultAccountsTab({super.key});
@@ -88,24 +89,9 @@ class _AccountItem extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
+          FollowButton(
+            isFollowing: isFollowing,
             onTap: onFollowToggle,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: isFollowing ? const Color(0xff8b5cf6) : Colors.white,
-                border: Border.all(color: const Color(0xff8b5cf6)),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                isFollowing ? '팔로잉' : '팔로우',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: isFollowing ? Colors.white : const Color(0xff8b5cf6),
-                ),
-              ),
-            ),
           ),
         ],
       ),

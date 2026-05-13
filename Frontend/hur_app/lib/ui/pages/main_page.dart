@@ -17,6 +17,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
   final FocusNode _searchFocusNode = FocusNode();
+  final GlobalKey<SearchPageState> _searchPageKey = GlobalKey<SearchPageState>();
   late final List<Widget> _pages;
 
   @override
@@ -26,7 +27,7 @@ class _MainPageState extends State<MainPage> {
       const HomePage(),
       const RankingPage(),
       const UploadPage(),
-      SearchPage(focusNode: _searchFocusNode),
+      SearchPage(key: _searchPageKey, focusNode: _searchFocusNode),
       const ProfilePage(),
     ];
   }
@@ -50,7 +51,7 @@ class _MainPageState extends State<MainPage> {
         currentIndex: _currentIndex,
         onTap: (index) {
           if (index == _currentIndex && index == 3) {
-            _searchFocusNode.unfocus();
+            _searchPageKey.currentState?.resetSearch();
           } else {
             setState(() {
               _currentIndex = index;

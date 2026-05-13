@@ -9,10 +9,10 @@ class SearchPage extends StatefulWidget {
   const SearchPage({super.key, this.focusNode});
 
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  State<SearchPage> createState() => SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage>
+class SearchPageState extends State<SearchPage>
     with SingleTickerProviderStateMixin {
   late final FocusNode _searchFocusNode;
   late final bool _ownsNode;
@@ -44,6 +44,14 @@ class _SearchPageState extends State<SearchPage>
     _tabController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void resetSearch() {
+    _searchFocusNode.unfocus();
+    setState(() {
+      _hasSearched = false;
+      _searchController.clear();
+    });
   }
 
   void _onSubmitted(String value) {
@@ -134,20 +142,21 @@ class _SearchPageState extends State<SearchPage>
                 ),
               ),
 
+              // 검색 결과 탭
               if (_hasSearched)
                 Expanded(
                   child: Column(
                     children: [
                       TabBar(
                         controller: _tabController,
-                        labelColor: const Color(0xff8b5cf6),
+                        labelColor: const Color(0xFF6B1F8A),
                         unselectedLabelColor: const Color(0xff9b9b9b),
                         labelStyle: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                         unselectedLabelStyle: const TextStyle(fontSize: 14),
-                        indicatorColor: const Color(0xff8b5cf6),
+                        indicatorColor: const Color(0xFF6B1F8A),
                         indicatorSize: TabBarIndicatorSize.tab,
                         dividerColor: const Color(0xffe5e5e5),
                         tabs: const [
@@ -170,6 +179,7 @@ class _SearchPageState extends State<SearchPage>
                   ),
                 ),
 
+              // 포커스 시 검색 기록
               if (!_hasSearched && _isSearchFocused)
                 Expanded(
                   child: ListView.builder(
@@ -181,6 +191,7 @@ class _SearchPageState extends State<SearchPage>
                   ),
                 ),
 
+              // 기본 화면 (최근/급상승 검색어)
               if (!_hasSearched && !_isSearchFocused)
                 Expanded(
                   child: Padding(
@@ -188,7 +199,6 @@ class _SearchPageState extends State<SearchPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 최근 검색어 제목
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: const [
@@ -209,19 +219,14 @@ class _SearchPageState extends State<SearchPage>
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 12),
-
                         Wrap(
                           spacing: 6,
                           children: recentKeywords.map((keyword) {
                             return _RecentKeywordChip(text: keyword);
                           }).toList(),
                         ),
-
                         const SizedBox(height: 42),
-
-                        // 급상승 검색어 제목
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: const [
@@ -242,10 +247,7 @@ class _SearchPageState extends State<SearchPage>
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 16),
-
-                        // 급상승 검색어 2열
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

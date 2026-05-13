@@ -5,15 +5,13 @@ class SearchResultFeedTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const colors = [
-      Color(0xfff5c5c5),
-      Color(0xfffce8e8),
-      Color(0xfff0d0d8),
-      Color(0xffffd9d9),
-      Color(0xffe8c5cc),
-      Color(0xfffff0f4),
-      Color(0xfff5d5e0),
-      Color(0xfffce4ec),
+    const images = [
+      'assets/images/search/search1.jpg',
+      'assets/images/search/search2.jpg',
+      'assets/images/search/search3.jpg',
+      'assets/images/search/search4.jpg',
+      'assets/images/search/search5.jpg',
+      'assets/images/search/search6.jpg',
     ];
 
     return GridView.builder(
@@ -23,9 +21,9 @@ class SearchResultFeedTab extends StatelessWidget {
         crossAxisSpacing: 2,
         mainAxisSpacing: 2,
       ),
-      itemCount: colors.length,
+      itemCount: images.length,
       itemBuilder: (context, index) {
-        return Container(color: colors[index]);
+        return Image.asset(images[index], fit: BoxFit.cover);
       },
     );
   }
