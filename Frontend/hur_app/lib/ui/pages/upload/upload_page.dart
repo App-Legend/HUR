@@ -106,10 +106,22 @@ class _UploadPageState extends State<UploadPage> {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 10),
-            const MainHeader(title: '게시물 작성'),
-            const SizedBox(height: 10),
-            Container(height: 1, color: const Color(0xffcecece)),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const MainHeader(
+                title: '게시물 작성',
+                padding: EdgeInsets.fromLTRB(18, 20, 18, 20),
+              ),
+            ),
 
             Expanded(
               child: SingleChildScrollView(

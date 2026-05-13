@@ -31,7 +31,6 @@ class _ImageTagSectionState extends State<ImageTagSection> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 460,
       child: Stack(
         children: [
           GestureDetector(
@@ -39,7 +38,6 @@ class _ImageTagSectionState extends State<ImageTagSection> {
             child: Image.asset(
               widget.imagePath,
               width: double.infinity,
-              height: 460,
               fit: BoxFit.cover,
             ),
           ),

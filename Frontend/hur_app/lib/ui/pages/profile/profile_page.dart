@@ -13,12 +13,21 @@ class ProfilePage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 5),
-            MainHeader(title: '프로필'),
-            const SizedBox(height: 5),
             Container(
-              height: 1,
-              color: const Color.fromARGB(255, 206, 206, 206),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const MainHeader(
+                title: '프로필',
+                padding: EdgeInsets.fromLTRB(18, 20, 18, 20),
+              ),
             ),
             const Expanded(child: _NotLoggedInBody()),
           ],
