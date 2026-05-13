@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/pages/profile/feed/user_feed_page.dart';
 
 class DetailProfileHeader extends StatelessWidget {
   final String nickname;
@@ -16,24 +17,36 @@ class DetailProfileHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 3, 24, 3),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              color: Color(0xffdddddd),
-              shape: BoxShape.circle,
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const UserFeedPage()),
+            ),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                color: Color(0xffdddddd),
+                shape: BoxShape.circle,
+              ),
             ),
           ),
 
           const SizedBox(width: 12),
 
           Expanded(
-            child: Text(
-              nickname,
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const UserFeedPage()),
+              ),
+              child: Text(
+                nickname,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
