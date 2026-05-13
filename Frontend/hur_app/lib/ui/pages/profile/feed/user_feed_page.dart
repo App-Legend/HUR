@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/common/widget/follow_button.dart';
 
 class UserFeedPage extends StatefulWidget {
   const UserFeedPage({super.key});
@@ -135,29 +136,10 @@ class _UserProfileHeader extends StatelessWidget {
               const SizedBox(width: 8),
               _TagChip(label: '21호', icon: Icons.palette_outlined),
               const Spacer(),
-              GestureDetector(
+              FollowButton(
+                isFollowing: isFollowing,
                 onTap: onFollowTap,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 28,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isFollowing
-                        ? Colors.white38
-                        : const Color(0xFF6B1F8A),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Text(
-                    isFollowing ? '팔로잉' : '팔로우',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+                onDark: true,
               ),
             ],
           ),
