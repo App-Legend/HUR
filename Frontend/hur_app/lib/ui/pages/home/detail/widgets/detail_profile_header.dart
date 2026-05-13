@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/common/widget/follow_button.dart';
 import 'package:hur_app/ui/pages/profile/feed/user_feed_page.dart';
 
-class DetailProfileHeader extends StatelessWidget {
+class DetailProfileHeader extends StatefulWidget {
   final String nickname;
   final VoidCallback onFollowTap;
 
@@ -10,6 +11,13 @@ class DetailProfileHeader extends StatelessWidget {
     required this.nickname,
     required this.onFollowTap,
   });
+
+  @override
+  State<DetailProfileHeader> createState() => _DetailProfileHeaderState();
+}
+
+class _DetailProfileHeaderState extends State<DetailProfileHeader> {
+  bool _isFollowing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +49,7 @@ class DetailProfileHeader extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const UserFeedPage()),
               ),
               child: Text(
-                nickname,
+                widget.nickname,
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 15,
@@ -51,23 +59,12 @@ class DetailProfileHeader extends StatelessWidget {
             ),
           ),
 
-          GestureDetector(
-            onTap: onFollowTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: const Text(
-                '팔로우',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
+          FollowButton(
+            isFollowing: _isFollowing,
+            onTap: () {
+              setState(() => _isFollowing = !_isFollowing);
+              widget.onFollowTap();
+            },
           ),
         ],
       ),

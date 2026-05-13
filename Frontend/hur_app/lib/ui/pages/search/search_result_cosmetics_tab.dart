@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
+import 'package:hur_app/ui/common/widget/product_more_popup.dart';
+import 'package:hur_app/ui/pages/ranking/detail_ranking_page.dart';
 
 class SearchResultCosmeticsTab extends StatelessWidget {
   const SearchResultCosmeticsTab({super.key});
@@ -69,7 +71,28 @@ class SearchResultCosmeticsTab extends StatelessWidget {
           brandName: p['brand']!,
           productName: p['name']!,
           price: p['price']!,
-          onOpenTap: () {},
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DetailRankingPage(
+                rank: p['rank']!,
+                imagePath: p['image']!,
+                brand: p['brand']!,
+                name: p['name']!,
+              ),
+            ),
+          ),
+          onOpenTap: () => showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            barrierColor: Colors.black.withValues(alpha: 0.25),
+            isScrollControlled: true,
+            builder: (_) => ProductMorePopup(
+              imagePath: p['image']!,
+              brand: p['brand']!,
+              name: p['name']!,
+            ),
+          ),
         );
       },
     );

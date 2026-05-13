@@ -123,6 +123,7 @@ class SearchPageState extends State<SearchPage>
                     textAlignVertical: TextAlignVertical.center,
                     textInputAction: TextInputAction.search,
                     onSubmitted: _onSubmitted,
+                    style: const TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       hintText: '검색어를 입력하세요',
                       prefixIcon: const Icon(
