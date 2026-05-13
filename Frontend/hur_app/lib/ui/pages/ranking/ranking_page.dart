@@ -192,11 +192,34 @@ class _CategorySection extends StatelessWidget {
 }
 
 // TOP3 전체 컴포넌트
-class _Top3Section extends StatelessWidget {
+class _Top3Section extends StatefulWidget {
   final List<RankingProduct> top3;
   final ValueChanged<RankingProduct> onProductTap;
 
   const _Top3Section({required this.top3, required this.onProductTap});
+
+  @override
+  State<_Top3Section> createState() => _Top3SectionState();
+}
+
+class _Top3SectionState extends State<_Top3Section> {
+  late final PageController _pageController;
+  double _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 0.72);
+    _pageController.addListener(() {
+      setState(() => _currentPage = _pageController.page ?? 0);
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -206,59 +229,84 @@ class _Top3Section extends StatelessWidget {
         const _SectionTitle(title: 'TOP3'),
 
         SizedBox(
-          height: 250,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                left: 0,
-                top: 55,
+          height: 240,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: widget.top3.length,
+            itemBuilder: (context, index) {
+              final product = widget.top3[index];
+              final distance = (_currentPage - index).abs();
+              final scale = (1 - distance * 0.12).clamp(0.85, 1.0);
+
+              return Transform.scale(
+                scale: scale,
                 child: GestureDetector(
-                  onTap: () => onProductTap(top3[1]),
-                  child: _TopImage(
-                    imagePath: top3[1].imagePath,
-                    width: 150,
-                    height: 170,
+                  onTap: () => widget.onProductTap(product),
+                  child: Stack(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xffeeeeee),
+                          image: DecorationImage(
+                            image: AssetImage(product.imagePath),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 12,
+                        left: 20,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.55),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '# ${product.rank}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              Positioned(
-                right: 0,
-                top: 55,
-                child: GestureDetector(
-                  onTap: () => onProductTap(top3[2]),
-                  child: _TopImage(
-                    imagePath: top3[2].imagePath,
-                    width: 150,
-                    height: 170,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                child: GestureDetector(
-                  onTap: () => onProductTap(top3[0]),
-                  child: _TopImage(
-                    imagePath: top3[0].imagePath,
-                    width: 255,
-                    height: 210,
-                  ),
-                ),
-              ),
-            ],
+              );
+            },
           ),
         ),
 
-        const Center(
-          child: Text(
-            '•  •  •',
-            style: TextStyle(
-              fontSize: 24,
-              letterSpacing: 5,
-              color: Colors.black,
-            ),
+        const SizedBox(height: 12),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            widget.top3.length,
+            (i) {
+              final isActive = _currentPage.round() == i;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: isActive ? 18 : 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: isActive ? Colors.black : Colors.black26,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              );
+            },
           ),
         ),
+
+        const SizedBox(height: 4),
       ],
     );
   }
@@ -296,30 +344,7 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-// TOP3 이미지 컴포넌트
-class _TopImage extends StatelessWidget {
-  final String imagePath;
-  final double width;
-  final double height;
 
-  const _TopImage({
-    required this.imagePath,
-    required this.width,
-    required this.height,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: const Color(0xffeeeeee),
-        image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
-      ),
-    );
-  }
-}
 
 // TOP20 리스트 컴포넌트
 class _RankingListSection extends StatelessWidget {
@@ -393,7 +418,7 @@ class _RankingItemState extends State<_RankingItem> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.25),
+      barrierColor: Colors.black.withValues(alpha: 0.25),
       isScrollControlled: true,
       builder: (context) {
         return RankingMorePopup(
@@ -418,7 +443,7 @@ class _RankingItemState extends State<_RankingItem> {
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.18),
+              color: Colors.black.withValues(alpha: 0.18),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

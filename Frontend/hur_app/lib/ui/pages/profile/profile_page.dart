@@ -14,17 +14,7 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 5),
-            MainHeader(
-              title: '프로필',
-              trailing: IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.settings_outlined,
-                  color: Colors.purple,
-                  size: 28,
-                ),
-              ),
-            ),
+            MainHeader(title: '프로필'),
             const SizedBox(height: 5),
             Container(
               height: 1,
