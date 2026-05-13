@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
+import 'package:hur_app/ui/common/widget/side_drawer.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'detail/detail_home_page.dart';
 
@@ -32,6 +33,7 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
+        drawer: const SideDrawer(),
         body: Column(
           children: [
             MainHeader(
@@ -149,7 +151,7 @@ class _HomeHeader extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 10),
             child: IconButton(
-              onPressed: () {},
+              onPressed: () => Scaffold.of(context).openDrawer(),
               icon: const Icon(
                 Symbols.menu,
                 size: 25,
