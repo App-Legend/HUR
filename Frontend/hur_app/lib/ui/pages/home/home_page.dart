@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/side_drawer.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+
 import 'detail/detail_home_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -186,7 +187,9 @@ class _HomeHeader extends StatelessWidget {
             child: Stack(
               children: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('알림 기능은 준비 중입니다.')),
+                  ),
                   icon: const Icon(
                     Symbols.notifications_none,
                     size: 28,
