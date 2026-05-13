@@ -15,15 +15,27 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0; // final 빼기
+  int _currentIndex = 0;
+  final FocusNode _searchFocusNode = FocusNode();
+  late final List<Widget> _pages;
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const RankingPage(),
-    const UploadPage(),
-    const SearchPage(),
-    const ProfilePage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      const HomePage(),
+      const RankingPage(),
+      const UploadPage(),
+      SearchPage(focusNode: _searchFocusNode),
+      const ProfilePage(),
+    ];
+  }
+
+  @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +49,13 @@ class _MainPageState extends State<MainPage> {
       bottomNavigationBar: BottomNav(
         currentIndex: _currentIndex,
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          if (index == _currentIndex && index == 3) {
+            _searchFocusNode.unfocus();
+          } else {
+            setState(() {
+              _currentIndex = index;
+            });
+          }
         },
       ),
     );

@@ -20,20 +20,29 @@ class TagSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 12)),
+        Text(title, style: const TextStyle(fontSize: 12, color: Colors.black)),
+
         const SizedBox(height: 10),
-        Wrap(
-          spacing: 4,
-          runSpacing: 8,
-          children: tags.map((tag) {
-            return CategoryChip(
-              text: tag,
-              selected: selectedTags.contains(tag),
-              onTap: () => onTap(tag),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              fontSize: 11,
-            );
-          }).toList(),
+
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: tags.map((tag) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: CategoryChip(
+                  text: tag,
+                  selected: selectedTags.contains(tag),
+                  onTap: () => onTap(tag),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  fontSize: 11,
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
