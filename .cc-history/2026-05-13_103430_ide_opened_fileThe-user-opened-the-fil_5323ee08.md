@@ -6,8 +6,8 @@
 | **Session ID** | `5323ee08-c8d8-4a80-b019-7ff38fb68429` |
 | **Working Dir** | `c:\Hur\HUR` |
 | **Started** | 2026. 5. 13. 오전 10:34:30 |
-| **Last Updated** | 2026. 5. 13. 오전 10:50:02 |
-| **Messages** | 49 |
+| **Last Updated** | 2026. 5. 13. 오전 11:14:39 |
+| **Messages** | 75 |
 
 ---
 
@@ -658,6 +658,400 @@ The file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\home\detail\widgets\detail_pro
 ## Assistant <sup>2026. 5. 13. 오전 10:50:02</sup>
 
 프로필 사진과 닉네임 각각에 `GestureDetector`를 달아서 `UserFeedPage`로 이동하도록 했습니다.
+
+
+---
+
+## User <sup>2026. 5. 13. 오전 11:10:47</sup>
+
+<ide_opened_file>The user opened the file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\home\detail\detail_home_page.dart in the IDE. This may or may not be related to the current task.</ide_opened_file>
+
+@Frontend/hur_app/lib/ui/pages/ranking/ranking_page.dart  여기에서 top3 사진들 양옆으로 스와이프 할 수 있는 기능으로 ㄱㄱ
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:11:12</sup>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:11:12</sup>
+
+`_Top3Section`을 `StatefulWidget`으로 교체해서 `PageView` 기반 스와이프로 만들겠습니다.
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:11:23</sup>
+
+<details>
+<summary>Tool: <code>Edit</code></summary>
+
+```json
+{
+  "replace_all": false,
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\ranking\\ranking_page.dart",
+  "old_string": "// TOP3 전체 컴포넌트\nclass _Top3Section extends StatelessWidget {\n  final List<RankingProduct> top3;\n  final ValueChanged<RankingProduct> onProductTap;\n\n  const _Top3Section({required this.top3, required this.onProductTap});\n\n  @override\n  Widget build(BuildContext context) {\n    return Column(\n      crossAxisAlignment: CrossAxisAlignment.start,\n      children: [\n        const _SectionTitle(title: 'TOP3'),\n\n        SizedBox(\n          height: 250,\n          child: Stack(\n            alignment: Alignment.center,\n            children: [\n              Positioned(\n                left: 0,\n                top: 55,\n                child: GestureDetector(\n                  onTap: () => onProductTap(top3[1]),\n                  child: _TopImage(\n                    imagePath: top3[1].imagePath,\n                    width: 150,\n                    height: 170,\n                  ),\n                ),\n              ),\n              Positioned(\n                right: 0,\n                top: 55,\n                child: GestureDetector(\n                  onTap: () => onProductTap(top3[2]),\n                  child: _TopImage(\n                    imagePath: top3[2].imagePath,\n                    width: 150,\n                    height: 170,\n                  ),\n                ),\n              ),\n              Positioned(\n                top: 0,\n                child: GestureDetector(\n                  onTap: () => onProductTap(top3[0]),\n                  child: _TopImage(\n                    imagePath: top3[0].imagePath,\n                    width: 255,\n                    height: 210,\n                  ),\n                ),\n              ),\n            ],\n          ),\n        ),\n\n        const Center(\n          child: Text(\n            '•  •  •',\n            style: TextStyle(\n              font
+...(truncated)
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 5. 13. 오전 11:11:38</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+The file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\ranking\ranking_page.dart has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:11:43</sup>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:11:43</sup>
+
+미사용 `_TopImage` 클래스 제거 + `withOpacity` → `withValues` 교체하겠습니다.
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:11:44</sup>
+
+<details>
+<summary>Tool: <code>Read</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\ranking\\ranking_page.dart",
+  "offset": 325,
+  "limit": 30
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 5. 13. 오전 11:11:44</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+325	      ),
+326	    );
+327	  }
+328	}
+329	
+330	// TOP3 이미지 컴포넌트
+331	class _TopImage extends StatelessWidget {
+332	  final String imagePath;
+333	  final double width;
+334	  final double height;
+335	
+336	  const _TopImage({
+337	    required this.imagePath,
+338	    required this.width,
+339	    required this.height,
+340	  });
+341	
+342	  @override
+343	  Widget build(BuildContext context) {
+344	    return Container(
+345	      width: width,
+346	      height: height,
+347	      decoration: BoxDecoration(
+348	        color: const Color(0xffeeeeee),
+349	        image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
+350	      ),
+351	    );
+352	  }
+353	}
+354
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:11:45</sup>
+
+<details>
+<summary>Tool: <code>Read</code></summary>
+
+```json
+{
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\ranking\\ranking_page.dart",
+  "offset": 405,
+  "limit": 35
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 5. 13. 오전 11:11:45</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+405	  bool isMoreSelected = false;
+406	
+407	  void _showMorePopup() {
+408	    showModalBottomSheet(
+409	      context: context,
+410	      backgroundColor: Colors.transparent,
+411	      barrierColor: Colors.black.withOpacity(0.25),
+412	      isScrollControlled: true,
+413	      builder: (context) {
+414	        return RankingMorePopup(
+415	          imagePath: widget.imagePath,
+416	          brand: widget.brand,
+417	          name: widget.name,
+418	        );
+419	      },
+420	    );
+421	  }
+422	
+423	  @override
+424	  Widget build(BuildContext context) {
+425	    return GestureDetector(
+426	      onTap: widget.onTap,
+427	      child: Container(
+428	        height: 80,
+429	        margin: const EdgeInsets.only(bottom: 14),
+430	        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+431	        decoration: BoxDecoration(
+432	          color: Colors.white,
+433	          borderRadius: BorderRadius.circular(22),
+434	          boxShadow: [
+435	            BoxShadow(
+436	       
+...(truncated)
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:11:49</sup>
+
+<details>
+<summary>Tool: <code>Edit</code></summary>
+
+```json
+{
+  "replace_all": false,
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\ranking\\ranking_page.dart",
+  "old_string": "// TOP3 이미지 컴포넌트\nclass _TopImage extends StatelessWidget {\n  final String imagePath;\n  final double width;\n  final double height;\n\n  const _TopImage({\n    required this.imagePath,\n    required this.width,\n    required this.height,\n  });\n\n  @override\n  Widget build(BuildContext context) {\n    return Container(\n      width: width,\n      height: height,\n      decoration: BoxDecoration(\n        color: const Color(0xffeeeeee),\n        image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),\n      ),\n    );\n  }\n}\n",
+  "new_string": "\n"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 5. 13. 오전 11:11:52</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+The file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\ranking\ranking_page.dart has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:11:55</sup>
+
+<details>
+<summary>Tool: <code>Edit</code></summary>
+
+```json
+{
+  "replace_all": false,
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\ranking\\ranking_page.dart",
+  "old_string": "                        color: Colors.black.withOpacity(0.55),",
+  "new_string": "                        color: Colors.black.withValues(alpha: 0.55),"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 5. 13. 오전 11:11:58</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+The file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\ranking\ranking_page.dart has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:12:01</sup>
+
+<details>
+<summary>Tool: <code>Edit</code></summary>
+
+```json
+{
+  "replace_all": false,
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\ranking\\ranking_page.dart",
+  "old_string": "      barrierColor: Colors.black.withOpacity(0.25),",
+  "new_string": "      barrierColor: Colors.black.withValues(alpha: 0.25),"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 5. 13. 오전 11:12:03</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+The file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\ranking\ranking_page.dart has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:12:06</sup>
+
+<details>
+<summary>Tool: <code>Edit</code></summary>
+
+```json
+{
+  "replace_all": false,
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\ranking\\ranking_page.dart",
+  "old_string": "              color: Colors.black.withOpacity(0.18),",
+  "new_string": "              color: Colors.black.withValues(alpha: 0.18),"
+}
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 5. 13. 오전 11:12:08</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+The file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\ranking\ranking_page.dart has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:12:11</sup>
+
+`_TopImage` 클래스 삭제, `withOpacity` 3곳 모두 `withValues`로 교체 완료했습니다.
+
+
+---
+
+## User <sup>2026. 5. 13. 오전 11:13:54</sup>
+
+<ide_opened_file>The user opened the file c:\Hur\HUR\Frontend\hur_app\lib\main.dart in the IDE. This may or may not be related to the current task.</ide_opened_file>
+
+사진 세개가 다 보이는데 두개는 뒤에 숨어있다 넘길때 보이는 사진이 크게 이런 식으로 못만드나?
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:14:16</sup>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:14:17</sup>
+
+`PageController`에 `viewportFraction`을 적용하고 현재 페이지를 크게, 양옆을 작게 스케일링하는 방식으로 바꾸겠습니다.
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:14:29</sup>
+
+<details>
+<summary>Tool: <code>Edit</code></summary>
+
+```json
+{
+  "replace_all": false,
+  "file_path": "c:\\Hur\\HUR\\Frontend\\hur_app\\lib\\ui\\pages\\ranking\\ranking_page.dart",
+  "old_string": "class _Top3SectionState extends State<_Top3Section> {\n  final PageController _pageController = PageController();\n  int _currentPage = 0;\n\n  @override\n  void dispose() {\n    _pageController.dispose();\n    super.dispose();\n  }\n\n  @override\n  Widget build(BuildContext context) {\n    return Column(\n      crossAxisAlignment: CrossAxisAlignment.start,\n      children: [\n        const _SectionTitle(title: 'TOP3'),\n\n        SizedBox(\n          height: 220,\n          child: PageView.builder(\n            controller: _pageController,\n            itemCount: widget.top3.length,\n            onPageChanged: (index) => setState(() => _currentPage = index),\n            itemBuilder: (context, index) {\n              final product = widget.top3[index];\n              return GestureDetector(\n                onTap: () => widget.onProductTap(product),\n                child: Stack(\n                  children: [\n                    Container(\n                      margin: const EdgeInsets.symmetric(horizontal: 4),\n                      decoration: BoxDecoration(\n                        color: const Color(0xffeeeeee),\n                        image: DecorationImage(\n                          image: AssetImage(product.imagePath),\n                          fit: BoxFit.cover,\n                        ),\n                      ),\n                    ),\n                    Positioned(\n                      top: 12,\n                      left: 20,\n                      child: Container(\n                        padding: const EdgeInsets.symmetric(\n                          horizontal: 12,\n                          vertical: 4,\n                        ),\n                        decoration: BoxDecoration(\n                          color: Colors.black.withValues(alpha: 0.55),\n                          borderRadius: BorderRad
+...(truncated)
+```
+
+</details>
+
+
+---
+
+## User <sup>2026. 5. 13. 오전 11:14:32</sup>
+
+<details>
+<summary>Tool Result</summary>
+
+```
+The file c:\Hur\HUR\Frontend\hur_app\lib\ui\pages\ranking\ranking_page.dart has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+
+---
+
+## Assistant <sup>2026. 5. 13. 오전 11:14:39</sup>
+
+완료했습니다. 변경 내용:
+
+- `PageController(viewportFraction: 0.72)` — 현재 페이지가 72% 너비를 차지하고 양옆 페이지가 살짝 보임
+- `_pageController.addListener` — 스와이프 중 실시간 위치(`double`) 추적
+- `Transform.scale` — 현재 페이지는 100%, 옆 페이지는 거리에 따라 최대 85%까지 축소
+- 도트 인디케이터도 `_currentPage.round()`로 부드럽게 연동
 
 
 ---
