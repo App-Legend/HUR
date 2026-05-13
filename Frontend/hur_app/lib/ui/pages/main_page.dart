@@ -43,8 +43,13 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       backgroundColor: Colors.white,
 
-      body: SafeArea(
-        child: Column(children: [Expanded(child: _pages[_currentIndex])]),
+      body: MediaQuery.removePadding(
+        context: context,
+        removeBottom: true,
+        child: SafeArea(
+          bottom: false,
+          child: Column(children: [Expanded(child: _pages[_currentIndex])]),
+        ),
       ),
 
       bottomNavigationBar: BottomNav(
@@ -58,22 +63,6 @@ class _MainPageState extends State<MainPage> {
             });
           }
         },
-      ),
-    );
-  }
-}
-
-class _PlaceholderPage extends StatelessWidget {
-  final String label;
-
-  const _PlaceholderPage({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 24, color: Colors.grey),
       ),
     );
   }

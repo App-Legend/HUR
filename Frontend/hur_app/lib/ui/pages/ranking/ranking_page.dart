@@ -138,18 +138,22 @@ class _RankingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const MainHeader(
-          title: '내 추구미 랭킹',
-          subtitle: '피드 기반으로 측정됩니다',
-          padding: EdgeInsets.fromLTRB(18, 20, 18, 7),
-        ),
-
-        const SizedBox(height: 5),
-
-        Container(height: 1, color: const Color.fromARGB(255, 206, 206, 206)),
-      ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: const MainHeader(
+        title: '내 추구미 랭킹',
+        subtitle: '피드 기반으로 측정됩니다',
+        padding: EdgeInsets.fromLTRB(18, 20, 18, 14),
+      ),
     );
   }
 }
@@ -373,7 +377,7 @@ class _RankingListSection extends StatelessWidget {
             showModalBottomSheet(
               context: context,
               backgroundColor: Colors.transparent,
-              barrierColor: Colors.black.withOpacity(0.25),
+              barrierColor: Colors.black.withValues(alpha: 0.25),
               isScrollControlled: true,
               builder: (context) {
                 return ProductMorePopup(

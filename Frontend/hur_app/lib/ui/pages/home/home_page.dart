@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
+import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 import 'package:hur_app/ui/common/widget/side_drawer.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
@@ -15,21 +16,36 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String selectedTab = '발견';
 
+  // TODO: 백엔드 연동 시 API 응답으로 교체 — 이미지 추가 시 이 숫자만 올려주면 됨
+  //앞으로 이미지 추가 시 _totalImages 숫자만 올리면 되고, 나중에 백엔드 연동할 때는 List.generate(...) 부분을 API 응답으로 교체하면 됨
+  static const int _totalImages = 13;
+
   @override
   Widget build(BuildContext context) {
-    final leftImages = [
-      'assets/images/home/home1.jpg',
-      'AD',
-      'assets/images/home/home2.jpg',
-      'assets/images/home/home3.jpg',
-    ];
+    // TODO: 백엔드 연동 시 label을 API 응답의 username/title로 교체 (null이면 텍스트 행 미표시)
+    const sampleLabels = <int, String>{
+      1: 'Catasters',
+      3: 'aesthetic.daily',
+      6: 'lookbook_kr',
+    };
+    final allItems = List.generate(
+      _totalImages,
+      (i) => (
+        path: 'assets/images/home/home${i + 1}.jpg',
+        label: sampleLabels[i + 1],
+      ),
+    );
 
-    final rightImages = [
-      'assets/images/home/home4.jpg',
-      'assets/images/home/home5.jpg',
-      'assets/images/home/home6.jpg',
-      'assets/images/home/home7.jpg',
-    ];
+    // 짝수 인덱스 → 왼쪽 열, 홀수 인덱스 → 오른쪽 열
+    final leftItems = <({String path, String? label})>[];
+    final rightItems = <({String path, String? label})>[];
+    for (int i = 0; i < allItems.length; i++) {
+      if (i.isEven) {
+        leftItems.add(allItems[i]);
+      } else {
+        rightItems.add(allItems[i]);
+      }
+    }
 
     return SafeArea(
       child: Scaffold(
@@ -56,63 +72,51 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: selectedTab == '발견'
                   ? Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 10,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: SingleChildScrollView(
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
                               child: Column(
-                                children: leftImages.map((item) {
-                                  if (item == 'AD') {
-                                    return const _AdBox();
-                                  }
-
+                                children: leftItems.map((item) {
                                   return GestureDetector(
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) =>
-                                              DetailHomePage(imagePath: item),
+                                          builder: (_) => DetailHomePage(
+                                              imagePath: item.path),
                                         ),
                                       );
                                     },
                                     child: _ImageCard(
-                                      imagePath: item,
-                                      height: 160,
+                                      imagePath: item.path,
+                                      label: item.label,
                                     ),
                                   );
                                 }).toList(),
                               ),
                             ),
 
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 8),
 
                             Expanded(
                               child: Column(
-                                children: rightImages.asMap().entries.map((
-                                  entry,
-                                ) {
-                                  final index = entry.key;
-                                  final item = entry.value;
-
+                                children: rightItems.map((item) {
                                   return GestureDetector(
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) =>
-                                              DetailHomePage(imagePath: item),
+                                          builder: (_) => DetailHomePage(
+                                              imagePath: item.path),
                                         ),
                                       );
                                     },
                                     child: _ImageCard(
-                                      imagePath: item,
-                                      height: index == 0 ? 300 : 130,
+                                      imagePath: item.path,
+                                      label: item.label,
                                     ),
                                   );
                                 }).toList(),
@@ -262,19 +266,54 @@ class _HeaderTab extends StatelessWidget {
 
 class _ImageCard extends StatelessWidget {
   final String imagePath;
-  final double height;
+  final String? label;
 
-  const _ImageCard({required this.imagePath, required this.height});
+  const _ImageCard({required this.imagePath, this.label});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      height: height,
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(5),
+            child: Image.asset(
+              imagePath,
+              width: double.infinity,
+              fit: BoxFit.fitWidth,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 6, 0, 0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: label != null
+                      ? Text(
+                          label!,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => showPostMoreOptions(context),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Icon(Icons.more_horiz, size: 18, color: Colors.black54),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
