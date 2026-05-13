@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
-import 'package:hur_app/ui/pages/ranking/widgets/ranking_more_popup.dart';
+import 'package:hur_app/ui/common/widget/product_more_popup.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'detail_ranking_page.dart';
 
@@ -376,7 +376,7 @@ class _RankingListSection extends StatelessWidget {
               barrierColor: Colors.black.withOpacity(0.25),
               isScrollControlled: true,
               builder: (context) {
-                return RankingMorePopup(
+                return ProductMorePopup(
                   imagePath: item.imagePath,
                   brand: item.brand,
                   name: item.name,
@@ -421,7 +421,7 @@ class _RankingItemState extends State<_RankingItem> {
       barrierColor: Colors.black.withValues(alpha: 0.25),
       isScrollControlled: true,
       builder: (context) {
-        return RankingMorePopup(
+        return ProductMorePopup(
           imagePath: widget.imagePath,
           brand: widget.brand,
           name: widget.name,

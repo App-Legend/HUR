@@ -25,7 +25,9 @@ class ProductItemContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
@@ -108,6 +110,7 @@ class ProductItemContainer extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }
