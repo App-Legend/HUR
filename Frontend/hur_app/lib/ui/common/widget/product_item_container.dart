@@ -1,37 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class ProductItemContainer extends StatelessWidget {
+  final String? rank;
   final String imagePath;
   final String brandName;
   final String productName;
   final String price;
+  final VoidCallback? onTap;
   final VoidCallback onOpenTap;
+  final IconData? trailingIcon;
 
   const ProductItemContainer({
     super.key,
+    this.trailingIcon,
+    this.rank,
     required this.imagePath,
     required this.brandName,
     required this.productName,
     required this.price,
     required this.onOpenTap,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xfff7f7f7),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.09),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
+          if (rank != null) ...[
+            Text(
+              rank!,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 14),
+          ],
+
+          const SizedBox(width: 14),
+
           ClipRRect(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(10),
             child: Image.asset(
               imagePath,
-              width: 48,
-              height: 48,
+              width: 52,
+              height: 52,
               fit: BoxFit.cover,
             ),
           ),
@@ -40,49 +69,41 @@ class ProductItemContainer extends StatelessWidget {
 
           Expanded(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   brandName,
-                  style: const TextStyle(
-                    color: Color(0xffaaaaaa),
-                    fontSize: 10,
-                  ),
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Text(
                   productName,
-                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
+                    fontSize: 12,
                     color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w100,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
           ),
 
-          const SizedBox(width: 10),
-
-          Text(
-            price,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
           GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: onOpenTap,
-            child: const Icon(
-              Icons.open_in_new,
-              color: Color(0xffc9c9c9),
-              size: 18,
+            child: const SizedBox(
+              width: 32,
+              height: 32,
+              child: Center(
+                child: Icon(
+                  Symbols.more_horiz,
+                  size: 24,
+                  color: Colors.black,
+                  weight: 400,
+                ),
+              ),
             ),
           ),
         ],

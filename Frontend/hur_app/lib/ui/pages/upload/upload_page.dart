@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:hur_app/ui/pages/upload/product_tag_page.dart';
 import 'package:hur_app/ui/pages/upload/widgets/tag_section.dart';
 import 'package:hur_app/ui/pages/upload/widgets/upload_image_box.dart';
 import 'package:hur_app/ui/pages/upload/widgets/upload_input_box.dart';
@@ -8,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:hur_app/ui/pages/upload/widgets/public_scope_page.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class UploadPage extends StatefulWidget {
   const UploadPage({super.key});
@@ -74,7 +76,12 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   void _openProductTagPage() {
-    // TODO: 화장품 태그 화면 연결
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProductTagPage(selectedImage: _selectedImage),
+      ),
+    );
   }
 
   void _submitPost() {
@@ -106,7 +113,7 @@ class _UploadPageState extends State<UploadPage> {
 
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(30, 22, 30, 24),
+                padding: const EdgeInsets.fromLTRB(18, 22, 18, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -116,9 +123,17 @@ class _UploadPageState extends State<UploadPage> {
                     ),
                     const SizedBox(height: 10),
 
-                    UploadImageBox(
-                      selectedImage: _selectedImage,
-                      onTap: _pickImage,
+                    Padding(
+                      padding: .symmetric(horizontal: 10),
+                      child: Column(
+                        crossAxisAlignment: .start,
+                        children: [
+                          UploadImageBox(
+                            selectedImage: _selectedImage,
+                            onTap: _pickImage,
+                          ),
+                        ],
+                      ),
                     ),
 
                     const SizedBox(height: 16),
@@ -202,7 +217,7 @@ class _UploadPageState extends State<UploadPage> {
                     const SizedBox(height: 28),
 
                     UploadMenuRow(
-                      icon: Icons.location_on_outlined,
+                      icon: Symbols.location_on,
                       title: '제품 태그',
                       onTap: _openProductTagPage,
                     ),
@@ -210,7 +225,7 @@ class _UploadPageState extends State<UploadPage> {
                     const SizedBox(height: 18),
 
                     UploadMenuRow(
-                      icon: Icons.visibility_outlined,
+                      icon: Symbols.visibility_lock,
                       title: '공개 대상',
                       value: _publicScope,
                       onTap: _openPublicScopePage,
@@ -255,26 +270,25 @@ class _UploadPageState extends State<UploadPage> {
                       brandName: '얼터너티브스테레오',
                       productName: '립 포션 카라멜 글레이즈',
                       price: '17,000원',
+                      trailingIcon: Symbols.more_horiz,
                       onOpenTap: _openProductDetail,
                     ),
-
-                    const SizedBox(height: 10),
 
                     ProductItemContainer(
                       imagePath: 'assets/images/ranking/ranking5.jpg',
                       brandName: '퓌',
                       productName: '로즈 옵세션 스테이핏 틴트',
                       price: '18,000원',
+                      trailingIcon: Symbols.more_horiz,
                       onOpenTap: _openProductDetail,
                     ),
-
-                    const SizedBox(height: 10),
 
                     ProductItemContainer(
                       imagePath: 'assets/images/ranking/ranking7.jpg',
                       brandName: '헤라',
                       productName: '센슈얼 누드 글로스',
                       price: '40,000원',
+                      trailingIcon: Symbols.more_horiz,
                       onOpenTap: _openProductDetail,
                     ),
 
