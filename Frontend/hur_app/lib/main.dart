@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hur_app/ui/pages/main_page.dart';
 
+const _navBarStyle = SystemUiOverlayStyle(
+  systemNavigationBarColor: Colors.white,
+  systemNavigationBarIconBrightness: Brightness.dark,
+  systemNavigationBarContrastEnforced: false,
+);
+
 void main() {
-  // 안드로이드 하단 네비게이션 바 색상과 아이콘 밝기 색 변경 (건우)
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ),
-  );
+  SystemChrome.setSystemUIOverlayStyle(_navBarStyle);
   runApp(const MyApp());
 }
 
@@ -19,11 +19,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'HUR',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.black),
-      home: const MainPage(),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: _navBarStyle,
+      child: MaterialApp(
+        title: 'HUR',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.black),
+        home: const MainPage(),
+      ),
     );
   }
 }

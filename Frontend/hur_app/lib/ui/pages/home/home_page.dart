@@ -3,7 +3,6 @@ import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 import 'package:hur_app/ui/common/widget/side_drawer.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'detail/detail_home_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,11 +17,11 @@ class _HomePageState extends State<HomePage> {
 
   // TODO: 백엔드 연동 시 API 응답으로 교체 — 이미지 추가 시 이 숫자만 올려주면 됨
   //앞으로 이미지 추가 시 _totalImages 숫자만 올리면 되고, 나중에 백엔드 연동할 때는 List.generate(...) 부분을 API 응답으로 교체하면 됨
-  static const int _totalImages = 13;
+  static const int _totalImages = 20;
 
   @override
   Widget build(BuildContext context) {
-    // TODO: 백엔드 연동 시 label을 API 응답의 username/title로 교체 (null이면 텍스트 행 미표시)
+    // TODO: 백엔드 연동 시 label을 API 응답의 username/title로 교체 (null이면 텍스트 행 미표시)라고 클로드가 말함
     const sampleLabels = <int, String>{
       1: 'Catasters',
       3: 'aesthetic.daily',
@@ -86,7 +85,8 @@ class _HomePageState extends State<HomePage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => DetailHomePage(
-                                              imagePath: item.path),
+                                            imagePath: item.path,
+                                          ),
                                         ),
                                       );
                                     },
@@ -110,7 +110,8 @@ class _HomePageState extends State<HomePage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => DetailHomePage(
-                                              imagePath: item.path),
+                                            imagePath: item.path,
+                                          ),
                                         ),
                                       );
                                     },
@@ -273,7 +274,7 @@ class _ImageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -286,7 +287,7 @@ class _ImageCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 6, 0, 0),
+            padding: const EdgeInsets.fromLTRB(4, 2, 0, 0),
             child: Row(
               children: [
                 Expanded(
@@ -307,7 +308,11 @@ class _ImageCard extends StatelessWidget {
                   onTap: () => showPostMoreOptions(context),
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Icon(Icons.more_horiz, size: 18, color: Colors.black54),
+                    child: Icon(
+                      Icons.more_horiz,
+                      size: 18,
+                      color: Colors.black54,
+                    ),
                   ),
                 ),
               ],
