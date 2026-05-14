@@ -45,10 +45,13 @@ dependencies:
   #점선
   dotted_border: ^2.1.0
 
+  flutter_native_splash: ^2.4.6
+  shared_preferences: ^2.3.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  
+
   flutter_lints: ^6.0.0
 
   flutter_launcher_icons: ^0.14.3
@@ -61,6 +64,13 @@ flutter_launcher_icons:
 
   adaptive_icon_background: "#000000"
   adaptive_icon_foreground: "assets/icons/app_icon.png"
+
+flutter_native_splash:
+  color: "#000000"
+  android: true
+  ios: true
+  android_12:
+    color: "#000000"
   
 
 # For information on the generic Dart part of this file, see the
@@ -77,6 +87,7 @@ flutter:
     - assets/images/ranking/
     - assets/images/search/
     - assets/icons/
+    - assets/splash/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

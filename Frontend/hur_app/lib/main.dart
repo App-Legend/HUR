@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hur_app/ui/pages/main_page.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:hur_app/ui/pages/splash/splash_page.dart';
 
 const _navBarStyle = SystemUiOverlayStyle(
   systemNavigationBarColor: Colors.white,
@@ -9,7 +10,8 @@ const _navBarStyle = SystemUiOverlayStyle(
 );
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   SystemChrome.setSystemUIOverlayStyle(_navBarStyle);
   runApp(const MyApp());
 }
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
         title: 'HUR',
         debugShowCheckedModeBanner: false,
         theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.black),
-        home: const MainPage(),
+        home: const SplashPage(),
       ),
     );
   }
