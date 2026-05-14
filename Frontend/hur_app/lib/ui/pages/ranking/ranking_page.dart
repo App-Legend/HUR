@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
@@ -209,24 +210,43 @@ class _Top3Section extends StatefulWidget {
 class _Top3SectionState extends State<_Top3Section> {
   late final PageController _pageController;
   double _currentPage = 0;
+  Timer? _autoScrollTimer;
+
+  static const int _virtualMultiplier = 10000;
+
+  int get _initialPage => widget.top3.length * (_virtualMultiplier ~/ 2);
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 0.72);
+    _pageController = PageController(
+      viewportFraction: 0.72,
+      initialPage: _initialPage,
+    );
+    _currentPage = _initialPage.toDouble();
     _pageController.addListener(() {
-      setState(() => _currentPage = _pageController.page ?? 0);
+      setState(() => _currentPage = _pageController.page ?? _currentPage);
+    });
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (_pageController.hasClients) {
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
     });
   }
 
   @override
   void dispose() {
+    _autoScrollTimer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final count = widget.top3.length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -236,9 +256,9 @@ class _Top3SectionState extends State<_Top3Section> {
           height: 240,
           child: PageView.builder(
             controller: _pageController,
-            itemCount: widget.top3.length,
+            itemCount: count * _virtualMultiplier,
             itemBuilder: (context, index) {
-              final product = widget.top3[index];
+              final product = widget.top3[index % count];
               final distance = (_currentPage - index).abs();
               final scale = (1 - distance * 0.12).clamp(0.85, 1.0);
 
@@ -295,7 +315,7 @@ class _Top3SectionState extends State<_Top3Section> {
           children: List.generate(
             widget.top3.length,
             (i) {
-              final isActive = _currentPage.round() == i;
+              final isActive = _currentPage.round() % widget.top3.length == i;
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
