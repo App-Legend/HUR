@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../login_page.dart';
+import 'profile_setup_page.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -29,6 +30,10 @@ class _SignupPageState extends State<SignupPage> {
 
   void _signup() {
     // TODO: 실제 회원가입 로직 연결
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProfileSetupPage()),
+    );
   }
 
   @override
@@ -108,9 +113,8 @@ class _SignupPageState extends State<SignupPage> {
                     color: Colors.black38,
                     size: 20,
                   ),
-                  onPressed:
-                      () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
               const SizedBox(height: 16),
@@ -133,8 +137,8 @@ class _SignupPageState extends State<SignupPage> {
                     color: Colors.black38,
                     size: 20,
                   ),
-                  onPressed:
-                      () => setState(() => _obscureConfirm = !_obscureConfirm),
+                  onPressed: () =>
+                      setState(() => _obscureConfirm = !_obscureConfirm),
                 ),
               ),
               const SizedBox(height: 20),
@@ -145,8 +149,8 @@ class _SignupPageState extends State<SignupPage> {
                     height: 22,
                     child: Checkbox(
                       value: _acceptedPolicy,
-                      onChanged:
-                          (v) => setState(() => _acceptedPolicy = v ?? false),
+                      onChanged: (v) =>
+                          setState(() => _acceptedPolicy = v ?? false),
                       activeColor: const Color(0xFF6B1F8A),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
@@ -169,7 +173,9 @@ class _SignupPageState extends State<SignupPage> {
                   onPressed: _acceptedPolicy ? _signup : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6B1F8A),
-                    disabledBackgroundColor: const Color(0xFF6B1F8A).withValues(alpha: 0.4),
+                    disabledBackgroundColor: const Color(
+                      0xFF6B1F8A,
+                    ).withValues(alpha: 0.4),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -223,16 +229,15 @@ class _SignupPageState extends State<SignupPage> {
                   _SocialButton(
                     onTap: () {},
                     child: ShaderMask(
-                      shaderCallback:
-                          (bounds) => const LinearGradient(
-                            colors: [
-                              Color(0xFFF9ED32),
-                              Color(0xFFEE2A7B),
-                              Color(0xFF002AFF),
-                            ],
-                            begin: Alignment.bottomLeft,
-                            end: Alignment.topRight,
-                          ).createShader(bounds),
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [
+                          Color(0xFFF9ED32),
+                          Color(0xFFEE2A7B),
+                          Color(0xFF002AFF),
+                        ],
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.topRight,
+                      ).createShader(bounds),
                       child: const Icon(
                         Icons.camera_alt_outlined,
                         size: 26,
