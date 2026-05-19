@@ -160,7 +160,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   const SizedBox(width: 10),
                   const Text(
-                    'By continuing you accept our Privacy Policy',
+                    '개인정보 수집 및 이용 동의',
                     style: TextStyle(color: Colors.black54, fontSize: 13),
                   ),
                 ],
