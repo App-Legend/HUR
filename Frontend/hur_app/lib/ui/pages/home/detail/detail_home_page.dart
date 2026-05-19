@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/extensions/snackbar_extension.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/comment_popup.dart';
-import 'package:hur_app/ui/pages/home/detail/popup/product_tag_popup.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/purchase_popup.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/detail_icon_action_bar.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/detail_profile_header.dart';
@@ -81,7 +81,8 @@ class _DetailHomePage extends State<DetailHomePage> {
                   Icons.share_outlined,
                   color: Color(0xff747474),
                 ),
-                onPressed: () {},
+                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('공유 기능은 준비 중입니다.')),)
               ),
               showDivider: false,
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
