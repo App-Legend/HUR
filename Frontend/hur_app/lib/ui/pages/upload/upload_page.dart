@@ -11,6 +11,10 @@ import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:hur_app/ui/pages/upload/widgets/public_scope_page.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+const _kPersonalColors = ['봄 웜톤', '가을 웜톤', '겨울 쿨톤', '여름쿨톤'];
+const _kMoods = ['청순', '시크', '큐티', '섹시', '차분'];
+const _kSkinTones = ['13호 ~ 17호', '21호', '23호', '25호', '27호'];
+
 class UploadPage extends StatefulWidget {
   const UploadPage({super.key});
 
@@ -28,10 +32,6 @@ class _UploadPageState extends State<UploadPage> {
   String _publicScope = '모든 사람';
 
   final Set<String> _selectedTags = {};
-
-  final List<String> _personalColors = ['봄 웜톤', '가을 웜톤', '겨울 쿨톤', '여름쿨톤'];
-  final List<String> _moods = ['청순', '시크', '큐티', '섹시', '차분'];
-  final List<String> _skinTones = ['13호 ~ 17호', '21호', '23호', '25호', '27호'];
 
   @override
   void dispose() {
@@ -75,7 +75,15 @@ class _UploadPageState extends State<UploadPage> {
     });
   }
 
+  //이미지를 선택하지 않았을 시 제품 태그 페이지에 들어가지 못하도록 하고 스낵바를 띄움.
   void _openProductTagPage() {
+    if (_selectedImage == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('이미지를 선택해주세요.')));
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -137,14 +145,9 @@ class _UploadPageState extends State<UploadPage> {
 
                     Padding(
                       padding: .symmetric(horizontal: 10),
-                      child: Column(
-                        crossAxisAlignment: .start,
-                        children: [
-                          UploadImageBox(
-                            selectedImage: _selectedImage,
-                            onTap: _pickImage,
-                          ),
-                        ],
+                      child: UploadImageBox(
+                        selectedImage: _selectedImage,
+                        onTap: _pickImage,
                       ),
                     ),
 
@@ -203,7 +206,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     TagSection(
                       title: '퍼스널 컬러',
-                      tags: _personalColors,
+                      tags: _kPersonalColors,
                       selectedTags: _selectedTags,
                       onTap: _toggleTag,
                     ),
@@ -212,7 +215,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     TagSection(
                       title: '분위기',
-                      tags: _moods,
+                      tags: _kMoods,
                       selectedTags: _selectedTags,
                       onTap: _toggleTag,
                     ),
@@ -221,7 +224,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     TagSection(
                       title: '피부 톤',
-                      tags: _skinTones,
+                      tags: _kSkinTones,
                       selectedTags: _selectedTags,
                       onTap: _toggleTag,
                     ),
@@ -277,31 +280,15 @@ class _UploadPageState extends State<UploadPage> {
 
                     const SizedBox(height: 14),
 
-                    ProductItemContainer(
-                      imagePath: 'assets/images/ranking/rank1.png',
-                      brandName: '얼터너티브스테레오',
-                      productName: '립 포션 카라멜 글레이즈',
-                      price: '17,000원',
-                      trailingIcon: Symbols.more_horiz,
-                      onOpenTap: _openProductDetail,
-                    ),
-
-                    ProductItemContainer(
-                      imagePath: 'assets/images/ranking/ranking5.jpg',
-                      brandName: '퓌',
-                      productName: '로즈 옵세션 스테이핏 틴트',
-                      price: '18,000원',
-                      trailingIcon: Symbols.more_horiz,
-                      onOpenTap: _openProductDetail,
-                    ),
-
-                    ProductItemContainer(
-                      imagePath: 'assets/images/ranking/ranking7.jpg',
-                      brandName: '헤라',
-                      productName: '센슈얼 누드 글로스',
-                      price: '40,000원',
-                      trailingIcon: Symbols.more_horiz,
-                      onOpenTap: _openProductDetail,
+                    ...kUploadProducts.map(
+                      (p) => ProductItemContainer(
+                        imagePath: p.imagePath,
+                        brandName: p.brand,
+                        productName: p.name,
+                        price: p.price,
+                        trailingIcon: Symbols.more_horiz,
+                        onOpenTap: _openProductDetail,
+                      ),
                     ),
 
                     const SizedBox(height: 24),

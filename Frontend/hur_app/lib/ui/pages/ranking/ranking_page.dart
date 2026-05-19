@@ -31,16 +31,51 @@ class RankingProduct {
 }
 
 const _kTop3 = [
-  RankingProduct(rank: '1', imagePath: 'assets/images/ranking/rank1.png', brand: '랭킹 1위 브랜드', name: '랭킹 1위 제품'),
-  RankingProduct(rank: '2', imagePath: 'assets/images/ranking/rank2.png', brand: '랭킹 2위 브랜드', name: '랭킹 2위 제품'),
-  RankingProduct(rank: '3', imagePath: 'assets/images/ranking/rank3.png', brand: '랭킹 3위 브랜드', name: '랭킹 3위 제품'),
+  RankingProduct(
+    rank: '1',
+    imagePath: 'assets/images/ranking/rank1.png',
+    brand: '랭킹 1위 브랜드',
+    name: '랭킹 1위 제품',
+  ),
+  RankingProduct(
+    rank: '2',
+    imagePath: 'assets/images/ranking/rank2.png',
+    brand: '랭킹 2위 브랜드',
+    name: '랭킹 2위 제품',
+  ),
+  RankingProduct(
+    rank: '3',
+    imagePath: 'assets/images/ranking/rank3.png',
+    brand: '랭킹 3위 브랜드',
+    name: '랭킹 3위 제품',
+  ),
 ];
 
 const _kProducts = [
-  RankingProduct(rank: '4', imagePath: 'assets/images/ranking/ranking4.jpg', brand: '얼터너티브스테레오', name: '립 포션 카라멜 글레이즈'),
-  RankingProduct(rank: '5', imagePath: 'assets/images/ranking/ranking5.jpg', brand: '퓌', name: '로즈 옵세션 스테이핏 틴트'),
-  RankingProduct(rank: '6', imagePath: 'assets/images/ranking/ranking6.jpg', brand: '헤라', name: '센슈얼 누드 글로스'),
-  RankingProduct(rank: '7', imagePath: 'assets/images/ranking/ranking7.jpg', brand: '롬앤', name: '글래스팅 컬러 글로스'),
+  RankingProduct(
+    rank: '4',
+    imagePath: 'assets/images/ranking/ranking4.jpg',
+    brand: '얼터너티브스테레오',
+    name: '립 포션 카라멜 글레이즈',
+  ),
+  RankingProduct(
+    rank: '5',
+    imagePath: 'assets/images/ranking/ranking5.jpg',
+    brand: '퓌',
+    name: '로즈 옵세션 스테이핏 틴트',
+  ),
+  RankingProduct(
+    rank: '6',
+    imagePath: 'assets/images/ranking/ranking6.jpg',
+    brand: '헤라',
+    name: '센슈얼 누드 글로스',
+  ),
+  RankingProduct(
+    rank: '7',
+    imagePath: 'assets/images/ranking/ranking7.jpg',
+    brand: '롬앤',
+    name: '글래스팅 컬러 글로스',
+  ),
 ];
 
 // 전체 랭킹 페이지
@@ -306,22 +341,19 @@ class _Top3SectionState extends State<_Top3Section> {
 
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            widget.top3.length,
-            (i) {
-              final isActive = _currentPage.round() % widget.top3.length == i;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: isActive ? 18 : 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: isActive ? Colors.black : Colors.black26,
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              );
-            },
-          ),
+          children: List.generate(widget.top3.length, (i) {
+            final isActive = _currentPage.round() % widget.top3.length == i;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: isActive ? 18 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: isActive ? Colors.black : Colors.black26,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            );
+          }),
         ),
 
         const SizedBox(height: 4),
@@ -361,8 +393,6 @@ class _SectionTitle extends StatelessWidget {
     );
   }
 }
-
-
 
 // TOP20 리스트 컴포넌트
 class _RankingListSection extends StatelessWidget {
