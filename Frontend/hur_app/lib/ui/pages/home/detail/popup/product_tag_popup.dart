@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |    이미지에 태그된 제품 팝업    |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class ProductTagPopup extends StatelessWidget {

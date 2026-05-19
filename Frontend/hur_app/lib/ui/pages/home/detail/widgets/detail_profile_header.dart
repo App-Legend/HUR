@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |   계정 헤더(닉네임/팔로우 버튼)   |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/follow_button.dart';
 import 'package:hur_app/ui/pages/profile/feed/user_feed_page.dart';

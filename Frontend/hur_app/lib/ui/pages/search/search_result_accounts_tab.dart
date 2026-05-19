@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |        검색 후 계정 탭         |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/follow_button.dart';
 
@@ -31,7 +35,8 @@ class _SearchResultAccountsTabState extends State<SearchResultAccountsTab> {
           isFollowing: _accounts[index]['isFollowing'] as bool,
           onFollowToggle: () {
             setState(() {
-              _accounts[index]['isFollowing'] = !(_accounts[index]['isFollowing'] as bool);
+              _accounts[index]['isFollowing'] =
+                  !(_accounts[index]['isFollowing'] as bool);
             });
           },
         );
@@ -59,10 +64,7 @@ class _AccountItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
-          const CircleAvatar(
-            radius: 24,
-            backgroundColor: Color(0xffe0e0e0),
-          ),
+          const CircleAvatar(radius: 24, backgroundColor: Color(0xffe0e0e0)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -87,10 +89,7 @@ class _AccountItem extends StatelessWidget {
               ],
             ),
           ),
-          FollowButton(
-            isFollowing: isFollowing,
-            onTap: onFollowToggle,
-          ),
+          FollowButton(isFollowing: isFollowing, onTap: onFollowToggle),
         ],
       ),
     );

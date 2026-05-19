@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |        검색 후 화장품 탭        |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:hur_app/ui/common/widget/product_more_popup.dart';

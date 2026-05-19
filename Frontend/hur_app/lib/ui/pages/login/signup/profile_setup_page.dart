@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |          프로필 작성           |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class ProfileSetupPage extends StatefulWidget {
@@ -118,7 +122,11 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       children: [
         GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back_ios, size: 20, color: Colors.black),
+          child: const Icon(
+            Icons.arrow_back_ios,
+            size: 20,
+            color: Colors.black,
+          ),
         ),
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
@@ -171,7 +179,10 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
             GestureDetector(
               onTap: () {},
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black87,
                   borderRadius: BorderRadius.circular(20),
@@ -199,7 +210,11 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       decoration: InputDecoration(
         hintText: '홍길동',
         hintStyle: const TextStyle(color: Colors.black38, fontSize: 15),
-        prefixIcon: const Icon(Icons.person_outline, color: Colors.black38, size: 20),
+        prefixIcon: const Icon(
+          Icons.person_outline,
+          color: Colors.black38,
+          size: 20,
+        ),
         filled: true,
         fillColor: _lightGray,
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
@@ -258,9 +273,9 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           firstDate: DateTime(1900),
           lastDate: DateTime.now(),
           builder: (context, child) => Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: const ColorScheme.light(primary: _purple),
-            ),
+            data: Theme.of(
+              context,
+            ).copyWith(colorScheme: const ColorScheme.light(primary: _purple)),
             child: child!,
           ),
         );
@@ -275,7 +290,11 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today_outlined, size: 17, color: Colors.black38),
+            const Icon(
+              Icons.calendar_today_outlined,
+              size: 17,
+              color: Colors.black38,
+            ),
             SizedBox(width: 8),
             Text(
               _birthDate != null
@@ -353,7 +372,10 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       decoration: InputDecoration(
         filled: true,
         fillColor: _lightGray,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,

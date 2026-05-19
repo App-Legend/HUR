@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |    이미지 영역(태그 기능)       |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/product_tag_popup.dart';
 

@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |        다른 사람 프로필         |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 
@@ -166,7 +170,6 @@ class _UserProfileHeader extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _TagChip extends StatelessWidget {

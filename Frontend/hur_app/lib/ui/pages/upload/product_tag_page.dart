@@ -1,5 +1,8 @@
-import 'dart:io';
+//  ————————————————————————————————
+//  |        태그 가능한 페이지        |
+//  ————————————————————————————————
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -19,9 +22,24 @@ class UploadProduct {
 }
 
 const kUploadProducts = [
-  UploadProduct(imagePath: 'assets/images/ranking/rank1.png', brand: '얼터너티브스테레오', name: '립 포션 카라멜 글레이즈', price: '17,000원'),
-  UploadProduct(imagePath: 'assets/images/ranking/ranking5.jpg', brand: '퓌', name: '로즈 옵세션 스테이핏 틴트', price: '18,000원'),
-  UploadProduct(imagePath: 'assets/images/ranking/ranking7.jpg', brand: '헤라', name: '센슈얼 누드 글로스', price: '40,000원'),
+  UploadProduct(
+    imagePath: 'assets/images/ranking/rank1.png',
+    brand: '얼터너티브스테레오',
+    name: '립 포션 카라멜 글레이즈',
+    price: '17,000원',
+  ),
+  UploadProduct(
+    imagePath: 'assets/images/ranking/ranking5.jpg',
+    brand: '퓌',
+    name: '로즈 옵세션 스테이핏 틴트',
+    price: '18,000원',
+  ),
+  UploadProduct(
+    imagePath: 'assets/images/ranking/ranking7.jpg',
+    brand: '헤라',
+    name: '센슈얼 누드 글로스',
+    price: '40,000원',
+  ),
 ];
 
 class ProductTagPage extends StatelessWidget {
@@ -159,7 +177,8 @@ class ProductTagPage extends StatelessWidget {
                         trailingIcon: Symbols.more_horiz,
                         onOpenTap: _openProductDetail,
                       ),
-                      if (i < kUploadProducts.length - 1) const SizedBox(height: 12),
+                      if (i < kUploadProducts.length - 1)
+                        const SizedBox(height: 12),
                     ],
                   ],
                 ),

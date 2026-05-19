@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |      추구미 태그 카테고리       |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
 

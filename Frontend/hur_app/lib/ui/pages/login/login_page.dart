@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../main_page.dart';
 import 'signup/signup_page.dart';
 
@@ -97,9 +96,8 @@ class _LoginPageState extends State<LoginPage> {
                       color: Colors.black38,
                       size: 20,
                     ),
-                    onPressed:
-                        () =>
-                            setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
               ),
@@ -179,16 +177,15 @@ class _LoginPageState extends State<LoginPage> {
                   _SocialButton(
                     onTap: () {},
                     child: ShaderMask(
-                      shaderCallback:
-                          (bounds) => const LinearGradient(
-                            colors: [
-                              Color(0xFFF9ED32),
-                              Color(0xFFEE2A7B),
-                              Color(0xFF002AFF),
-                            ],
-                            begin: Alignment.bottomLeft,
-                            end: Alignment.topRight,
-                          ).createShader(bounds),
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [
+                          Color(0xFFF9ED32),
+                          Color(0xFFEE2A7B),
+                          Color(0xFF002AFF),
+                        ],
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.topRight,
+                      ).createShader(bounds),
                       child: const Icon(
                         Icons.camera_alt_outlined,
                         size: 26,
