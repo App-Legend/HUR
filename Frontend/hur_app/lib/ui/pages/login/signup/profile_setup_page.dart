@@ -77,7 +77,13 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                     const SizedBox(height: 8),
                     _buildNicknameField(),
                     const SizedBox(height: 20),
-                    _buildGenderAndBirthRow(),
+                    _buildFieldLabel('성별'),
+                    const SizedBox(height: 8),
+                    _buildGenderSelector(),
+                    const SizedBox(height: 20),
+                    _buildFieldLabel('생년월일'),
+                    const SizedBox(height: 8),
+                    _buildBirthField(),
                     const SizedBox(height: 20),
                     _buildFieldLabel('퍼스널 컬러'),
                     const SizedBox(height: 10),
@@ -209,37 +215,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     );
   }
 
-  Widget _buildGenderAndBirthRow() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildFieldLabel('성별'),
-              const SizedBox(height: 8),
-              _buildGenderSelector(),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildFieldLabel('생년월일'),
-              const SizedBox(height: 8),
-              _buildBirthField(),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildGenderSelector() {
-    final genders = ['여성', '남성', '기타'];
+    final genders = ['여성', '남성'];
     return Row(
       children: genders.map((g) {
         final selected = _selectedGender == g;
