@@ -4,7 +4,6 @@ import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:hur_app/ui/common/widget/product_more_popup.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'detail_ranking_page.dart';
 
 // 랭킹 상품 데이터 모델
@@ -31,6 +30,19 @@ class RankingProduct {
   }
 }
 
+const _kTop3 = [
+  RankingProduct(rank: '1', imagePath: 'assets/images/ranking/rank1.png', brand: '랭킹 1위 브랜드', name: '랭킹 1위 제품'),
+  RankingProduct(rank: '2', imagePath: 'assets/images/ranking/rank2.png', brand: '랭킹 2위 브랜드', name: '랭킹 2위 제품'),
+  RankingProduct(rank: '3', imagePath: 'assets/images/ranking/rank3.png', brand: '랭킹 3위 브랜드', name: '랭킹 3위 제품'),
+];
+
+const _kProducts = [
+  RankingProduct(rank: '4', imagePath: 'assets/images/ranking/ranking4.jpg', brand: '얼터너티브스테레오', name: '립 포션 카라멜 글레이즈'),
+  RankingProduct(rank: '5', imagePath: 'assets/images/ranking/ranking5.jpg', brand: '퓌', name: '로즈 옵세션 스테이핏 틴트'),
+  RankingProduct(rank: '6', imagePath: 'assets/images/ranking/ranking6.jpg', brand: '헤라', name: '센슈얼 누드 글로스'),
+  RankingProduct(rank: '7', imagePath: 'assets/images/ranking/ranking7.jpg', brand: '롬앤', name: '글래스팅 컬러 글로스'),
+];
+
 // 전체 랭킹 페이지
 class RankingPage extends StatefulWidget {
   const RankingPage({super.key});
@@ -44,24 +56,6 @@ class _RankingPageState extends State<RankingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final top3Data = [
-      ['1', 'assets/images/ranking/rank1.png', '랭킹 1위 브랜드', '랭킹 1위 제품'],
-      ['2', 'assets/images/ranking/rank2.png', '랭킹 2위 브랜드', '랭킹 2위 제품'],
-      ['3', 'assets/images/ranking/rank3.png', '랭킹 3위 브랜드', '랭킹 3위 제품'],
-    ];
-
-    final productsData = [
-      ['4', 'assets/images/ranking/ranking4.jpg', '얼터너티브스테레오', '립 포션 카라멜 글레이즈'],
-      ['5', 'assets/images/ranking/ranking5.jpg', '퓌', '로즈 옵세션 스테이핏 틴트'],
-      ['6', 'assets/images/ranking/ranking6.jpg', '헤라', '센슈얼 누드 글로스'],
-      ['7', 'assets/images/ranking/ranking7.jpg', '롬앤', '글래스팅 컬러 글로스'],
-    ];
-
-    final top3 = top3Data.map((e) => RankingProduct.fromList(e)).toList();
-    final products = productsData
-        .map((e) => RankingProduct.fromList(e))
-        .toList();
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -93,7 +87,7 @@ class _RankingPageState extends State<RankingPage> {
 
                     // TOP3 영역
                     _Top3Section(
-                      top3: top3,
+                      top3: _kTop3,
                       onProductTap: (item) => _goToDetail(context, item),
                     ),
 
@@ -108,7 +102,7 @@ class _RankingPageState extends State<RankingPage> {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               sliver: _RankingListSection(
-                products: products,
+                products: _kProducts,
                 onProductTap: (item) => _goToDetail(context, item),
               ),
             ),
@@ -171,7 +165,7 @@ class _CategorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categories = ['틴트', '렌즈', '볼터치', '섀도우'];
+    const categories = ['틴트', '렌즈', '볼터치', '섀도우'];
 
     return SizedBox(
       height: 36,
@@ -410,140 +404,6 @@ class _RankingListSection extends StatelessWidget {
           },
         );
       }, childCount: products.length),
-    );
-  }
-}
-
-// TOP20 개별 아이템 컴포넌트
-// TOP20 개별 아이템 컴포넌트
-class _RankingItem extends StatefulWidget {
-  final String rank;
-  final String imagePath;
-  final String brand;
-  final String name;
-  final VoidCallback onTap;
-
-  const _RankingItem({
-    required this.rank,
-    required this.imagePath,
-    required this.brand,
-    required this.name,
-    required this.onTap,
-  });
-
-  @override
-  State<_RankingItem> createState() => _RankingItemState();
-}
-
-class _RankingItemState extends State<_RankingItem> {
-  bool isMoreSelected = false;
-
-  void _showMorePopup() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withValues(alpha: 0.25),
-      isScrollControlled: true,
-      builder: (context) {
-        return ProductMorePopup(
-          imagePath: widget.imagePath,
-          brand: widget.brand,
-          name: widget.name,
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: Container(
-        height: 80,
-        margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(22),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.18),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-
-        //Top20 제품 리스트
-        child: Row(
-          children: [
-            Text(
-              widget.rank,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(width: 14),
-
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                widget.imagePath,
-                width: 52,
-                height: 52,
-                fit: BoxFit.cover,
-              ),
-            ),
-
-            const SizedBox(width: 14),
-
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.brand,
-                    style: const TextStyle(fontSize: 10, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.name,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                _showMorePopup();
-              },
-              child: SizedBox(
-                width: 32,
-                height: 32,
-                child: Center(
-                  child: Icon(
-                    Symbols.more_horiz,
-                    size: 24,
-                    color: Colors.black,
-                    weight: 400,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
