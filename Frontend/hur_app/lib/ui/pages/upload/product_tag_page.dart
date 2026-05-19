@@ -4,6 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+class UploadProduct {
+  final String imagePath;
+  final String brand;
+  final String name;
+  final String price;
+
+  const UploadProduct({
+    required this.imagePath,
+    required this.brand,
+    required this.name,
+    this.price = '',
+  });
+}
+
+const kUploadProducts = [
+  UploadProduct(imagePath: 'assets/images/ranking/rank1.png', brand: '얼터너티브스테레오', name: '립 포션 카라멜 글레이즈', price: '17,000원'),
+  UploadProduct(imagePath: 'assets/images/ranking/ranking5.jpg', brand: '퓌', name: '로즈 옵세션 스테이핏 틴트', price: '18,000원'),
+  UploadProduct(imagePath: 'assets/images/ranking/ranking7.jpg', brand: '헤라', name: '센슈얼 누드 글로스', price: '40,000원'),
+];
+
 class ProductTagPage extends StatelessWidget {
   final File? selectedImage;
 
@@ -130,36 +150,17 @@ class ProductTagPage extends StatelessWidget {
 
                     const SizedBox(height: 14),
 
-                    ProductItemContainer(
-                      imagePath: 'assets/images/ranking/rank1.png',
-                      brandName: '얼터너티브스테레오',
-                      productName: '립 포션 카라멜 글레이즈',
-                      price: '',
-                      trailingIcon: Symbols.more_horiz,
-                      onOpenTap: _openProductDetail,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    ProductItemContainer(
-                      imagePath: 'assets/images/ranking/ranking5.jpg',
-                      brandName: '퓌',
-                      productName: '로즈 옵세션 스테이핏 틴트',
-                      price: '',
-                      trailingIcon: Symbols.more_horiz,
-                      onOpenTap: _openProductDetail,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    ProductItemContainer(
-                      imagePath: 'assets/images/ranking/ranking7.jpg',
-                      brandName: '헤라',
-                      productName: '센슈얼 누드 글로스',
-                      price: '',
-                      trailingIcon: Symbols.more_horiz,
-                      onOpenTap: _openProductDetail,
-                    ),
+                    for (int i = 0; i < kUploadProducts.length; i++) ...[
+                      ProductItemContainer(
+                        imagePath: kUploadProducts[i].imagePath,
+                        brandName: kUploadProducts[i].brand,
+                        productName: kUploadProducts[i].name,
+                        price: '',
+                        trailingIcon: Symbols.more_horiz,
+                        onOpenTap: _openProductDetail,
+                      ),
+                      if (i < kUploadProducts.length - 1) const SizedBox(height: 12),
+                    ],
                   ],
                 ),
               ),
