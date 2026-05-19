@@ -4,8 +4,23 @@
 
 import 'package:flutter/material.dart';
 
-class CommentPopup extends StatelessWidget {
+class CommentPopup extends StatefulWidget {
   const CommentPopup({super.key});
+
+  @override
+  State<CommentPopup> createState() => _CommentPopupState();
+}
+
+class _CommentPopupState extends State<CommentPopup> {
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +95,71 @@ class CommentPopup extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return const CommentItem();
                   },
+                ),
+              ),
+
+              const Divider(height: 1, color: Color(0xffeeeeee)),
+
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 10,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 10,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: const BoxDecoration(
+                        color: Color(0xffdddddd),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        focusNode: _focusNode,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: '댓글을 입력하세요...',
+                          hintStyle: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xffaaaaaa),
+                          ),
+                          filled: true,
+                          fillColor: const Color(0xfff5f5f5),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () {
+                        if (_controller.text.trim().isNotEmpty) {
+                          _controller.clear();
+                          _focusNode.unfocus();
+                        }
+                      },
+                      child: const Icon(
+                        Icons.send_rounded,
+                        color: Color(0xff690673),
+                        size: 26,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
