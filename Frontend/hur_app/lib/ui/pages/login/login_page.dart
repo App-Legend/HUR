@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../main_page.dart';
+import 'popup/forgot_password_popup.dart';
 import 'signup/signup_page.dart';
+import 'package:hur_app/app/extensions/sized_box_extension.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -103,15 +105,23 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () => showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    barrierColor: Colors.black.withValues(alpha: 0.25),
+                    isScrollControlled: true,
+                    builder: (_) => const ForgotPasswordPopup(),
+                  ),
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
+                  
                   child: const Text(
                     '비밀번호를 잊으셨나요?',
                     style: TextStyle(color: Colors.black54, fontSize: 13),
