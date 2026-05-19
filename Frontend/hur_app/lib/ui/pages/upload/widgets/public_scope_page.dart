@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |     공개 대상 선택 페이지      |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -78,7 +82,8 @@ class _PublicScopePageState extends State<PublicScopePage> {
                         selected: _selectedScope == _kScopeOptions[i].title,
                         onTap: () => _selectScope(_kScopeOptions[i].title),
                       ),
-                      if (i < _kScopeOptions.length - 1) const SizedBox(height: 22),
+                      if (i < _kScopeOptions.length - 1)
+                        const SizedBox(height: 22),
                     ],
                   ],
                 ),

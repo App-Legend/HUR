@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  | 제품 태그/공개 대상 row 컴포넌트 |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class UploadMenuRow extends StatelessWidget {

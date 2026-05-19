@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |          댓글창 팝업           |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class CommentPopup extends StatefulWidget {

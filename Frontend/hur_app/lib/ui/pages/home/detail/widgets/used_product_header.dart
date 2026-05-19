@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |  사용한 제품(텍스트/아이콘) 헤더  |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 

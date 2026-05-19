@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |        제목/설명 작성란         |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class UploadInputBox extends StatelessWidget {

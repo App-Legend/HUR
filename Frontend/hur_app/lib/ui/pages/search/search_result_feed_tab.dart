@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |        검색 후 피드 탭         |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class SearchResultFeedTab extends StatelessWidget {

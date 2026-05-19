@@ -1,6 +1,9 @@
+//  ————————————————————————————————
+//  |     로그인 전 프로필 페이지      |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
-
 import '../login/login_page.dart';
 
 class ProfilePage extends StatelessWidget {

@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |         피드 상세 페이지        |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/app/extensions/snackbar_extension.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';

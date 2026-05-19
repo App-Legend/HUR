@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |       사용한 제품 리스트        |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:hur_app/ui/pages/ranking/detail_ranking_page.dart';

@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |      좋아요/댓글/북마크 바      |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
