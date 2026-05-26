@@ -3,6 +3,7 @@ import 'package:hur_app/ui/common/widget/category_chip.dart';
 
 class TagSection extends StatelessWidget {
   final String title;
+  final String? hint;
   final List<String> tags;
   final Set<String> selectedTags;
   final void Function(String tag) onTap;
@@ -10,6 +11,7 @@ class TagSection extends StatelessWidget {
   const TagSection({
     super.key,
     required this.title,
+    this.hint,
     required this.tags,
     required this.selectedTags,
     required this.onTap,
@@ -20,7 +22,18 @@ class TagSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 12, color: Colors.black)),
+        Row(
+          children: [
+            Text(title, style: const TextStyle(fontSize: 12, color: Colors.black)),
+            if (hint != null) ...[
+              const SizedBox(width: 8),
+              Text(
+                hint!,
+                style: const TextStyle(fontSize: 11, color: Color(0xffaaaaaa)),
+              ),
+            ],
+          ],
+        ),
 
         const SizedBox(height: 10),
 
