@@ -227,7 +227,7 @@ class _UploadPageState extends State<UploadPage> {
 
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://15.164.231.59:3000/post'),
+        Uri.parse('http://15.164.231.59/post'),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
