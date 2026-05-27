@@ -1,14 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/pages/upload/product_search_sheet.dart';
-import 'package:hur_app/ui/pages/upload/upload_login_gate.dart';
+import 'package:hur_app/ui/pages/upload/widgets/public_scope_page.dart';
 import 'package:hur_app/ui/pages/upload/widgets/tag_section.dart';
 import 'package:hur_app/ui/pages/upload/widgets/upload_image_box.dart';
 import 'package:hur_app/ui/pages/upload/widgets/upload_input_box.dart';
 import 'package:hur_app/ui/pages/upload/widgets/upload_menu_row.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:hur_app/ui/common/headers/main_header.dart';
-import 'package:hur_app/ui/pages/upload/widgets/public_scope_page.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,6 +39,7 @@ class UploadPage extends StatefulWidget {
 
 class _UploadPageState extends State<UploadPage> {
   bool? _isLoggedIn;
+  bool _isLoading = false;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -197,7 +200,7 @@ class _UploadPageState extends State<UploadPage> {
     });
   }
 
-  void _submitPost() {
+  Future<void> _submitPost() async {
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('제목을 입력해주세요.')),
@@ -216,7 +219,67 @@ class _UploadPageState extends State<UploadPage> {
       return;
     }
 
-    // TODO: 게시물 저장 로직
+    setState(() => _isLoading = true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://15.164.231.59:3000/post'),
+      );
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      if (_selectedImage != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath('image', _selectedImage!.path),
+        );
+      }
+
+      request.fields['title'] = _titleController.text.trim();
+      request.fields['description'] = _descriptionController.text.trim();
+      request.fields['personalColors'] = jsonEncode(
+        _selectedPersonalColors.toList(),
+      );
+      request.fields['moods'] = jsonEncode(_selectedMoods.toList());
+      request.fields['skinTones'] = jsonEncode(_selectedSkinTones.toList());
+      request.fields['stickers'] = jsonEncode(
+        _stickers
+            .map(
+              (s) => {
+                'xRatio': s.xRatio,
+                'yRatio': s.yRatio,
+                'brandName': s.brandName,
+                'productName': s.productName,
+              },
+            )
+            .toList(),
+      );
+
+      final response = await request.send();
+
+      if (!mounted) return;
+
+      if (response.statusCode == 201) {
+        Navigator.pop(context);
+      } else {
+        final body = await response.stream.bytesToString();
+        if (!mounted) return;
+        final message = jsonDecode(body)['message'] ?? '게시글 등록에 실패했어요.';
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('서버 연결에 실패했어요.')));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   List<Widget> _buildProductList() {
@@ -479,8 +542,8 @@ class _UploadPageState extends State<UploadPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoggedIn == null) return const Scaffold(backgroundColor: Colors.white);
-    if (_isLoggedIn == false) return const UploadLoginGate();
+    // if (_isLoggedIn == null) return const Scaffold(backgroundColor: Colors.white);
+    // if (_isLoggedIn == false) return const UploadLoginGate();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -655,7 +718,7 @@ class _UploadPageState extends State<UploadPage> {
                       width: double.infinity,
                       height: 48,
                       child: ElevatedButton(
-                        onPressed: _submitPost,
+                        onPressed: _isLoading ? null : _submitPost,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff9c27b0),
                           foregroundColor: Colors.white,
@@ -663,7 +726,16 @@ class _UploadPageState extends State<UploadPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('게시하기'),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text('게시하기'),
                       ),
                     ),
                   ],

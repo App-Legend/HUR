@@ -246,6 +246,7 @@ class _ProductTagPageState extends State<ProductTagPage> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
       child: SizedBox(
+        
         width: double.infinity,
         height: 38,
         child: OutlinedButton.icon(

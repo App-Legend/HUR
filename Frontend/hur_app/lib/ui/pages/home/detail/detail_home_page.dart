@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
+import 'package:hur_app/ui/common/widget/category_chip.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/comment_popup.dart';
-import 'package:hur_app/ui/pages/home/detail/popup/product_tag_popup.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/purchase_popup.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/detail_icon_action_bar.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/detail_profile_header.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/image_tag_section.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/used_product_header.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/used_product_list.dart';
-import 'package:hur_app/ui/common/widget/category_chip.dart';
 
 class DetailHomePage extends StatefulWidget {
   final String imagePath;
@@ -43,7 +42,7 @@ class _DetailHomePage extends State<DetailHomePage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.25),
+      barrierColor: Colors.black.withValues(alpha: 0.25),
       isScrollControlled: true,
       builder: (context) {
         return const CommentPopup();
@@ -55,7 +54,7 @@ class _DetailHomePage extends State<DetailHomePage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.35),
+      barrierColor: Colors.black.withValues(alpha: 0.35),
       isScrollControlled: true,
       builder: (context) {
         return const PurchasePopup();
