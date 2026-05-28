@@ -3,10 +3,10 @@ const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const { verifyToken } = require('../middleware/auth');
-const { createPost } = require('../controllers/postController');
+const { createPost, getFeed } = require('../controllers/postController');
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads')),
+  destination: (req, file, cb) => cb(null, path.join(__dirname, '../images/posts')),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, `${uuidv4()}${ext}`);
@@ -22,6 +22,7 @@ const upload = multer({
   },
 });
 
+router.get('/feed', getFeed);
 router.post('/', verifyToken, upload.single('image'), createPost);
 
 module.exports = router;

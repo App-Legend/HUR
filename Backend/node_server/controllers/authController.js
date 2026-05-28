@@ -34,7 +34,7 @@ const login = async (req, res) => {
       message: 'login success',
       token,
       user: {
-        id: user.user_id,
+        id: parseInt(user.user_id),
         email: user.email,
         name: user.nickname,
       },

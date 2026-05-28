@@ -9,10 +9,11 @@ const createPost = async (req, res) => {
       return res.status(400).json({ message: '제목은 필수입니다.' });
     }
 
-    const postImage = req.file ? `/uploads/${req.file.filename}` : null;
+    const postImage = req.file ? `/images/posts/${req.file.filename}` : null;
 
     const stickerList = stickers ? JSON.parse(stickers) : [];
-    const personalColorList = personalColors ? JSON.parse(personalColors) : [];
+    const personalColorList = (personalColors ? JSON.parse(personalColors) : [])
+      .filter((v) => v !== '잘 모르겠음');
     const moodList = moods ? JSON.parse(moods) : [];
     const skinToneList = skinTones ? JSON.parse(skinTones) : [];
 
@@ -63,4 +64,41 @@ const createPost = async (req, res) => {
   }
 };
 
-module.exports = { createPost };
+const getFeed = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 0;
+    const limit = 20;
+    const offset = page * limit;
+
+    const result = await pool.query(
+      `SELECT
+        p.post_id,
+        p.title,
+        p.post_image,
+        p.post_like,
+        p.created_at,
+        u.nickname,
+        u.profile_image_url,
+        COALESCE(
+          json_agg(
+            json_build_object('type', pc.category_type, 'value', pc.category_value)
+          ) FILTER (WHERE pc.id IS NOT NULL),
+          '[]'
+        ) AS categories
+      FROM posts p
+      JOIN users u ON p.user_id = u.user_id
+      LEFT JOIN post_category pc ON p.post_id = pc.post_id
+      WHERE p.created_at > NOW() - INTERVAL '7 days'
+      GROUP BY p.post_id, u.nickname, u.profile_image_url
+      ORDER BY p.post_like DESC, p.created_at DESC
+      LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+
+    res.json({ posts: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = { createPost, getFeed };

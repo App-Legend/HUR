@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 // 이미지 정적 파일 서빙
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/images/posts', express.static(path.join(__dirname, 'images/posts')));
 
 // 라우터 연결
 app.use('/auth', require('./routes/auth'));
