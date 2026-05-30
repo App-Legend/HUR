@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/pages/upload/product_search_sheet.dart';
 import 'package:hur_app/ui/pages/upload/widgets/public_scope_page.dart';
@@ -227,7 +228,7 @@ class _UploadPageState extends State<UploadPage> {
 
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://15.164.231.59/post'),
+        Uri.parse('${ApiConstants.baseUrl}/post'),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
