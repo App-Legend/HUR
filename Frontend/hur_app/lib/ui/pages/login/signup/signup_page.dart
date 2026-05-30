@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../login_page.dart';
 
@@ -34,9 +37,80 @@ class _SignupPageState extends State<SignupPage> {
     super.dispose();
   }
 
-  void _signup() {
-    // TODO: 실제 회원가입 로직 연결
+  
+
+
+  void _signup() async {
+    // 입력 데이터 수집
+    final name = _nameController.text;
+    final nickname = _nicknameController.text;
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    // 성별 선택 확인
+    String? gender;
+    if (_selectedGender == '여성') {
+      gender = 'female';
+    } else if (_selectedGender == '남성') {
+      gender = 'male';
+    } else if (_selectedGender == '기타') {
+      gender = 'other';
+    }
+
+  // 생년월일 포맷팅
+    String birthDate = '';
+    if (_birthDate != null) {
+      birthDate = '${_birthDate!.year}-${_birthDate!.month.toString().padLeft(2, '0')}-${_birthDate!.day.toString().padLeft(2, '0')}';
+    }
+
+  // API 요청 데이터 생성
+    final requestData = {
+      "name": name,
+      "nickname": nickname,
+      "gender": gender,
+      "birth": birthDate,
+      "email": email,
+      "password": password,
+    };
+
+  try {
+      // API 호출
+      final response = await http.post(
+        Uri.parse('http://15.164.231.59'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestData),
+      );
+
+    if (response.statusCode == 201) {
+        // 성공 처리
+        final data = jsonDecode(response.body);
+        print('회원가입 성공: ${data['token']}');
+
+        // 토큰 저장 (예: SharedPreferences)
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Dashboard()));
+
+      } else if (response.statusCode == 409) {
+        // 이메일 중복 에러
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('이미 사용 중인 이메일입니다')),
+        );
+      } else {
+        // 다른 에러 처리
+        final errorData = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorData['message'] ?? '회원가입 실패')),
+        );
+      }
+    } catch (e) {
+      // 네트워크 에러 처리
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('네트워크 오류가 발생했습니다')),
+      );
+    }
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +149,7 @@ class _SignupPageState extends State<SignupPage> {
               const SizedBox(height: 8),
               _buildTextField(
                 controller: _nameController,
-                hint: '홍길용',
+                hint: '홍길동',
                 prefix: const Icon(Icons.person_outline, color: Colors.black38, size: 20),
               ),
               const SizedBox(height: 16),
