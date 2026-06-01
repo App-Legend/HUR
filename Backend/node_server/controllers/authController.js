@@ -1,25 +1,11 @@
 const pool = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
+const { validateRegister, validateLogin } = require('../middleware/validation');
 
 // 환경변수에서 JWT 시크릿 키 가져오기
 const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret-key-please-change-this';
-
-// 유효성 검사 미들웨어
-const validateRegister = [
-  body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 8 }).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/),
-  body('nickname').isLength({ min: 2, max: 30 }),
-  body('name').isLength({ min: 2, max: 50 }),
-  body('gender').isIn(['male', 'female', 'other']),
-  body('birth').isISO8601().toDate()
-];
-
-const validateLogin = [
-  body('email').isEmail().normalizeEmail(),
-  body('password').notEmpty()
-];
 
 // 로그인 기능
 const login = async (req, res) => {
@@ -115,16 +101,53 @@ const signup = async (req, res) => {
     );
 
     if (existingUser.rows.length > 0) {
-      return res.status(409).json({ 
-        message: 'Email already registered' 
+      return res.status(409).json({
+        message: '이미 등록된 이메일입니다.',
+        error: 'duplicate_email'
       });
     }
 
     // 비밀번호 강도 검사
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+    const passwordRequirements = {
+      hasUppercase: /[A-Z]/.test(password),
+      hasLowercase: /[a-z]/.test(password),
+      hasNumber: /\d/.test(password),
+      hasSpecialChar: /[@$!%*?&]/.test(password),
+      minLength: password.length >= 8
+    };
+
     if (!passwordRegex.test(password)) {
-      return res.status(400).json({ 
-        message: 'Password must contain at least one uppercase letter, lowercase letter, number, and special character' 
+      const missingRequirements = [];
+
+      if (!passwordRequirements.hasUppercase) {
+        missingRequirements.push('대문자');
+      }
+      if (!passwordRequirements.hasLowercase) {
+        missingRequirements.push('소문자');
+      }
+      if (!passwordRequirements.hasNumber) {
+        missingRequirements.push('숫자');
+      }
+      if (!passwordRequirements.hasSpecialChar) {
+        missingRequirements.push('특수문자');
+      }
+      if (!passwordRequirements.minLength) {
+        missingRequirements.push('8자 이상');
+      }
+
+      return res.status(400).json({
+        message: '비밀번호가 정책에 맞지 않습니다.',
+        details: {
+          missingRequirements,
+          required: {
+            uppercase: '대문자',
+            lowercase: '소문자',
+            number: '숫자',
+            specialChar: '특수문자',
+            minLength: '8자 이상'
+          }
+        }
       });
     }
 
@@ -151,9 +174,7 @@ const signup = async (req, res) => {
       },
       JWT_SECRET,
       { 
-        expiresIn: '24h',
-        issuer: 'your-app-name',
-        audience: 'your-app-users'
+        expiresIn: '3h',
       }
     );
 
@@ -179,40 +200,10 @@ const signup = async (req, res) => {
   }
 };
 
-// 토큰 검증 미들웨어
-const authenticateToken = async (req, res, next) => {
-  try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
-    if (!token) {
-      return res.status(401).json({ message: 'Access token required' });
-    }
+const { authenticateToken } = require('../middleware/auth');
 
-    // JWT 토큰 검증
-    const decoded = jwt.verify(token, JWT_SECRET);
-    
-    // 사용자 정보 조회
-    const userResult = await pool.query(
-      'SELECT user_id, email, nickname, name FROM users WHERE user_id=$1',
-      [decoded.user_id]
-    );
-
-    if (userResult.rows.length === 0) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-
-    req.user = userResult.rows[0];
-    next();
-  } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Token expired' });
-    }
-    return res.status(403).json({ message: 'Invalid token' });
-  }
-};
-
-module.exports = { 
+module.exports = {
   login,
   signup,
   authenticateToken
