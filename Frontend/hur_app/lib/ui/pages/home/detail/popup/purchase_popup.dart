@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |        구매하기 링크 팝업       |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class PurchasePopup extends StatelessWidget {

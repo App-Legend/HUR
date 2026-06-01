@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |          프로필 설정           |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class ProfileEditPage extends StatelessWidget {
@@ -64,10 +68,13 @@ class ProfileEditPage extends StatelessWidget {
             _EditCard(
               items: [
                 _EditRow(label: '소개', value: '사용자'),
-                _EditRow(label: '태그', valueWidget: const Text(
-                  '자세히 보기',
-                  style: TextStyle(color: Colors.black38, fontSize: 15),
-                )),
+                _EditRow(
+                  label: '태그',
+                  valueWidget: const Text(
+                    '자세히 보기',
+                    style: TextStyle(color: Colors.black38, fontSize: 15),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 14),
@@ -192,20 +199,16 @@ class _EditRow extends StatelessWidget {
               child: trailing != null
                   ? Align(alignment: Alignment.centerLeft, child: trailing)
                   : valueWidget ??
-                      Text(
-                        value ?? '',
-                        style: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
+                        Text(
+                          value ?? '',
+                          style: const TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: Colors.black26,
-              size: 20,
-            ),
+            const Icon(Icons.chevron_right, color: Colors.black26, size: 20),
           ],
         ),
       ),

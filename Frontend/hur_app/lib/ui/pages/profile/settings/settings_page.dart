@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |          회원 설정            |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatelessWidget {

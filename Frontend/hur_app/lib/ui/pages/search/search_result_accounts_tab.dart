@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |        검색 후 계정 탭         |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/follow_button.dart';
 
@@ -10,15 +14,13 @@ class SearchResultAccountsTab extends StatefulWidget {
 }
 
 class _SearchResultAccountsTabState extends State<SearchResultAccountsTab> {
-  final List<bool> _following = [false, true, false, false, true, false];
-
-  final _accounts = const [
-    {'id': '사용자아이디', 'followers': '팔로워 000명'},
-    {'id': '사용자아이디', 'followers': '팔로워 000명'},
-    {'id': '사용자아이디', 'followers': '팔로워 000명'},
-    {'id': '사용자아이디', 'followers': '팔로워 000명'},
-    {'id': '사용자아이디', 'followers': '팔로워 000명'},
-    {'id': '사용자아이디', 'followers': '팔로워 000명'},
+  final _accounts = <Map<String, Object>>[
+    {'id': '사용자아이디', 'followers': '팔로워 000명', 'isFollowing': false},
+    {'id': '사용자아이디', 'followers': '팔로워 000명', 'isFollowing': true},
+    {'id': '사용자아이디', 'followers': '팔로워 000명', 'isFollowing': false},
+    {'id': '사용자아이디', 'followers': '팔로워 000명', 'isFollowing': false},
+    {'id': '사용자아이디', 'followers': '팔로워 000명', 'isFollowing': true},
+    {'id': '사용자아이디', 'followers': '팔로워 000명', 'isFollowing': false},
   ];
 
   @override
@@ -28,12 +30,13 @@ class _SearchResultAccountsTabState extends State<SearchResultAccountsTab> {
       itemCount: _accounts.length,
       itemBuilder: (context, index) {
         return _AccountItem(
-          userId: _accounts[index]['id']!,
-          followers: _accounts[index]['followers']!,
-          isFollowing: _following[index],
+          userId: _accounts[index]['id'] as String,
+          followers: _accounts[index]['followers'] as String,
+          isFollowing: _accounts[index]['isFollowing'] as bool,
           onFollowToggle: () {
             setState(() {
-              _following[index] = !_following[index];
+              _accounts[index]['isFollowing'] =
+                  !(_accounts[index]['isFollowing'] as bool);
             });
           },
         );
@@ -61,10 +64,7 @@ class _AccountItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
-          const CircleAvatar(
-            radius: 24,
-            backgroundColor: Color(0xffe0e0e0),
-          ),
+          const CircleAvatar(radius: 24, backgroundColor: Color(0xffe0e0e0)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -89,10 +89,7 @@ class _AccountItem extends StatelessWidget {
               ],
             ),
           ),
-          FollowButton(
-            isFollowing: isFollowing,
-            onTap: onFollowToggle,
-          ),
+          FollowButton(isFollowing: isFollowing, onTap: onFollowToggle),
         ],
       ),
     );

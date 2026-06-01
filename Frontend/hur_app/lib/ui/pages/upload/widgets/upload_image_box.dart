@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |       이미지 업도르 구역       |
+//  ————————————————————————————————
+
 import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';

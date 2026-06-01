@@ -1,6 +1,9 @@
+//  ————————————————————————————————
+//  |      로그인 후 마이페이지       |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/side_drawer.dart';
-
 import 'edit/profile_edit_page.dart';
 import 'settings/settings_page.dart';
 
@@ -188,7 +191,10 @@ class _TagChip extends StatelessWidget {
         children: [
           Icon(icon, size: 13, color: Colors.white),
           const SizedBox(width: 5),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -265,9 +271,6 @@ class _EmptyTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Icon(icon, size: 48, color: Colors.black12),
-    );
+    return Center(child: Icon(icon, size: 48, color: Colors.black12));
   }
 }
-
