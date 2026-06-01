@@ -32,7 +32,8 @@ class _StickerData {
 }
 
 class UploadPage extends StatefulWidget {
-  const UploadPage({super.key});
+  final VoidCallback? onPostSuccess;
+  const UploadPage({super.key, this.onPostSuccess});
 
   @override
   State<UploadPage> createState() => _UploadPageState();
@@ -264,7 +265,7 @@ class _UploadPageState extends State<UploadPage> {
       if (!mounted) return;
 
       if (response.statusCode == 201) {
-        Navigator.pop(context);
+        widget.onPostSuccess?.call();
       } else {
         final body = await response.stream.bytesToString();
         if (!mounted) return;
@@ -546,7 +547,10 @@ class _UploadPageState extends State<UploadPage> {
     // if (_isLoggedIn == null) return const Scaffold(backgroundColor: Colors.white);
     // if (_isLoggedIn == false) return const UploadLoginGate();
 
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
@@ -570,13 +574,13 @@ class _UploadPageState extends State<UploadPage> {
 
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(18, 22, 18, 24),
+                padding: EdgeInsets.fromLTRB(18, 22, 18, 24 + bottomInset),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       '사진',
-                      style: TextStyle(fontSize: 13, color: Colors.black),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
                     ),
                     const SizedBox(height: 10),
 
@@ -626,11 +630,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     const Text(
                       '제목',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
                     ),
                     const SizedBox(height: 6),
                     UploadInputBox(controller: _titleController),
@@ -639,7 +639,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     const Text(
                       '설명',
-                      style: TextStyle(fontSize: 12, color: Colors.black),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
                     ),
                     const SizedBox(height: 6),
                     UploadInputBox(
@@ -652,11 +652,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     const Text(
                       '추구미 태그',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
                     ),
 
                     const SizedBox(height: 16),
@@ -702,11 +698,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     const Text(
                       '사용한 제품',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
                     ),
 
                     const SizedBox(height: 14),

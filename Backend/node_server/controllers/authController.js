@@ -8,16 +8,16 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const result = await pool.query(
-      'SELECT * FROM users WHERE email=$1',
+    const [rows] = await pool.query(
+      'SELECT * FROM users WHERE email=?',
       [email]
     );
 
-    if (result.rows.length === 0) {
+    if (rows.length === 0) {
       return res.status(401).json({ message: 'user not found' });
     }
 
-    const user = result.rows[0];
+    const user = rows[0];
     const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {

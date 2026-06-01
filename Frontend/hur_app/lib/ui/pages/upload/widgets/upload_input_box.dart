@@ -19,6 +19,7 @@ class UploadInputBox extends StatelessWidget {
       child: TextField(
         controller: controller,
         maxLines: maxLines,
+        style: const TextStyle(color: Colors.black, fontSize: 14),
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,
