@@ -26,7 +26,7 @@ class _MainPageState extends State<MainPage> {
     _pages = [
       const HomePage(),
       const RankingPage(),
-      const UploadPage(),
+      UploadPage(onPostSuccess: () => setState(() => _currentIndex = 0)),
       SearchPage(key: _searchPageKey, focusNode: _searchFocusNode),
       const ProfilePage(),
     ];

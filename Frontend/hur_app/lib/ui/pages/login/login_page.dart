@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../app/constants.dart';
 import '../main_page.dart';
-import 'popup/forgot_password_popup.dart';
 import 'signup/signup_page.dart';
-import 'package:hur_app/app/extensions/sized_box_extension.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,11 +19,55 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
-  void _login() {
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => const MainPage()));
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('이메일과 비밀번호를 입력해주세요.')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConstants.baseUrl}/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+
+      if (!mounted) return;
+
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', body['token']);
+        await prefs.setInt('userId', body['user']['id']);
+        await prefs.setString('userName', body['user']['name']);
+
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const MainPage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(body['message'] ?? '로그인에 실패했어요.')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('서버 연결에 실패했어요.')),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -98,28 +146,21 @@ class _LoginPageState extends State<LoginPage> {
                       color: Colors.black38,
                       size: 20,
                     ),
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed:
+                        () =>
+                            setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () => showModalBottomSheet(
-                    context: context,
-                    backgroundColor: Colors.transparent,
-                    barrierColor: Colors.black.withValues(alpha: 0.25),
-                    isScrollControlled: true,
-                    builder: (_) => const ForgotPasswordPopup(),
-                  ),
+                  onPressed: () {},
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  
                   child: const Text(
                     '비밀번호를 잊으셨나요?',
                     style: TextStyle(color: Colors.black54, fontSize: 13),
@@ -131,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: _login,
+                  onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6B1F8A),
                     foregroundColor: Colors.white,
@@ -140,10 +181,20 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    '로그인',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          '로그인',
+                          style: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
                 ),
               ),
               const SizedBox(height: 28),
@@ -187,15 +238,16 @@ class _LoginPageState extends State<LoginPage> {
                   _SocialButton(
                     onTap: () {},
                     child: ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [
-                          Color(0xFFF9ED32),
-                          Color(0xFFEE2A7B),
-                          Color(0xFF002AFF),
-                        ],
-                        begin: Alignment.bottomLeft,
-                        end: Alignment.topRight,
-                      ).createShader(bounds),
+                      shaderCallback:
+                          (bounds) => const LinearGradient(
+                            colors: [
+                              Color(0xFFF9ED32),
+                              Color(0xFFEE2A7B),
+                              Color(0xFF002AFF),
+                            ],
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topRight,
+                          ).createShader(bounds),
                       child: const Icon(
                         Icons.camera_alt_outlined,
                         size: 26,

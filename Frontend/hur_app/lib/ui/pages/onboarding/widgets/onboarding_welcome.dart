@@ -53,7 +53,7 @@ class OnboardingWelcome extends StatelessWidget {
                 width: 36,
                 height: 2,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF7B2D8B).withOpacity(0.4),
+                  color: const Color(0xFF7B2D8B).withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(1),
                 ),
               ),
