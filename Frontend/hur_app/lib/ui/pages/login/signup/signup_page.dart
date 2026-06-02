@@ -76,7 +76,7 @@ class _SignupPageState extends State<SignupPage> {
   try {
       // API 호출
       final response = await http.post(
-        Uri.parse('http://172.16.13.141:3000'),
+        Uri.parse('http://172.16.13.141:3000/signup'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -103,8 +103,9 @@ class _SignupPageState extends State<SignupPage> {
       }
     } catch (e) {
       // 네트워크 에러 처리
+      print('Network error: $e'); // 에러 로그 추가
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('네트워크 오류가 발생했습니다')),
+        SnackBar(content: Text('네트워크 오류가 발생했습니다: $e')),
       );
     }
   }

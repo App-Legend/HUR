@@ -5,7 +5,7 @@ const pool = require('../db');
 const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret-key-please-change-this';
 
 // 토큰 검증 미들웨어
-const authenticateToken = async (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
@@ -37,4 +37,4 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-module.exports = { authenticateToken };
+module.exports = { verifyToken };

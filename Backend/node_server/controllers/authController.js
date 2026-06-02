@@ -201,10 +201,10 @@ const signup = async (req, res) => {
 };
 
 
-const { authenticateToken } = require('../middleware/auth');
+const { verifyToken } = require('../middleware/auth');
 
 module.exports = {
   login,
   signup,
-  authenticateToken
+  verifyToken
 };
