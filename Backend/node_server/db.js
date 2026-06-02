@@ -1,19 +1,13 @@
-const { Pool } = require("pg");
-//로컬 db로 테스트해보는중
-const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "postgres",
-  password: "1234",
-  port: 5432,
+const mysql = require('mysql2');
 
-  keepAlive: true,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: '1234',
+  database: 'hur_test',
+  port: 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
 });
 
-pool.on("error", (err) => {
-  console.error("DB connection error:", err.message);
-});
-
-module.exports = pool;
+module.exports = pool.promise();

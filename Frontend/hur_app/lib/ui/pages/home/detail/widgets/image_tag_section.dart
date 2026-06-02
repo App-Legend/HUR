@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/product_tag_popup.dart';
 
 class ImageTagSection extends StatefulWidget {
-  final String imagePath;
+  final String imageUrl;
 
-  const ImageTagSection({super.key, required this.imagePath});
+  const ImageTagSection({super.key, required this.imageUrl});
 
   @override
   State<ImageTagSection> createState() => _ImageTagSectionState();
@@ -39,10 +39,14 @@ class _ImageTagSectionState extends State<ImageTagSection> {
         children: [
           GestureDetector(
             onTap: _toggleProductIcons,
-            child: Image.asset(
-              widget.imagePath,
+            child: Image.network(
+              widget.imageUrl,
               width: double.infinity,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => AspectRatio(
+                aspectRatio: 3 / 4,
+                child: Container(color: const Color(0xFFEEEEEE)),
+              ),
             ),
           ),
 
