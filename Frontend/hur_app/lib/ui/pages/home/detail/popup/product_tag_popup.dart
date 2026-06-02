@@ -25,7 +25,7 @@ class ProductTagPopup extends StatelessWidget {
       height: 54,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

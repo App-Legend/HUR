@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../app/constants.dart';
 import '../main_page.dart';
-import 'popup/forgot_password_popup.dart';
 import 'signup/signup_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -34,7 +33,6 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     setState(() => _isLoading = true);
-
     try {
       final response = await http.post(
         Uri.parse('${ApiConstants.baseUrl}/auth/login'),
@@ -48,9 +46,9 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', body['token']);
-        await prefs.setInt('userId', body['user']['id']);
-        await prefs.setString('userName', body['user']['name']);
+        await prefs.setString('auth_token', body['token']);
+        await prefs.setInt('user_id', body['user']['id']);
+        await prefs.setString('user_name', body['user']['name']);
 
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
@@ -58,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(body['message'] ?? '로그인에 실패했어요.')),
+          SnackBar(content: Text(body['message'] ?? body['error'] ?? '로그인에 실패했어요.')),
         );
       }
     } catch (e) {
@@ -147,28 +145,21 @@ class _LoginPageState extends State<LoginPage> {
                       color: Colors.black38,
                       size: 20,
                     ),
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed:
+                        () =>
+                            setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () => showModalBottomSheet(
-                    context: context,
-                    backgroundColor: Colors.transparent,
-                    barrierColor: Colors.black.withValues(alpha: 0.25),
-                    isScrollControlled: true,
-                    builder: (_) => const ForgotPasswordPopup(),
-                  ),
+                  onPressed: () {},
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  
                   child: const Text(
                     '비밀번호를 잊으셨나요?',
                     style: TextStyle(color: Colors.black54, fontSize: 13),
@@ -183,6 +174,8 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6B1F8A),
+                    disabledBackgroundColor:
+                        const Color(0xFF6B1F8A).withValues(alpha: 0.4),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -246,15 +239,16 @@ class _LoginPageState extends State<LoginPage> {
                   _SocialButton(
                     onTap: () {},
                     child: ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [
-                          Color(0xFFF9ED32),
-                          Color(0xFFEE2A7B),
-                          Color(0xFF002AFF),
-                        ],
-                        begin: Alignment.bottomLeft,
-                        end: Alignment.topRight,
-                      ).createShader(bounds),
+                      shaderCallback:
+                          (bounds) => const LinearGradient(
+                            colors: [
+                              Color(0xFFF9ED32),
+                              Color(0xFFEE2A7B),
+                              Color(0xFF002AFF),
+                            ],
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topRight,
+                          ).createShader(bounds),
                       child: const Icon(
                         Icons.camera_alt_outlined,
                         size: 26,
@@ -301,6 +295,23 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const MainPage()),
+                  ),
+                  child: const Text(
+                    '비회원으로 시작하기',
+                    style: TextStyle(
+                      color: Colors.black38,
+                      fontSize: 13,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.black38,
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 32),
             ],

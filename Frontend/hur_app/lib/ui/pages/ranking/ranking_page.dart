@@ -1,84 +1,53 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:hur_app/ui/common/widget/product_more_popup.dart';
 import 'detail_ranking_page.dart';
 
+import 'package:hur_app/app/constants.dart';
+
+// ─────────────────────────────────────────────
 // 랭킹 상품 데이터 모델
+// ─────────────────────────────────────────────
 class RankingProduct {
+  final int? id;
   final String rank;
-  final String imagePath;
+  final String imagePath; // asset 경로 or https:// URL
   final String brand;
   final String name;
 
   const RankingProduct({
+    this.id,
     required this.rank,
     required this.imagePath,
     required this.brand,
     required this.name,
   });
 
-  factory RankingProduct.fromList(List<String> data) {
+  factory RankingProduct.fromJson(Map<String, dynamic> json, int rankNum) {
     return RankingProduct(
-      rank: data[0],
-      imagePath: data[1],
-      brand: data[2],
-      name: data[3],
+      id: json['id'] as int?,
+      rank: rankNum.toString(),
+      imagePath: json['image'] as String? ?? '',
+      brand: json['brand'] as String? ?? '',
+      name: json['name'] as String? ?? '',
     );
   }
 }
 
-const _kTop3 = [
-  RankingProduct(
-    rank: '1',
-    imagePath: 'assets/images/ranking/rank1.png',
-    brand: '랭킹 1위 브랜드',
-    name: '랭킹 1위 제품',
-  ),
-  RankingProduct(
-    rank: '2',
-    imagePath: 'assets/images/ranking/rank2.png',
-    brand: '랭킹 2위 브랜드',
-    name: '랭킹 2위 제품',
-  ),
-  RankingProduct(
-    rank: '3',
-    imagePath: 'assets/images/ranking/rank3.png',
-    brand: '랭킹 3위 브랜드',
-    name: '랭킹 3위 제품',
-  ),
-];
+// imagePath가 http로 시작하면 NetworkImage, 아니면 AssetImage
+ImageProvider _imageProvider(String path) {
+  if (path.startsWith('http')) return NetworkImage(path);
+  return AssetImage(path);
+}
 
-const _kProducts = [
-  RankingProduct(
-    rank: '4',
-    imagePath: 'assets/images/ranking/ranking4.jpg',
-    brand: '얼터너티브스테레오',
-    name: '립 포션 카라멜 글레이즈',
-  ),
-  RankingProduct(
-    rank: '5',
-    imagePath: 'assets/images/ranking/ranking5.jpg',
-    brand: '퓌',
-    name: '로즈 옵세션 스테이핏 틴트',
-  ),
-  RankingProduct(
-    rank: '6',
-    imagePath: 'assets/images/ranking/ranking6.jpg',
-    brand: '헤라',
-    name: '센슈얼 누드 글로스',
-  ),
-  RankingProduct(
-    rank: '7',
-    imagePath: 'assets/images/ranking/ranking7.jpg',
-    brand: '롬앤',
-    name: '글래스팅 컬러 글로스',
-  ),
-];
-
+// ─────────────────────────────────────────────
 // 전체 랭킹 페이지
+// ─────────────────────────────────────────────
 class RankingPage extends StatefulWidget {
   const RankingPage({super.key});
 
@@ -87,7 +56,63 @@ class RankingPage extends StatefulWidget {
 }
 
 class _RankingPageState extends State<RankingPage> {
-  String selectedCategory = '틴트';
+  String _selectedCategory = '틴트';
+  List<RankingProduct> _products = [];
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRanking('틴트');
+  }
+
+  Future<void> _fetchRanking(String category) async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final response = await http
+          .get(
+            Uri.parse(
+              '${ApiConstants.baseUrl}/products/ranking'
+              '?category=${Uri.encodeComponent(category)}&limit=20',
+            ),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data =
+            jsonDecode(response.body) as List<dynamic>;
+        setState(() {
+          _products = data.asMap().entries.map((e) {
+            return RankingProduct.fromJson(
+              e.value as Map<String, dynamic>,
+              e.key + 1,
+            );
+          }).toList();
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _error = '데이터를 불러오지 못했습니다 (${response.statusCode})';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = '서버에 연결할 수 없습니다';
+        _isLoading = false;
+      });
+    }
+  }
+
+  List<RankingProduct> get _top3 => _products.take(3).toList();
+  List<RankingProduct> get _listProducts => _products.skip(3).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -96,10 +121,10 @@ class _RankingPageState extends State<RankingPage> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // 헤더 영역
+            // ── 헤더
             const SliverToBoxAdapter(child: _RankingHeader()),
 
-            // 헤더 아래부터 TOP20 제목까지: 화면 양옆 padding 16 적용
+            // ── 카테고리 + TOP3 + TOP20 제목
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               sliver: SliverToBoxAdapter(
@@ -108,39 +133,82 @@ class _RankingPageState extends State<RankingPage> {
                   children: [
                     const SizedBox(height: 15),
 
-                    // 카테고리
                     _CategorySection(
-                      selectedCategory: selectedCategory,
+                      selectedCategory: _selectedCategory,
                       onCategorySelected: (category) {
-                        setState(() {
-                          selectedCategory = category;
-                        });
+                        setState(() => _selectedCategory = category);
+                        if (category == '틴트') _fetchRanking(category);
                       },
                     ),
 
                     const SizedBox(height: 15),
 
-                    // TOP3 영역
-                    _Top3Section(
-                      top3: _kTop3,
-                      onProductTap: (item) => _goToDetail(context, item),
-                    ),
+                    // 틴트 외 카테고리 → 준비중
+                    if (_selectedCategory != '틴트')
+                      const _ComingSoonSection()
+                    // 로딩 중
+                    else if (_isLoading)
+                      const SizedBox(
+                        height: 280,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.black,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      )
+                    // 에러
+                    else if (_error != null)
+                      SizedBox(
+                        height: 280,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                _error!,
+                                style: const TextStyle(
+                                    color: Colors.grey, fontSize: 14),
+                              ),
+                              const SizedBox(height: 12),
+                              GestureDetector(
+                                onTap: () => _fetchRanking(_selectedCategory),
+                                child: const Text(
+                                  '다시 시도',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    // TOP3
+                    else if (_top3.isNotEmpty)
+                      _Top3Section(
+                        top3: _top3,
+                        onProductTap: (item) => _goToDetail(context, item),
+                      ),
 
-                    // TOP20 제목
-                    const _Top20Title(),
+                    if (_selectedCategory == '틴트' && !_isLoading && _error == null)
+                      const _Top20Title(),
                   ],
                 ),
               ),
             ),
 
-            // TOP20 리스트 영역
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              sliver: _RankingListSection(
-                products: _kProducts,
-                onProductTap: (item) => _goToDetail(context, item),
+            // ── TOP20 리스트
+            if (_selectedCategory == '틴트' && !_isLoading && _error == null && _listProducts.isNotEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                sliver: _RankingListSection(
+                  products: _listProducts,
+                  onProductTap: (item) => _goToDetail(context, item),
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -162,7 +230,9 @@ class _RankingPageState extends State<RankingPage> {
   }
 }
 
+// ─────────────────────────────────────────────
 // 헤더 컴포넌트
+// ─────────────────────────────────────────────
 class _RankingHeader extends StatelessWidget {
   const _RankingHeader();
 
@@ -188,7 +258,9 @@ class _RankingHeader extends StatelessWidget {
   }
 }
 
-// 카테고리 칩 컴포넌트
+// ─────────────────────────────────────────────
+// 카테고리 칩
+// ─────────────────────────────────────────────
 class _CategorySection extends StatelessWidget {
   final String selectedCategory;
   final ValueChanged<String> onCategorySelected;
@@ -201,23 +273,19 @@ class _CategorySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const categories = ['틴트', '렌즈', '볼터치', '섀도우'];
-
     return SizedBox(
       height: 36,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.zero,
         itemCount: categories.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (_, index) {
           final category = categories[index];
-
           return CategoryChip(
             text: category,
             selected: selectedCategory == category,
-            onTap: () {
-              onCategorySelected(category);
-            },
+            onTap: () => onCategorySelected(category),
           );
         },
       ),
@@ -225,7 +293,9 @@ class _CategorySection extends StatelessWidget {
   }
 }
 
-// TOP3 전체 컴포넌트
+// ─────────────────────────────────────────────
+// TOP3 캐러셀
+// ─────────────────────────────────────────────
 class _Top3Section extends StatefulWidget {
   final List<RankingProduct> top3;
   final ValueChanged<RankingProduct> onProductTap;
@@ -242,7 +312,6 @@ class _Top3SectionState extends State<_Top3Section> {
   Timer? _autoScrollTimer;
 
   static const int _virtualMultiplier = 10000;
-
   int get _initialPage => widget.top3.length * (_virtualMultiplier ~/ 2);
 
   @override
@@ -286,7 +355,7 @@ class _Top3SectionState extends State<_Top3Section> {
           child: PageView.builder(
             controller: _pageController,
             itemCount: count * _virtualMultiplier,
-            itemBuilder: (context, index) {
+            itemBuilder: (_, index) {
               final product = widget.top3[index % count];
               final distance = (_currentPage - index).abs();
               final scale = (1 - distance * 0.12).clamp(0.85, 1.0);
@@ -302,7 +371,7 @@ class _Top3SectionState extends State<_Top3Section> {
                         decoration: BoxDecoration(
                           color: const Color(0xffeeeeee),
                           image: DecorationImage(
-                            image: AssetImage(product.imagePath),
+                            image: _imageProvider(product.imagePath),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -342,7 +411,8 @@ class _Top3SectionState extends State<_Top3Section> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(widget.top3.length, (i) {
-            final isActive = _currentPage.round() % widget.top3.length == i;
+            final isActive =
+                _currentPage.round() % widget.top3.length == i;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -362,20 +432,19 @@ class _Top3SectionState extends State<_Top3Section> {
   }
 }
 
-// TOP20 제목 컴포넌트
+// ─────────────────────────────────────────────
+// TOP20 제목
+// ─────────────────────────────────────────────
 class _Top20Title extends StatelessWidget {
   const _Top20Title();
 
   @override
-  Widget build(BuildContext context) {
-    return const _SectionTitle(title: 'TOP20');
-  }
+  Widget build(BuildContext context) => const _SectionTitle(title: 'TOP20');
 }
 
-// 공통 섹션 제목 컴포넌트
+// 공통 섹션 제목
 class _SectionTitle extends StatelessWidget {
   final String title;
-
   const _SectionTitle({required this.title});
 
   @override
@@ -394,7 +463,9 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-// TOP20 리스트 컴포넌트
+// ─────────────────────────────────────────────
+// TOP20 리스트
+// ─────────────────────────────────────────────
 class _RankingListSection extends StatelessWidget {
   final List<RankingProduct> products;
   final ValueChanged<RankingProduct> onProductTap;
@@ -407,33 +478,84 @@ class _RankingListSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverList(
-      delegate: SliverChildBuilderDelegate((context, index) {
-        final item = products[index];
-
-        return ProductItemContainer(
-          rank: item.rank,
-          imagePath: item.imagePath,
-          brandName: item.brand,
-          productName: item.name,
-          price: '',
-          onTap: () => onProductTap(item),
-          onOpenTap: () {
-            showModalBottomSheet(
-              context: context,
-              backgroundColor: Colors.transparent,
-              barrierColor: Colors.black.withValues(alpha: 0.25),
-              isScrollControlled: true,
-              builder: (context) {
-                return ProductMorePopup(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          final item = products[index];
+          return ProductItemContainer(
+            rank: item.rank,
+            imagePath: item.imagePath,
+            brandName: item.brand,
+            productName: item.name,
+            price: '',
+            onTap: () => onProductTap(item),
+            onOpenTap: () {
+              showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                barrierColor: Colors.black.withValues(alpha: 0.25),
+                isScrollControlled: true,
+                builder: (_) => ProductMorePopup(
                   imagePath: item.imagePath,
                   brand: item.brand,
                   name: item.name,
-                );
-              },
-            );
-          },
-        );
-      }, childCount: products.length),
+                ),
+              );
+            },
+          );
+        },
+        childCount: products.length,
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// 준비중 화면
+// ─────────────────────────────────────────────
+class _ComingSoonSection extends StatelessWidget {
+  const _ComingSoonSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 360,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: const Color(0xfff5f5f5),
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: const Icon(
+                Icons.access_time_rounded,
+                size: 40,
+                color: Color(0xffbdbdbd),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              '준비 중이에요',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              '곧 만나볼 수 있어요 :)',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

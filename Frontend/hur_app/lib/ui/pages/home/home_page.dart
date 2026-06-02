@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 import 'package:hur_app/ui/common/widget/side_drawer.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+
 import 'detail/detail_home_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,35 +19,40 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String selectedTab = '발견';
+  List<Map<String, dynamic>> _posts = [];
+  bool _isLoading = true;
 
-  // TODO: 백엔드 연동 시 API 응답으로 교체 — 이미지 추가 시 이 숫자만 올려주면 됨
-  //앞으로 이미지 추가 시 _totalImages 숫자만 올리면 되고, 나중에 백엔드 연동할 때는 List.generate(...) 부분을 API 응답으로 교체하면 됨
-  static const int _totalImages = 20;
+  @override
+  void initState() {
+    super.initState();
+    _fetchFeed();
+  }
+
+  Future<void> _fetchFeed() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/post/feed'),
+      );
+      if (!mounted) return;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _posts = List<Map<String, dynamic>>.from(data['posts']);
+        });
+      }
+    } catch (_) {}
+    if (mounted) setState(() => _isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: 백엔드 연동 시 label을 API 응답의 username/title로 교체 (null이면 텍스트 행 미표시)라고 클로드가 말함
-    const sampleLabels = <int, String>{
-      1: 'Catasters',
-      3: 'aesthetic.daily',
-      6: 'lookbook_kr',
-    };
-    final allItems = List.generate(
-      _totalImages,
-      (i) => (
-        path: 'assets/images/home/home${i + 1}.jpg',
-        label: sampleLabels[i + 1],
-      ),
-    );
-
-    // 짝수 인덱스 → 왼쪽 열, 홀수 인덱스 → 오른쪽 열
-    final leftItems = <({String path, String? label})>[];
-    final rightItems = <({String path, String? label})>[];
-    for (int i = 0; i < allItems.length; i++) {
+    final leftItems = <Map<String, dynamic>>[];
+    final rightItems = <Map<String, dynamic>>[];
+    for (int i = 0; i < _posts.length; i++) {
       if (i.isEven) {
-        leftItems.add(allItems[i]);
+        leftItems.add(_posts[i]);
       } else {
-        rightItems.add(allItems[i]);
+        rightItems.add(_posts[i]);
       }
     }
 
@@ -70,63 +80,92 @@ class _HomePageState extends State<HomePage> {
 
             Expanded(
               child: selectedTab == '발견'
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: SingleChildScrollView(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                children: leftItems.map((item) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => DetailHomePage(
-                                            imagePath: item.path,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: _ImageCard(
-                                      imagePath: item.path,
-                                      label: item.label,
-                                    ),
-                                  );
-                                }).toList(),
+                  ? _isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.purple,
+                            ),
+                          )
+                        : _posts.isEmpty
+                        ? const Center(
+                            child: Text(
+                              '게시물이 없습니다.',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
                               ),
                             ),
-
-                            const SizedBox(width: 8),
-
-                            Expanded(
-                              child: Column(
-                                children: rightItems.map((item) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => DetailHomePage(
-                                            imagePath: item.path,
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 12,
+                            ),
+                            child: SingleChildScrollView(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      children: leftItems.map((post) {
+                                        final imageUrl =
+                                            '${ApiConstants.baseUrl}${post['post_image']}';
+                                        return GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => DetailHomePage(
+                                                  imageUrl: imageUrl,
+                                                  nickname:
+                                                      post['nickname'] ?? '',
+                                                  title: post['title'] ?? '',
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: _ImageCard(
+                                            imageUrl: imageUrl,
+                                            label: post['nickname'],
                                           ),
-                                        ),
-                                      );
-                                    },
-                                    child: _ImageCard(
-                                      imagePath: item.path,
-                                      label: item.label,
+                                        );
+                                      }).toList(),
                                     ),
-                                  );
-                                }).toList(),
+                                  ),
+
+                                  const SizedBox(width: 8),
+
+                                  Expanded(
+                                    child: Column(
+                                      children: rightItems.map((post) {
+                                        final imageUrl =
+                                            '${ApiConstants.baseUrl}${post['post_image']}';
+                                        return GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => DetailHomePage(
+                                                  imageUrl: imageUrl,
+                                                  nickname:
+                                                      post['nickname'] ?? '',
+                                                  title: post['title'] ?? '',
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: _ImageCard(
+                                            imageUrl: imageUrl,
+                                            label: post['nickname'],
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    )
+                          )
                   : const Center(
                       child: Text(
                         '팔로우 화면입니다.',
@@ -266,10 +305,10 @@ class _HeaderTab extends StatelessWidget {
 }
 
 class _ImageCard extends StatelessWidget {
-  final String imagePath;
+  final String imageUrl;
   final String? label;
 
-  const _ImageCard({required this.imagePath, this.label});
+  const _ImageCard({required this.imageUrl, this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -280,10 +319,21 @@ class _ImageCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(5),
-            child: Image.asset(
-              imagePath,
+            child: Image.network(
+              imageUrl,
               width: double.infinity,
               fit: BoxFit.fitWidth,
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) return child;
+                return AspectRatio(
+                  aspectRatio: 3 / 4,
+                  child: Container(color: const Color(0xFFEEEEEE)),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) => AspectRatio(
+                aspectRatio: 3 / 4,
+                child: Container(color: const Color(0xFFEEEEEE)),
+              ),
             ),
           ),
           Padding(
@@ -319,32 +369,6 @@ class _ImageCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _AdBox extends StatelessWidget {
-  const _AdBox();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 215,
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xffd9d9d9),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: const Center(
-        child: Text(
-          'AD',
-          style: TextStyle(
-            fontSize: 64,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
       ),
     );
   }

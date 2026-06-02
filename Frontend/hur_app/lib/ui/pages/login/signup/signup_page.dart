@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import '../../../../app/constants.dart';
 import '../login_page.dart';
 
+import 'package:hur_app/app/constants.dart';
+
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 
@@ -16,12 +18,14 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   final _nameController = TextEditingController();
   final _nicknameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordConfirmController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _acceptedPolicy = false;
+  bool _isLoading = false;
   String? _selectedGender;
   DateTime? _birthDate;
 
@@ -32,6 +36,7 @@ class _SignupPageState extends State<SignupPage> {
   void dispose() {
     _nameController.dispose();
     _nicknameController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _passwordConfirmController.dispose();
@@ -174,6 +179,14 @@ class _SignupPageState extends State<SignupPage> {
                 prefix: const Icon(Icons.person_outline, color: Colors.black38, size: 20),
               ),
               const SizedBox(height: 16),
+              const _FieldLabel('아이디'),
+              const SizedBox(height: 8),
+              _buildTextField(
+                controller: _usernameController,
+                hint: 'hong_gildong',
+                prefix: const Icon(Icons.alternate_email, color: Colors.black38, size: 20),
+              ),
+              const SizedBox(height: 16),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -269,7 +282,7 @@ class _SignupPageState extends State<SignupPage> {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: _acceptedPolicy ? _signup : null,
+                  onPressed: (_acceptedPolicy && !_isLoading) ? _signup : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _purple,
                     disabledBackgroundColor: _purple.withValues(alpha: 0.4),
@@ -277,10 +290,19 @@ class _SignupPageState extends State<SignupPage> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
-                  child: const Text(
-                    '회원가입',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          '회원가입',
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
                 ),
               ),
               const SizedBox(height: 28),

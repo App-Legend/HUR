@@ -1,21 +1,9 @@
-//  ————————————————————————————————
-//  |     공개 대상 선택 페이지      |
-//  ————————————————————————————————
+//  ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+// ㅣ          공개 대상 설정 페이지           ㅣ
+//  ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 import 'package:flutter/material.dart';
-import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
-
-class _ScopeData {
-  final IconData icon;
-  final String title;
-  const _ScopeData({required this.icon, required this.title});
-}
-
-const _kScopeOptions = [
-  _ScopeData(icon: Symbols.group, title: '모든 사람'),
-  _ScopeData(icon: Icons.star_border, title: '팔로워만'),
-];
 
 class PublicScopePage extends StatefulWidget {
   final String selectedScope;
@@ -36,6 +24,10 @@ class _PublicScopePageState extends State<PublicScopePage> {
   }
 
   void _selectScope(String scope) {
+    setState(() {
+      _selectedScope = scope;
+    });
+
     Navigator.pop(context, scope);
   }
 
@@ -46,14 +38,28 @@ class _PublicScopePageState extends State<PublicScopePage> {
       body: SafeArea(
         child: Column(
           children: [
-            MainHeader(
-              title: '공개 대상',
-              titleFontSize: 18,
-              leading: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const Icon(Icons.chevron_left, size: 34),
+            SizedBox(
+              height: 70,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Positioned(
+                    left: 20,
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(Icons.chevron_left, size: 34),
+                    ),
+                  ),
+                  const Text(
+                    '공개 대상',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
               ),
-              padding: const EdgeInsets.fromLTRB(8, 20, 18, 20),
             ),
 
             Container(height: 1, color: const Color(0xffdddddd)),
@@ -75,16 +81,21 @@ class _PublicScopePageState extends State<PublicScopePage> {
 
                     const SizedBox(height: 28),
 
-                    for (int i = 0; i < _kScopeOptions.length; i++) ...[
-                      _ScopeOption(
-                        icon: _kScopeOptions[i].icon,
-                        title: _kScopeOptions[i].title,
-                        selected: _selectedScope == _kScopeOptions[i].title,
-                        onTap: () => _selectScope(_kScopeOptions[i].title),
-                      ),
-                      if (i < _kScopeOptions.length - 1)
-                        const SizedBox(height: 22),
-                    ],
+                    _ScopeOption(
+                      icon: Symbols.group,
+                      title: '모든 사람',
+                      selected: _selectedScope == '모든 사람',
+                      onTap: () => _selectScope('모든 사람'),
+                    ),
+
+                    const SizedBox(height: 22),
+
+                    _ScopeOption(
+                      icon: Icons.star_border,
+                      title: '팔로워만',
+                      selected: _selectedScope == '팔로워만',
+                      onTap: () => _selectScope('팔로워만'),
+                    ),
                   ],
                 ),
               ),

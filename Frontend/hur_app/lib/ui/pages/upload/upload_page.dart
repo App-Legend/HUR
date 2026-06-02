@@ -14,6 +14,7 @@ import 'package:hur_app/ui/pages/upload/widgets/upload_menu_row.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'guest_upload_page.dart';
 
 class _StickerData {
   double xRatio;
@@ -31,12 +32,9 @@ class _StickerData {
   });
 }
 
-const _kPersonalColors = ['봄 웜톤', '가을 웜톤', '겨울 쿨톤', '여름쿨톤'];
-const _kMoods = ['청순', '시크', '큐티', '섹시', '차분'];
-const _kSkinTones = ['13호 ~ 17호', '21호', '23호', '25호', '27호'];
-
 class UploadPage extends StatefulWidget {
-  const UploadPage({super.key});
+  final VoidCallback? onPostSuccess;
+  const UploadPage({super.key, this.onPostSuccess});
 
   @override
   State<UploadPage> createState() => _UploadPageState();
@@ -81,7 +79,7 @@ class _UploadPageState extends State<UploadPage> {
 
   Future<void> _checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = prefs.getString('auth_token');
     setState(() => _isLoggedIn = token != null && token.isNotEmpty);
   }
 
@@ -228,7 +226,7 @@ class _UploadPageState extends State<UploadPage> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
+      final token = prefs.getString('auth_token') ?? '';
 
       final request = http.MultipartRequest(
         'POST',
@@ -268,7 +266,7 @@ class _UploadPageState extends State<UploadPage> {
       if (!mounted) return;
 
       if (response.statusCode == 201) {
-        Navigator.pop(context);
+        widget.onPostSuccess?.call();
       } else {
         final body = await response.stream.bytesToString();
         if (!mounted) return;
@@ -547,10 +545,13 @@ class _UploadPageState extends State<UploadPage> {
 
   @override
   Widget build(BuildContext context) {
-    // if (_isLoggedIn == null) return const Scaffold(backgroundColor: Colors.white);
-    // if (_isLoggedIn == false) return const UploadLoginGate();
+    if (_isLoggedIn == null) return const Scaffold(backgroundColor: Colors.white);
+    if (_isLoggedIn == false) return const UploadLoginGate();
+
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
@@ -574,13 +575,13 @@ class _UploadPageState extends State<UploadPage> {
 
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(18, 22, 18, 24),
+                padding: EdgeInsets.fromLTRB(18, 22, 18, 24 + bottomInset),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       '사진',
-                      style: TextStyle(fontSize: 13, color: Colors.black),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
                     ),
                     const SizedBox(height: 10),
 
@@ -630,11 +631,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     const Text(
                       '제목',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
                     ),
                     const SizedBox(height: 6),
                     UploadInputBox(controller: _titleController),
@@ -643,7 +640,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     const Text(
                       '설명',
-                      style: TextStyle(fontSize: 12, color: Colors.black),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
                     ),
                     const SizedBox(height: 6),
                     UploadInputBox(

@@ -28,7 +28,7 @@ class TagSection extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(title, style: const TextStyle(fontSize: 12, color: Colors.black)),
+            Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black)),
             if (hint != null) ...[
               const SizedBox(width: 8),
               Text(

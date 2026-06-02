@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'search_result_cosmetics_tab.dart';
+
 import 'search_result_accounts_tab.dart';
+import 'search_result_cosmetics_tab.dart';
 import 'search_result_feed_tab.dart';
 
 class SearchPage extends StatefulWidget {
@@ -23,7 +24,7 @@ class SearchPageState extends State<SearchPage>
   bool _hasSearched = false;
   late final String _trendingUpdatedAt;
 
-  List<String> _recentKeywords = ['틴트', '워터밤 비오틴'];
+  final List<String> _recentKeywords = ['틴트', '워터밤 비오틴'];
 
   static const _trendingKeywords = [
     ['1', '선크림', '-'],
@@ -172,10 +173,10 @@ class SearchPageState extends State<SearchPage>
                       Expanded(
                         child: TabBarView(
                           controller: _tabController,
-                          children: const [
-                            SearchResultCosmeticsTab(),
-                            SearchResultAccountsTab(),
-                            SearchResultFeedTab(),
+                          children: [
+                            SearchResultCosmeticsTab(query: _searchController.text.trim()),
+                            SearchResultAccountsTab(query: _searchController.text.trim()),
+                            const SearchResultFeedTab(),
                           ],
                         ),
                       ),
