@@ -8,11 +8,13 @@ import 'package:hur_app/ui/pages/profile/feed/user_feed_page.dart';
 
 class DetailProfileHeader extends StatefulWidget {
   final String nickname;
+  final int? userId;
   final VoidCallback onFollowTap;
 
   const DetailProfileHeader({
     super.key,
     required this.nickname,
+    this.userId,
     required this.onFollowTap,
   });
 
@@ -30,10 +32,12 @@ class _DetailProfileHeaderState extends State<DetailProfileHeader> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const UserFeedPage()),
-            ),
+            onTap: () {
+              if (widget.userId != null) Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => UserFeedPage(userId: widget.userId!)),
+              );
+            },
             child: Container(
               width: 40,
               height: 40,
@@ -48,10 +52,12 @@ class _DetailProfileHeaderState extends State<DetailProfileHeader> {
 
           Expanded(
             child: GestureDetector(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const UserFeedPage()),
-              ),
+              onTap: () {
+                if (widget.userId != null) Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => UserFeedPage(userId: widget.userId!)),
+                );
+              },
               child: Text(
                 widget.nickname,
                 style: const TextStyle(

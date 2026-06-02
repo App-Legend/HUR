@@ -2,11 +2,17 @@
 //  |        다른 사람 프로필         |
 //  ————————————————————————————————
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 
+import 'package:hur_app/app/config/api_config.dart';
+
 class UserFeedPage extends StatefulWidget {
-  const UserFeedPage({super.key});
+  final int userId;
+  const UserFeedPage({super.key, required this.userId});
 
   @override
   State<UserFeedPage> createState() => _UserFeedPageState();
@@ -15,47 +21,137 @@ class UserFeedPage extends StatefulWidget {
 class _UserFeedPageState extends State<UserFeedPage> {
   int _selectedTab = 0;
   bool _isFollowing = false;
+  Map<String, dynamic>? _user;
+  bool _isLoading = true;
+  int? _myId;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final prefs = await SharedPreferences.getInstance();
+    _myId = prefs.getInt('user_id');
+    await _fetchUser();
+  }
+
+  Future<void> _fetchUser() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/user/${widget.userId}'));
+      if (response.statusCode == 200 && mounted) {
+        final data = jsonDecode(response.body);
+
+        bool following = false;
+        if (_myId != null) {
+          final checkRes = await http.get(
+            Uri.parse('$baseUrl/user/${widget.userId}/follow/check?me=$_myId'),
+          );
+          if (checkRes.statusCode == 200) {
+            following = jsonDecode(checkRes.body)['is_following'] ?? false;
+          }
+        }
+
+        setState(() {
+          _user = data;
+          _isFollowing = following;
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _toggleFollow() async {
+    if (_myId == null) return;
+    final before = _isFollowing;
+    setState(() => _isFollowing = !before);
+
+    try {
+      final uri = Uri.parse('$baseUrl/user/${widget.userId}/follow');
+      final response = before
+          ? await http.delete(
+              uri,
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({'follower_id': _myId}),
+            )
+          : await http.post(
+              uri,
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({'follower_id': _myId}),
+            );
+
+      if (response.statusCode != 200 && mounted) {
+        setState(() => _isFollowing = before);
+      } else {
+        _fetchUser(); // 팔로워 수 갱신
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isFollowing = before);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          children: [
-            _UserProfileHeader(
-              isFollowing: _isFollowing,
-              onFollowTap: () => setState(() => _isFollowing = !_isFollowing),
-            ),
-            _FeedTabBar(
-              selected: _selectedTab,
-              onTap: (i) => setState(() => _selectedTab = i),
-            ),
-            Expanded(
-              child: _selectedTab == 0
-                  ? _PostsGrid()
-                  : const _EmptyTab(icon: Icons.location_on_outlined),
-            ),
-          ],
-        ),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  _UserProfileHeader(
+                    user: _user,
+                    isFollowing: _isFollowing,
+                    onFollowTap: _toggleFollow,
+                  ),
+                  _FeedTabBar(
+                    selected: _selectedTab,
+                    onTap: (i) => setState(() => _selectedTab = i),
+                  ),
+                  Expanded(
+                    child: _selectedTab == 0
+                        ? _PostsGrid()
+                        : const _EmptyTab(icon: Icons.location_on_outlined),
+                  ),
+                ],
+              ),
       ),
     );
   }
 }
 
 class _UserProfileHeader extends StatelessWidget {
+  final Map<String, dynamic>? user;
   final bool isFollowing;
   final VoidCallback onFollowTap;
 
   const _UserProfileHeader({
+    required this.user,
     required this.isFollowing,
     required this.onFollowTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final nickname = user?['nickname'] ?? '사용자';
+    final username = user?['username'] ?? '-';
+    final bio = user?['bio'];
+    final profileImage = user?['profile_image'] as String?;
+    final backgroundImage = user?['background_image'] as String?;
+    final followerCount = user?['follower_count'] ?? 0;
+    final followingCount = user?['following_count'] ?? 0;
+    final aestheticTag = user?['aesthetic_tag'] as String?;
+
     return Container(
-      color: const Color(0xFFB0B0B0),
+      decoration: BoxDecoration(
+        color: const Color(0xFFB0B0B0),
+        image: backgroundImage != null
+            ? DecorationImage(image: NetworkImage(backgroundImage), fit: BoxFit.cover)
+            : null,
+      ),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,20 +160,12 @@ class _UserProfileHeader extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.white,
-                  size: 22,
-                ),
+                child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 22),
               ),
               const Spacer(),
               GestureDetector(
                 onTap: () => showPostMoreOptions(context),
-                child: const Icon(
-                  Icons.more_horiz,
-                  color: Colors.white,
-                  size: 26,
-                ),
+                child: const Icon(Icons.more_horiz, color: Colors.white, size: 26),
               ),
             ],
           ),
@@ -85,82 +173,59 @@ class _UserProfileHeader extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF9E9E9E),
-                  shape: BoxShape.circle,
-                ),
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: const Color(0xFF9E9E9E),
+                backgroundImage: profileImage != null ? NetworkImage(profileImage) : null,
+                child: profileImage == null
+                    ? const Icon(Icons.person, color: Colors.white, size: 36)
+                    : null,
               ),
               const SizedBox(width: 20),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '사용자',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    nickname,
+                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 6),
-                  Text(
-                    'ID: 0000',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
+                  const SizedBox(height: 6),
+                  Text('@$username', style: const TextStyle(color: Colors.white70, fontSize: 14)),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 20),
-          const Row(
+          Row(
             children: [
-              Text(
-                '0 팔로우',
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
-              SizedBox(width: 20),
-              Text(
-                '0 받은 좋아요/찜',
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
+              Text('$followerCount 팔로워', style: const TextStyle(color: Colors.white, fontSize: 14)),
+              const SizedBox(width: 20),
+              Text('$followingCount 팔로잉', style: const TextStyle(color: Colors.white, fontSize: 14)),
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
-            '자기소개',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+          Text(
+            bio ?? '자기소개가 없습니다',
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              _TagChip(label: '가을 웜톤', icon: Icons.contrast),
-              const SizedBox(width: 8),
-              _TagChip(label: '21호', icon: Icons.palette_outlined),
+              if (aestheticTag != null)
+                _TagChip(label: aestheticTag, icon: Icons.auto_awesome_outlined),
               const Spacer(),
               GestureDetector(
                 onTap: onFollowTap,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 28,
-                    vertical: 10,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isFollowing
-                        ? Colors.white38
-                        : const Color(0xFF6B1F8A),
+                    color: isFollowing ? Colors.white38 : const Color(0xFF6B1F8A),
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Text(
                     isFollowing ? '팔로잉' : '팔로우',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -175,7 +240,6 @@ class _UserProfileHeader extends StatelessWidget {
 class _TagChip extends StatelessWidget {
   final String label;
   final IconData icon;
-
   const _TagChip({required this.label, required this.icon});
 
   @override
@@ -192,10 +256,7 @@ class _TagChip extends StatelessWidget {
         children: [
           Icon(icon, size: 13, color: Colors.white),
           const SizedBox(width: 5),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white, fontSize: 12),
-          ),
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
         ],
       ),
     );
@@ -205,13 +266,11 @@ class _TagChip extends StatelessWidget {
 class _FeedTabBar extends StatelessWidget {
   final int selected;
   final ValueChanged<int> onTap;
-
   const _FeedTabBar({required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final icons = [Icons.grid_on, Icons.location_on_outlined];
-
     return Row(
       children: List.generate(icons.length, (i) {
         final active = selected == i;
@@ -228,11 +287,7 @@ class _FeedTabBar extends StatelessWidget {
                 ),
               ),
             ),
-            child: Icon(
-              icons[i],
-              size: 24,
-              color: active ? const Color(0xFF6B1F8A) : Colors.black38,
-            ),
+            child: Icon(icons[i], size: 24, color: active ? const Color(0xFF6B1F8A) : Colors.black38),
           ),
         );
       }),

@@ -2,10 +2,16 @@
 //  |      로그인 후 마이페이지       |
 //  ————————————————————————————————
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/side_drawer.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'edit/profile_edit_page.dart';
 import 'settings/settings_page.dart';
+import 'follow_list_page.dart';
+
+import 'package:hur_app/app/config/api_config.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -16,6 +22,41 @@ class MyPage extends StatefulWidget {
 
 class _MyPageState extends State<MyPage> {
   int _selectedTab = 0;
+  Map<String, dynamic>? _user;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+  }
+
+  Future<void> _fetchUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('user_id');
+    final token = prefs.getString('auth_token');
+
+    if (userId == null) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/user/$userId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (!mounted) return;
+      if (response.statusCode == 200) {
+        setState(() {
+          _user = jsonDecode(response.body);
+        });
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +66,7 @@ class _MyPageState extends State<MyPage> {
       body: SafeArea(
         child: Column(
           children: [
-            _ProfileHeader(),
+            _ProfileHeader(user: _user, isLoading: _isLoading, onRefresh: _fetchUser),
             _TabBar(
               selected: _selectedTab,
               onTap: (i) => setState(() => _selectedTab = i),
@@ -50,10 +91,41 @@ class _MyPageState extends State<MyPage> {
 }
 
 class _ProfileHeader extends StatelessWidget {
+  final Map<String, dynamic>? user;
+  final bool isLoading;
+  final VoidCallback onRefresh;
+
+  const _ProfileHeader({required this.user, required this.isLoading, required this.onRefresh});
+
+  void _goToFollowList(BuildContext context, bool isFollowers) {
+    final userId = user?['id'];
+    if (userId == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FollowListPage(userId: userId, isFollowers: isFollowers),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final nickname = user?['nickname'] ?? '사용자';
+    final username = user?['username'] ?? '-';
+    final bio = user?['bio'];
+    final profileImage = user?['profile_image'] as String?;
+    final backgroundImage = user?['background_image'] as String?;
+    final followerCount  = user?['follower_count']  ?? 0;
+    final followingCount = user?['following_count'] ?? 0;
+    final aestheticTag = user?['aesthetic_tag'] as String?;
+
     return Container(
-      color: const Color(0xFFB0B0B0),
+      decoration: BoxDecoration(
+        color: const Color(0xFFB0B0B0),
+        image: backgroundImage != null
+            ? DecorationImage(image: NetworkImage(backgroundImage), fit: BoxFit.cover)
+            : null,
+      ),
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,29 +138,20 @@ class _ProfileHeader extends StatelessWidget {
               ),
               const Spacer(),
               OutlinedButton.icon(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProfileEditPage()),
-                ),
-                icon: const Icon(
-                  Icons.edit_outlined,
-                  size: 14,
-                  color: Colors.white,
-                ),
-                label: const Text(
-                  '프로필 편집',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProfileEditPage()),
+                  );
+                  onRefresh();
+                },
+                icon: const Icon(Icons.edit_outlined, size: 14, color: Colors.white),
+                label: const Text('프로필 편집', style: TextStyle(color: Colors.white, fontSize: 13)),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.white54),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 7,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                   minimumSize: Size.zero,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -97,11 +160,7 @@ class _ProfileHeader extends StatelessWidget {
                   context,
                   MaterialPageRoute(builder: (_) => const SettingsPage()),
                 ),
-                child: const Icon(
-                  Icons.settings_outlined,
-                  color: Colors.white,
-                  size: 26,
-                ),
+                child: const Icon(Icons.settings_outlined, color: Colors.white, size: 26),
               ),
             ],
           ),
@@ -112,57 +171,82 @@ class _ProfileHeader extends StatelessWidget {
               Container(
                 width: 88,
                 height: 88,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF9E9E9E),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF9E9E9E),
                   shape: BoxShape.circle,
+                  image: profileImage != null
+                      ? DecorationImage(image: NetworkImage(profileImage), fit: BoxFit.cover)
+                      : null,
                 ),
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : null,
               ),
               const SizedBox(width: 20),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '사용자',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    nickname,
+                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 6),
-                  Text(
-                    'ID: 0000',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
+                  const SizedBox(height: 6),
+                  Text('@$username', style: const TextStyle(color: Colors.white70, fontSize: 14)),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 22),
-          const Row(
+          Row(
             children: [
-              Text(
-                '0 팔로우',
-                style: TextStyle(color: Colors.white, fontSize: 14),
+              GestureDetector(
+                onTap: () => _goToFollowList(context, true),
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '$followerCount',
+                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      const TextSpan(
+                        text: ' 팔로워',
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              SizedBox(width: 20),
-              Text(
-                '0 받은 좋아요/찜',
-                style: TextStyle(color: Colors.white, fontSize: 14),
+              const SizedBox(width: 20),
+              GestureDetector(
+                onTap: () => _goToFollowList(context, false),
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '$followingCount',
+                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      const TextSpan(
+                        text: ' 팔로잉',
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 14),
-          const Text(
-            '자기소개',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+          Text(
+            bio ?? '자기소개가 없습니다',
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 18),
           Wrap(
             spacing: 8,
             children: [
-              _TagChip(label: '가을 웜톤', icon: Icons.contrast),
-              _TagChip(label: '21호', icon: Icons.palette_outlined),
+              if (aestheticTag != null)
+                _TagChip(label: aestheticTag, icon: Icons.auto_awesome_outlined),
             ],
           ),
         ],
