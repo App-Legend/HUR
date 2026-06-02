@@ -56,7 +56,6 @@ const createPost = async (req, res) => {
   }
 };
 
-// 피드 조회 API
 const getFeed = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 0;

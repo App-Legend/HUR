@@ -1,7 +1,9 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../../app/constants.dart';
 import '../login_page.dart';
 
 import 'package:hur_app/app/constants.dart';
@@ -19,7 +21,7 @@ class _SignupPageState extends State<SignupPage> {
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  final _passwordConfirmController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _acceptedPolicy = false;
@@ -37,73 +39,96 @@ class _SignupPageState extends State<SignupPage> {
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    _passwordConfirmController.dispose();
     super.dispose();
   }
 
-  Future<void> _signup() async {
-    final name = _nameController.text.trim();
-    final nickname = _nicknameController.text.trim();
-    final username = _usernameController.text.trim();
-    final email = _emailController.text.trim();
+  
+
+
+  void _signup() async {
+    // 입력 데이터 수집
+    final name = _nameController.text;
+    final nickname = _nicknameController.text;
+    final email = _emailController.text;
     final password = _passwordController.text;
-    final confirmPassword = _confirmPasswordController.text;
+    final passwordConfirm = _passwordConfirmController.text;
 
-    if (name.isEmpty || nickname.isEmpty || username.isEmpty || email.isEmpty || password.isEmpty) {
-      _showSnack('모든 필드를 입력해주세요');
-      return;
-    }
-    if (_selectedGender == null) {
-      _showSnack('성별을 선택해주세요');
-      return;
-    }
-    if (_birthDate == null) {
-      _showSnack('생년월일을 선택해주세요');
-      return;
-    }
-    if (password != confirmPassword) {
-      _showSnack('비밀번호가 일치하지 않습니다');
-      return;
+    // 성별 선택 확인
+    String? gender;
+    if (_selectedGender == '여성') {
+      gender = 'female';
+    } else if (_selectedGender == '남성') {
+      gender = 'male';
+    } else if (_selectedGender == '기타') {
+      gender = 'other';
     }
 
-    setState(() => _isLoading = true);
-    try {
+  // 생년월일 포맷팅
+    String birthDate = '';
+    if (_birthDate != null) {
+      birthDate = '${_birthDate!.year}-${_birthDate!.month.toString().padLeft(2, '0')}-${_birthDate!.day.toString().padLeft(2, '0')}';
+    }
+
+  // API 요청 데이터 생성
+    final requestData = {
+      "name": name,
+      "nickname": nickname,
+      "gender": gender,
+      "birth": birthDate,
+      "email": email,
+      "password": password,
+      "passwordConfirm": passwordConfirm,
+    };
+
+  try {
+      // API 호출
       final response = await http.post(
-        Uri.parse('${ApiConstants.baseUrl}/signup'),
+        Uri.parse('${ApiConstants.baseUrl}:3000/auth/signup'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'name': name,
-          'nickname': nickname,
-          'username': username,
-          'gender': _selectedGender,
-          'birth_date':
-              '${_birthDate!.year}-${_birthDate!.month.toString().padLeft(2, '0')}-${_birthDate!.day.toString().padLeft(2, '0')}',
-          'email': email,
-          'password': password,
-        }),
+        body: jsonEncode(requestData),
       );
 
-      final data = jsonDecode(response.body);
-      if (!mounted) return;
+    if (response.statusCode == 201) {
+        // 성공 처리
+        final data = jsonDecode(response.body);
 
-      if (response.statusCode == 201) {
+        // 토큰 저장 (예: SharedPreferences)
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Dashboard()));
+
+        // 회원가입 성공 메시지 출력
+        SnackBar(content: Text('회원가입 성공!'),);
+        await Future.delayed(const Duration(seconds: 2));
+
+        // 회원가입 성공 시 로그인 페이지로 이동
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const LoginPage()),
         );
+
+      } else if (response.statusCode == 409) {
+        // 이메일 중복 에러
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('이미 사용 중인 이메일입니다')),
+        );
       } else {
-        _showSnack(data['message'] ?? data['error'] ?? '회원가입 실패');
+        // 다른 에러 처리/
+        final errorData = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorData['message'] ?? '회원가입 실패')),
+        );
       }
     } catch (e) {
-      _showSnack('서버 연결 실패: $e');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      // 네트워크 에러 처리
+      print('Network error: $e'); // 에러 로그 추가
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('네트워크 오류가 발생했습니다: $e')),
+      );
     }
   }
 
-  void _showSnack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +167,7 @@ class _SignupPageState extends State<SignupPage> {
               const SizedBox(height: 8),
               _buildTextField(
                 controller: _nameController,
-                hint: '홍길용',
+                hint: '홍길동',
                 prefix: const Icon(Icons.person_outline, color: Colors.black38, size: 20),
               ),
               const SizedBox(height: 16),
@@ -218,7 +243,7 @@ class _SignupPageState extends State<SignupPage> {
               const _FieldLabel('비밀번호확인'),
               const SizedBox(height: 8),
               _buildTextField(
-                controller: _confirmPasswordController,
+                controller: _passwordConfirmController,
                 hint: '••••••••',
                 obscure: _obscureConfirm,
                 prefix: const Icon(Icons.lock_outline, color: Colors.black38, size: 20),

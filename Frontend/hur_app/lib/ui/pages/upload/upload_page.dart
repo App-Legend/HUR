@@ -653,7 +653,11 @@ class _UploadPageState extends State<UploadPage> {
 
                     const Text(
                       '추구미 태그',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
 
                     const SizedBox(height: 16),
@@ -699,7 +703,11 @@ class _UploadPageState extends State<UploadPage> {
 
                     const Text(
                       '사용한 제품',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
 
                     const SizedBox(height: 14),
