@@ -56,7 +56,7 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nickname, username, bio, profile_image, background_image, aesthetic_tag } = req.body;
+        const { nickname, bio, profile_image, background_image, aesthetic_tag } = req.body;
 
         const [existing] = await pool.query('SELECT user_id FROM users WHERE user_id=?', [id]);
         if (existing.length === 0) {
@@ -68,25 +68,19 @@ const updateProfile = async (req, res) => {
             if (dup.length > 0) return res.status(409).json({ message: "이미 사용 중인 닉네임입니다" });
         }
 
-        if (username) {
-            const [dup] = await pool.query('SELECT user_id FROM users WHERE username=? AND user_id!=?', [username, id]);
-            if (dup.length > 0) return res.status(409).json({ message: "이미 사용 중인 아이디입니다" });
-        }
-
         await pool.query(
             `UPDATE users
              SET nickname         = COALESCE(?, nickname),
-                 username         = COALESCE(?, username),
                  bio              = COALESCE(?, bio),
                  profile_image    = COALESCE(?, profile_image),
                  background_image = COALESCE(?, background_image),
                  aesthetic_tag    = COALESCE(?, aesthetic_tag)
              WHERE user_id=?`,
-            [nickname, username, bio, profile_image, background_image, aesthetic_tag, id]
+            [nickname, bio, profile_image, background_image, aesthetic_tag, id]
         );
 
         const [updated] = await pool.query(
-            'SELECT user_id AS id, email, name, nickname, username, bio, profile_image, background_image, aesthetic_tag FROM users WHERE user_id=?',
+            'SELECT user_id AS id, email, name, nickname, bio, profile_image, background_image, aesthetic_tag FROM users WHERE user_id=?',
             [id]
         );
 

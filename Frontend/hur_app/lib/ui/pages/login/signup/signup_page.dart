@@ -2,11 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-import '../../../../app/constants.dart';
-import '../login_page.dart';
-
 import 'package:hur_app/app/constants.dart';
+
+import '../login_page.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -18,14 +16,13 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   final _nameController = TextEditingController();
   final _nicknameController = TextEditingController();
-  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordConfirmController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _acceptedPolicy = false;
-  bool _isLoading = false;
+  final bool _isLoading = false;
   String? _selectedGender;
   DateTime? _birthDate;
 
@@ -36,7 +33,6 @@ class _SignupPageState extends State<SignupPage> {
   void dispose() {
     _nameController.dispose();
     _nicknameController.dispose();
-    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _passwordConfirmController.dispose();
@@ -84,7 +80,7 @@ class _SignupPageState extends State<SignupPage> {
   try {
       // API 호출
       final response = await http.post(
-        Uri.parse('${ApiConstants.baseUrl}:3000/auth/signup'),
+        Uri.parse('${ApiConstants.baseUrl}/auth/signup'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -97,7 +93,11 @@ class _SignupPageState extends State<SignupPage> {
         // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Dashboard()));
 
         // 회원가입 성공 메시지 출력
-        SnackBar(content: Text('회원가입 성공!'),);
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('회원가입 성공!')));
+        }
         await Future.delayed(const Duration(seconds: 2));
 
         // 회원가입 성공 시 로그인 페이지로 이동
@@ -177,14 +177,6 @@ class _SignupPageState extends State<SignupPage> {
                 controller: _nicknameController,
                 hint: '홍길동',
                 prefix: const Icon(Icons.person_outline, color: Colors.black38, size: 20),
-              ),
-              const SizedBox(height: 16),
-              const _FieldLabel('아이디'),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _usernameController,
-                hint: 'hong_gildong',
-                prefix: const Icon(Icons.alternate_email, color: Colors.black38, size: 20),
               ),
               const SizedBox(height: 16),
               Row(

@@ -134,11 +134,6 @@ class _UserItem extends StatelessWidget {
                   user['nickname'] ?? '',
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '@${user['username'] ?? ''}',
-                  style: const TextStyle(fontSize: 12, color: Colors.black45),
-                ),
               ],
             ),
           ),

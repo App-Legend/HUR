@@ -137,7 +137,6 @@ class _UserProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nickname = user?['nickname'] ?? '사용자';
-    final username = user?['username'] ?? '-';
     final bio = user?['bio'];
     final profileImage = user?['profile_image'] as String?;
     final backgroundImage = user?['background_image'] as String?;
@@ -189,8 +188,6 @@ class _UserProfileHeader extends StatelessWidget {
                     nickname,
                     style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 6),
-                  Text('@$username', style: const TextStyle(color: Colors.white70, fontSize: 14)),
                 ],
               ),
             ],

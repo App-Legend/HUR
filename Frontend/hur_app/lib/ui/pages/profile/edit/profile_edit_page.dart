@@ -23,7 +23,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   bool _isSaving = false;
 
   String _nickname = '';
-  String _username = '';
   String _bio = '';
   String? _aestheticTag;
   String? _profileImageUrl;
@@ -57,7 +56,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         setState(() {
           _user = data;
           _nickname = data['nickname'] ?? '';
-          _username = data['username'] ?? '';
           _bio = data['bio'] ?? '';
           _aestheticTag = data['aesthetic_tag'];
           _profileImageUrl = data['profile_image'];
@@ -86,7 +84,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         },
         body: jsonEncode({
           'nickname': _nickname,
-          'username': _username,
           'bio': _bio,
           'aesthetic_tag': _aestheticTag,
           'profile_image': _profileImageUrl,
@@ -267,11 +264,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         label: '닉네임',
                         value: _nickname,
                         onTap: () => _editField('닉네임', _nickname, (v) => setState(() => _nickname = v)),
-                      ),
-                      _EditRow(
-                        label: 'ID',
-                        value: '@$_username',
-                        onTap: () => _editField('아이디', _username, (v) => setState(() => _username = v)),
                       ),
                     ],
                   ),

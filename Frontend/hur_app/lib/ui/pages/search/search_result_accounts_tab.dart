@@ -118,7 +118,6 @@ class _SearchResultAccountsTabState extends State<SearchResultAccountsTab> {
         final account = _accounts[index];
         return _AccountItem(
           nickname: account['nickname'] ?? '',
-          username: account['username'] ?? '',
           profileImage: account['profile_image'],
           isFollowing: account['is_following'] as bool? ?? false,
           onFollowToggle: () => _toggleFollow(index),
@@ -130,14 +129,12 @@ class _SearchResultAccountsTabState extends State<SearchResultAccountsTab> {
 
 class _AccountItem extends StatelessWidget {
   final String nickname;
-  final String username;
   final String? profileImage;
   final bool isFollowing;
   final VoidCallback onFollowToggle;
 
   const _AccountItem({
     required this.nickname,
-    required this.username,
     required this.profileImage,
     required this.isFollowing,
     required this.onFollowToggle,
@@ -167,7 +164,6 @@ class _AccountItem extends StatelessWidget {
                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
                 ),
                 const SizedBox(height: 2),
-                Text('@$username', style: const TextStyle(fontSize: 11, color: Color(0xff9b9b9b))),
               ],
             ),
           ),

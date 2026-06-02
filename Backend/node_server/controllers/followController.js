@@ -66,7 +66,7 @@ const getFollowers = async (req, res) => {
     try {
         const { id } = req.params;
         const [rows] = await pool.query(
-            `SELECT u.user_id AS id, u.nickname, u.username, u.profile_image
+            `SELECT u.user_id AS id, u.nickname, u.profile_image
              FROM follow f JOIN users u ON f.follower_id = u.user_id
              WHERE f.following_id = ?`,
             [id]
@@ -82,7 +82,7 @@ const getFollowing = async (req, res) => {
     try {
         const { id } = req.params;
         const [rows] = await pool.query(
-            `SELECT u.user_id AS id, u.nickname, u.username, u.profile_image
+            `SELECT u.user_id AS id, u.nickname, u.profile_image
              FROM follow f JOIN users u ON f.following_id = u.user_id
              WHERE f.follower_id = ?`,
             [id]
