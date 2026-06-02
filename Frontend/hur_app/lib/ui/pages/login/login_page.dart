@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(body['message'] ?? '로그인에 실패했어요.')),
+          SnackBar(content: Text(body['message'] ?? body['error'] ?? '로그인에 실패했어요.')),
         );
       }
     } catch (e) {
