@@ -32,12 +32,20 @@ class ProductMorePopup extends StatelessWidget {
             child: Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(14),
-                child: Image.asset(
-                  imagePath,
-                  width: 86,
-                  height: 86,
-                  fit: BoxFit.cover,
-                ),
+                child: imagePath.startsWith('http')
+                    ? Image.network(
+                        imagePath,
+                        width: 86,
+                        height: 86,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => Container(
+                          width: 86,
+                          height: 86,
+                          color: Colors.grey[200],
+                          child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                        ),
+                      )
+                    : Image.asset(imagePath, width: 86, height: 86, fit: BoxFit.cover),
               ),
             ),
           ),

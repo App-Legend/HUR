@@ -175,12 +175,20 @@ class _PhotoTab extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    imagePath,
-                    width: 84,
-                    height: 84,
-                    fit: BoxFit.cover,
-                  ),
+                  child: imagePath.startsWith('http')
+                      ? Image.network(
+                          imagePath,
+                          width: 84,
+                          height: 84,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => Container(
+                            width: 84,
+                            height: 84,
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                          ),
+                        )
+                      : Image.asset(imagePath, width: 84, height: 84, fit: BoxFit.cover),
                 ),
 
                 const SizedBox(width: 24),

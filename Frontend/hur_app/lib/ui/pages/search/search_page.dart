@@ -173,10 +173,10 @@ class SearchPageState extends State<SearchPage>
                       Expanded(
                         child: TabBarView(
                           controller: _tabController,
-                          children: const [
-                            SearchResultCosmeticsTab(),
-                            SearchResultAccountsTab(),
-                            SearchResultFeedTab(),
+                          children: [
+                            SearchResultCosmeticsTab(query: _searchController.text.trim()),
+                            SearchResultAccountsTab(query: _searchController.text.trim()),
+                            const SearchResultFeedTab(),
                           ],
                         ),
                       ),

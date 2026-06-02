@@ -1,6 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// imagePath가 'http'로 시작하면 NetworkImage, 아니면 AssetImage 사용
+Widget _productImage(String imagePath, {double? width, double? height}) {
+  final fit = BoxFit.cover;
+  if (imagePath.startsWith('http')) {
+    return Image.network(
+      imagePath,
+      width: width,
+      height: height,
+      fit: fit,
+      errorBuilder: (_, _, _) => Container(
+        width: width,
+        height: height,
+        color: Colors.grey[200],
+        child: const Icon(Icons.image_not_supported, color: Colors.grey, size: 20),
+      ),
+    );
+  }
+  return Image.asset(imagePath, width: width, height: height, fit: fit);
+}
+
 class ProductItemContainer extends StatelessWidget {
   final String? rank;
   final String imagePath;
@@ -59,12 +79,7 @@ class ProductItemContainer extends StatelessWidget {
 
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
-              imagePath,
-              width: 52,
-              height: 52,
-              fit: BoxFit.cover,
-            ),
+            child: _productImage(imagePath, width: 52, height: 52),
           ),
 
           const SizedBox(width: 14),

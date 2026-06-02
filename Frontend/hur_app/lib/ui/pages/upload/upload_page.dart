@@ -14,6 +14,7 @@ import 'package:hur_app/ui/pages/upload/widgets/upload_menu_row.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'guest_upload_page.dart';
 
 class _StickerData {
   double xRatio;
@@ -78,7 +79,7 @@ class _UploadPageState extends State<UploadPage> {
 
   Future<void> _checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = prefs.getString('auth_token');
     setState(() => _isLoggedIn = token != null && token.isNotEmpty);
   }
 
@@ -225,7 +226,7 @@ class _UploadPageState extends State<UploadPage> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
+      final token = prefs.getString('auth_token') ?? '';
 
       final request = http.MultipartRequest(
         'POST',
@@ -544,8 +545,8 @@ class _UploadPageState extends State<UploadPage> {
 
   @override
   Widget build(BuildContext context) {
-    // if (_isLoggedIn == null) return const Scaffold(backgroundColor: Colors.white);
-    // if (_isLoggedIn == false) return const UploadLoginGate();
+    if (_isLoggedIn == null) return const Scaffold(backgroundColor: Colors.white);
+    if (_isLoggedIn == false) return const UploadLoginGate();
 
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 

@@ -6,16 +6,16 @@ const searchUsers = async (req, res) => {
         if (!q || q.trim() === "") return res.json([]);
 
         const [rows] = await pool.query(
-            `SELECT u.user_id AS id, u.nickname, u.username, u.profile_image,
+            `SELECT u.user_id AS id, u.nickname, u.profile_image,
                     EXISTS(
                         SELECT 1 FROM follow
                         WHERE follower_id = ? AND following_id = u.user_id
                     ) AS is_following
              FROM users u
-             WHERE (u.username LIKE ? OR u.nickname LIKE ?)
+             WHERE u.nickname LIKE ?
                AND u.user_id != ?
              LIMIT 20`,
-            [me ?? 0, `%${q}%`, `%${q}%`, me ?? 0]
+            [me ?? 0, `%${q}%`, me ?? 0]
         );
         res.json(rows);
     } catch (err) {
@@ -26,9 +26,10 @@ const searchUsers = async (req, res) => {
 const getProfile = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log('[getProfile] id:', id);
 
         const [rows] = await pool.query(
-            `SELECT u.user_id AS id, u.email, u.name, u.nickname, u.username, u.gender, u.birth_date,
+            `SELECT u.user_id AS id, u.email, u.name, u.nickname, u.gender, u.birth_date,
                     u.bio, u.profile_image, u.background_image, u.aesthetic_tag,
                     COUNT(DISTINCT f_in.follower_id)   AS follower_count,
                     COUNT(DISTINCT f_out.following_id) AS following_count
@@ -41,10 +42,13 @@ const getProfile = async (req, res) => {
         );
 
         if (rows.length === 0) {
+            console.log('[getProfile] 유저 없음, id:', id);
             return res.status(404).json({ message: "유저를 찾을 수 없습니다" });
         }
+        console.log('[getProfile] 응답:', rows[0]);
         res.json(rows[0]);
     } catch (err) {
+        console.error('[getProfile] 에러:', err.message);
         res.status(500).json({ error: err.message });
     }
 };

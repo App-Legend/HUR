@@ -38,7 +38,7 @@ class _MainPageState extends State<MainPage> {
   Future<void> _checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
-    setState(() => _isLoggedIn = prefs.getInt('userId') != null);
+    setState(() => _isLoggedIn = prefs.getInt('user_id') != null);
   }
 
   @override

@@ -33,7 +33,6 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     setState(() => _isLoading = true);
-
     try {
       final response = await http.post(
         Uri.parse('${ApiConstants.baseUrl}/auth/login'),
@@ -47,9 +46,9 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', body['token']);
-        await prefs.setInt('userId', body['user']['id']);
-        await prefs.setString('userName', body['user']['name']);
+        await prefs.setString('auth_token', body['token']);
+        await prefs.setInt('user_id', body['user']['id']);
+        await prefs.setString('user_name', body['user']['name']);
 
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
@@ -175,6 +174,8 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6B1F8A),
+                    disabledBackgroundColor:
+                        const Color(0xFF6B1F8A).withValues(alpha: 0.4),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -294,6 +295,23 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const MainPage()),
+                  ),
+                  child: const Text(
+                    '비회원으로 시작하기',
+                    style: TextStyle(
+                      color: Colors.black38,
+                      fontSize: 13,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.black38,
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 32),
             ],
