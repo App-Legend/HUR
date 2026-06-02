@@ -3,7 +3,6 @@
 //  ————————————————————————————————
 
 import 'package:flutter/material.dart';
-import 'package:hur_app/app/extensions/snackbar_extension.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/comment_popup.dart';
@@ -15,9 +14,16 @@ import 'package:hur_app/ui/pages/home/detail/widgets/used_product_header.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/used_product_list.dart';
 
 class DetailHomePage extends StatefulWidget {
-  final String imagePath;
+  final String imageUrl;
+  final String nickname;
+  final String title;
 
-  const DetailHomePage({super.key, required this.imagePath});
+  const DetailHomePage({
+    super.key,
+    required this.imageUrl,
+    required this.nickname,
+    required this.title,
+  });
 
   @override
   State<DetailHomePage> createState() => _DetailHomePage();
@@ -96,11 +102,11 @@ class _DetailHomePage extends State<DetailHomePage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    DetailProfileHeader(nickname: '닉네임', onFollowTap: () {}),
+                    DetailProfileHeader(nickname: widget.nickname, onFollowTap: () {}),
 
                     const SizedBox(height: 12),
 
-                    ImageTagSection(imagePath: widget.imagePath),
+                    ImageTagSection(imageUrl: widget.imageUrl),
 
                     DetailIconActionBar(
                       isLiked: isLiked,
@@ -117,9 +123,9 @@ class _DetailHomePage extends State<DetailHomePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            '봄 웜톤 데일리 메이크업',
-                            style: TextStyle(
+                          Text(
+                            widget.title,
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 21,
                               fontWeight: FontWeight.bold,

@@ -66,7 +66,6 @@ const getFeed = async (req, res) => {
         p.post_id,
         p.title,
         p.post_image,
-        p.post_like,
         p.created_at,
         u.nickname,
         u.profile_image,
@@ -79,7 +78,7 @@ const getFeed = async (req, res) => {
       FROM posts p
       JOIN users u ON p.user_id = u.user_id
       WHERE p.created_at > NOW() - INTERVAL 7 DAY
-      ORDER BY p.post_like DESC, p.created_at DESC
+      ORDER BY p.created_at DESC
       LIMIT ? OFFSET ?`,
       [limit, offset]
     );

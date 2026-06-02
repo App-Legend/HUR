@@ -249,7 +249,9 @@ class _PhotoTab extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (_) => DetailHomePage(
-                      imagePath: _kDetailImages[index],
+                      imageUrl: _kDetailImages[index],
+                      nickname: '',
+                      title: '',
                     ),
                   ),
                 ),
