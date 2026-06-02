@@ -4,13 +4,50 @@
 
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../login/login_page.dart';
+import 'my_page.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  bool _isLoggedIn = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLogin();
+  }
+
+  Future<void> _checkLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    final userId = prefs.getInt('user_id');
+    if (mounted) {
+      setState(() {
+        _isLoggedIn = token != null && token.isNotEmpty && userId != null;
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_isLoggedIn) return const MyPage();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -32,7 +69,7 @@ class ProfilePage extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(18, 20, 18, 20),
               ),
             ),
-            const Expanded(child: _NotLoggedInBody()),
+            Expanded(child: _NotLoggedInBody(onLoginSuccess: _checkLogin)),
           ],
         ),
       ),
@@ -41,7 +78,8 @@ class ProfilePage extends StatelessWidget {
 }
 
 class _NotLoggedInBody extends StatelessWidget {
-  const _NotLoggedInBody();
+  final VoidCallback onLoginSuccess;
+  const _NotLoggedInBody({required this.onLoginSuccess});
 
   @override
   Widget build(BuildContext context) {
@@ -71,11 +109,12 @@ class _NotLoggedInBody extends StatelessWidget {
             width: double.infinity,
             height: 54,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const LoginPage()),
                 );
+                onLoginSuccess();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6B1F8A),

@@ -8,6 +8,8 @@ import '../../../app/constants.dart';
 import '../main_page.dart';
 import 'signup/signup_page.dart';
 
+import 'package:hur_app/app/config/api_config.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -26,6 +28,7 @@ class _LoginPageState extends State<LoginPage> {
     final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
+      _showSnack('이메일과 비밀번호를 입력해주세요');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('이메일과 비밀번호를 입력해주세요.')),
       );
@@ -33,6 +36,9 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     setState(() => _isLoading = true);
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/login'),
 
     try {
       final response = await http.post(
@@ -175,6 +181,8 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6B1F8A),
+                    disabledBackgroundColor:
+                        const Color(0xFF6B1F8A).withValues(alpha: 0.4),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -294,6 +302,23 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const MainPage()),
+                  ),
+                  child: const Text(
+                    '비회원으로 시작하기',
+                    style: TextStyle(
+                      color: Colors.black38,
+                      fontSize: 13,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.black38,
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 32),
             ],

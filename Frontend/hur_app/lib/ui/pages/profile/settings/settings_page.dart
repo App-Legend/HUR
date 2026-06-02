@@ -3,9 +3,52 @@
 //  ————————————————————————————————
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../login/login_page.dart';
+
+import 'package:hur_app/app/config/api_config.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('로그아웃'),
+        content: const Text('정말 로그아웃 하시겠어요?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('로그아웃', style: TextStyle(color: Color(0xFFE53935))),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+      await http.post(
+        Uri.parse('$baseUrl/logout'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } catch (_) {}
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    await prefs.remove('user_id');
+
+    if (context.mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +95,7 @@ class SettingsPage extends StatelessWidget {
           _SettingsItem(
             label: '로그아웃',
             labelColor: const Color(0xFFE53935),
-            onTap: () {},
+            onTap: () => _logout(context),
           ),
           _SettingsItem(
             label: '회원탈퇴',

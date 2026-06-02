@@ -1,6 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../login_page.dart';
+
+import 'package:hur_app/app/config/api_config.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -12,12 +16,14 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   final _nameController = TextEditingController();
   final _nicknameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _acceptedPolicy = false;
+  bool _isLoading = false;
   String? _selectedGender;
   DateTime? _birthDate;
 
@@ -28,14 +34,75 @@ class _SignupPageState extends State<SignupPage> {
   void dispose() {
     _nameController.dispose();
     _nicknameController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _signup() {
-    // TODO: 실제 회원가입 로직 연결
+  Future<void> _signup() async {
+    final name = _nameController.text.trim();
+    final nickname = _nicknameController.text.trim();
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (name.isEmpty || nickname.isEmpty || username.isEmpty || email.isEmpty || password.isEmpty) {
+      _showSnack('모든 필드를 입력해주세요');
+      return;
+    }
+    if (_selectedGender == null) {
+      _showSnack('성별을 선택해주세요');
+      return;
+    }
+    if (_birthDate == null) {
+      _showSnack('생년월일을 선택해주세요');
+      return;
+    }
+    if (password != confirmPassword) {
+      _showSnack('비밀번호가 일치하지 않습니다');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/signup'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': name,
+          'nickname': nickname,
+          'username': username,
+          'gender': _selectedGender,
+          'birth_date':
+              '${_birthDate!.year}-${_birthDate!.month.toString().padLeft(2, '0')}-${_birthDate!.day.toString().padLeft(2, '0')}',
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+      if (!mounted) return;
+
+      if (response.statusCode == 201) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginPage()),
+        );
+      } else {
+        _showSnack(data['message'] ?? data['error'] ?? '회원가입 실패');
+      }
+    } catch (e) {
+      _showSnack('서버 연결 실패: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSnack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
@@ -85,6 +152,14 @@ class _SignupPageState extends State<SignupPage> {
                 controller: _nicknameController,
                 hint: '홍길동',
                 prefix: const Icon(Icons.person_outline, color: Colors.black38, size: 20),
+              ),
+              const SizedBox(height: 16),
+              const _FieldLabel('아이디'),
+              const SizedBox(height: 8),
+              _buildTextField(
+                controller: _usernameController,
+                hint: 'hong_gildong',
+                prefix: const Icon(Icons.alternate_email, color: Colors.black38, size: 20),
               ),
               const SizedBox(height: 16),
               Row(
@@ -182,7 +257,7 @@ class _SignupPageState extends State<SignupPage> {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: _acceptedPolicy ? _signup : null,
+                  onPressed: (_acceptedPolicy && !_isLoading) ? _signup : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _purple,
                     disabledBackgroundColor: _purple.withValues(alpha: 0.4),
@@ -190,10 +265,19 @@ class _SignupPageState extends State<SignupPage> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
-                  child: const Text(
-                    '회원가입',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          '회원가입',
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
                 ),
               ),
               const SizedBox(height: 28),
