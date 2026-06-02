@@ -86,10 +86,14 @@ const signup = async (req, res) => {
     // 유효성 검사
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('body:', req.body);
+      console.log('errors:', errors.array());
+      
       return res.status(400).json({ 
         message: 'Validation failed',
         errors: errors.array() 
       });
+
     }
 
     const { email, password, nickname, name, gender, birth } = req.body;
@@ -108,9 +112,8 @@ const signup = async (req, res) => {
     }
 
     // 비밀번호 강도 검사
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
     const passwordRequirements = {
-      hasUppercase: /[A-Z]/.test(password),
       hasLowercase: /[a-z]/.test(password),
       hasNumber: /\d/.test(password),
       hasSpecialChar: /[@$!%*?&]/.test(password),
@@ -120,9 +123,6 @@ const signup = async (req, res) => {
     if (!passwordRegex.test(password)) {
       const missingRequirements = [];
 
-      if (!passwordRequirements.hasUppercase) {
-        missingRequirements.push('대문자');
-      }
       if (!passwordRequirements.hasLowercase) {
         missingRequirements.push('소문자');
       }
@@ -141,7 +141,6 @@ const signup = async (req, res) => {
         details: {
           missingRequirements,
           required: {
-            uppercase: '대문자',
             lowercase: '소문자',
             number: '숫자',
             specialChar: '특수문자',

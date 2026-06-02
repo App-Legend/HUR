@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../../app/constants.dart';
 import '../login_page.dart';
 
 class SignupPage extends StatefulWidget {
@@ -17,7 +18,7 @@ class _SignupPageState extends State<SignupPage> {
   final _nicknameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  final _passwordConfirmController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _acceptedPolicy = false;
@@ -33,7 +34,7 @@ class _SignupPageState extends State<SignupPage> {
     _nicknameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    _passwordConfirmController.dispose();
     super.dispose();
   }
 
@@ -46,6 +47,7 @@ class _SignupPageState extends State<SignupPage> {
     final nickname = _nicknameController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
+    final passwordConfirm = _passwordConfirmController.text;
 
     // 성별 선택 확인
     String? gender;
@@ -71,12 +73,13 @@ class _SignupPageState extends State<SignupPage> {
       "birth": birthDate,
       "email": email,
       "password": password,
+      "passwordConfirm": passwordConfirm,
     };
 
   try {
       // API 호출
       final response = await http.post(
-        Uri.parse('http://172.16.13.141:3000/signup'),
+        Uri.parse('${ApiConstants.baseUrl}:3000/auth/signup'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -84,10 +87,19 @@ class _SignupPageState extends State<SignupPage> {
     if (response.statusCode == 201) {
         // 성공 처리
         final data = jsonDecode(response.body);
-        print('회원가입 성공: ${data['token']}');
 
         // 토큰 저장 (예: SharedPreferences)
         // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Dashboard()));
+
+        // 회원가입 성공 메시지 출력
+        SnackBar(content: Text('회원가입 성공!'),);
+        await Future.delayed(const Duration(seconds: 2));
+
+        // 회원가입 성공 시 로그인 페이지로 이동
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginPage()),
+        );
 
       } else if (response.statusCode == 409) {
         // 이메일 중복 에러
@@ -95,7 +107,7 @@ class _SignupPageState extends State<SignupPage> {
           const SnackBar(content: Text('이미 사용 중인 이메일입니다')),
         );
       } else {
-        // 다른 에러 처리
+        // 다른 에러 처리/
         final errorData = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorData['message'] ?? '회원가입 실패')),
@@ -218,7 +230,7 @@ class _SignupPageState extends State<SignupPage> {
               const _FieldLabel('비밀번호확인'),
               const SizedBox(height: 8),
               _buildTextField(
-                controller: _confirmPasswordController,
+                controller: _passwordConfirmController,
                 hint: '••••••••',
                 obscure: _obscureConfirm,
                 prefix: const Icon(Icons.lock_outline, color: Colors.black38, size: 20),
