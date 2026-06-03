@@ -4,63 +4,44 @@
 
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
-import 'package:hur_app/ui/pages/ranking/detail_ranking_page.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class UsedProductList extends StatelessWidget {
   final VoidCallback onOpenTap;
+  final List<Map<String, dynamic>> stickers;
 
-  const UsedProductList({super.key, required this.onOpenTap});
+  const UsedProductList({
+    super.key,
+    required this.onOpenTap,
+    required this.stickers,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final products = [
-      {
-        'imagePath': 'assets/images/ranking/ranking4.jpg',
-        'brandName': '얼터너티브스테레오',
-        'productName': '립 포션 카라멜 글레이즈',
-        'price': '18,900원~',
-      },
-      {
-        'imagePath': 'assets/images/ranking/ranking5.jpg',
-        'brandName': '얼터너티브스테레오',
-        'productName': '립 포션 카라멜 글레이즈',
-        'price': '18,900원~',
-      },
-      {
-        'imagePath': 'assets/images/ranking/ranking6.jpg',
-        'brandName': '얼터너티브스테레오',
-        'productName': '립 포션 카라멜 글레이즈',
-        'price': '18,900원~',
-      },
-    ];
+    if (stickers.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        child: Text(
+          '사용한 제품이 없습니다',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+      );
+    }
 
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: products.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 0),
+      itemCount: stickers.length,
+      separatorBuilder: (_, __) => const SizedBox.shrink(),
       itemBuilder: (context, index) {
-        final product = products[index];
-
+        final s = stickers[index];
         return ProductItemContainer(
-          imagePath: product['imagePath']!,
-          brandName: product['brandName']!,
-          productName: product['productName']!,
-          price: product['price']!,
+          imagePath: '',
+          brandName: s['brand_name'] ?? '',
+          productName: s['product_name'] ?? '',
+          price: '',
           onOpenTap: onOpenTap,
           trailingIcon: Symbols.more_horiz,
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => DetailRankingPage(
-                rank: '${index + 1}',
-                imagePath: product['imagePath']!,
-                brand: product['brandName']!,
-                name: product['productName']!,
-              ),
-            ),
-          ),
         );
       },
     );

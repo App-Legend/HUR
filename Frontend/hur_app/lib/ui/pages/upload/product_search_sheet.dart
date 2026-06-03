@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:hur_app/app/constants.dart';
 
 class ProductItem {
-  final String id;
+  final int id;
   final String brand;
   final String name;
   final String? imagePath;
@@ -12,39 +15,14 @@ class ProductItem {
     required this.name,
     this.imagePath,
   });
-}
 
-const List<ProductItem> _lipProducts = [
-  ProductItem(
-    id: '1',
-    brand: '롬앤',
-    name: '베터 댄 팔레트 03',
-  ),
-  ProductItem(
-    id: '2',
-    brand: '얼터너티브스테레오',
-    name: '립 포션 카라멜 글레이즈',
-    imagePath: 'assets/images/ranking/rank1.png',
-  ),
-  ProductItem(
-    id: '3',
-    brand: '퓌',
-    name: '로즈 옵세션 스테이핏 틴트',
-    imagePath: 'assets/images/ranking/ranking5.jpg',
-  ),
-  ProductItem(
-    id: '4',
-    brand: '헤라',
-    name: '센슈얼 누드 글로스',
-    imagePath: 'assets/images/ranking/ranking7.jpg',
-  ),
-  ProductItem(id: '5', brand: '3CE', name: '무드 레시피 립 컬러'),
-  ProductItem(id: '6', brand: '클리오', name: '버진 키스 블루밍 틴트'),
-  ProductItem(id: '7', brand: '조선미녀', name: '비타-B 립 에센스 틴트'),
-  ProductItem(id: '8', brand: '마몽드', name: '립 착 틴트'),
-  ProductItem(id: '9', brand: '에뛰드', name: '픽싱 틴트'),
-  ProductItem(id: '10', brand: '맥', name: '파우더 키스 리퀴드 립컬러'),
-];
+  factory ProductItem.fromJson(Map<String, dynamic> json) => ProductItem(
+        id: json['id'] as int,
+        brand: json['brand'] ?? '',
+        name: json['name'] ?? '',
+        imagePath: json['image'] as String?,
+      );
+}
 
 class ProductSearchSheet extends StatefulWidget {
   const ProductSearchSheet({super.key});
@@ -55,19 +33,61 @@ class ProductSearchSheet extends StatefulWidget {
 
 class _ProductSearchSheetState extends State<ProductSearchSheet> {
   final TextEditingController _searchController = TextEditingController();
+  List<ProductItem> _products = [];
+  bool _isLoading = false;
   String _query = '';
 
-  List<ProductItem> get _filtered {
-    if (_query.isEmpty) return _lipProducts;
-    return _lipProducts.where((p) {
-      return p.brand.contains(_query) || p.name.contains(_query);
-    }).toList();
+  @override
+  void initState() {
+    super.initState();
+    _fetchInitial();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchInitial() async {
+    setState(() => _isLoading = true);
+    try {
+      final res = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/products/ranking?limit=30'),
+      );
+      if (res.statusCode == 200 && mounted) {
+        final List data = jsonDecode(res.body);
+        setState(() => _products = data.map((e) => ProductItem.fromJson(e)).toList());
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _search(String query) async {
+    setState(() {
+      _query = query;
+      _isLoading = true;
+    });
+
+    if (query.trim().isEmpty) {
+      await _fetchInitial();
+      return;
+    }
+
+    try {
+      final uri = Uri.parse('${ApiConstants.baseUrl}/products/search')
+          .replace(queryParameters: {'q': query.trim(), 'limit': '30'});
+      final res = await http.get(uri);
+      if (res.statusCode == 200 && mounted) {
+        final List data = jsonDecode(res.body);
+        setState(() => _products = data.map((e) => ProductItem.fromJson(e)).toList());
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -91,7 +111,7 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
           ),
           const SizedBox(height: 16),
           const Text(
-            '립 제품 검색',
+            '제품 검색',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -104,18 +124,11 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
             child: TextField(
               controller: _searchController,
               style: const TextStyle(color: Colors.black),
-              onChanged: (v) => setState(() => _query = v),
+              onChanged: _search,
               decoration: InputDecoration(
                 hintText: '브랜드명 또는 제품명 검색',
-                hintStyle: const TextStyle(
-                  fontSize: 13,
-                  color: Color(0xffaaaaaa),
-                ),
-                prefixIcon: const Icon(
-                  Icons.search,
-                  color: Color(0xffaaaaaa),
-                  size: 20,
-                ),
+                hintStyle: const TextStyle(fontSize: 13, color: Color(0xffaaaaaa)),
+                prefixIcon: const Icon(Icons.search, color: Color(0xffaaaaaa), size: 20),
                 filled: true,
                 fillColor: const Color(0xfff5f5f5),
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
@@ -128,81 +141,78 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
           ),
           const SizedBox(height: 12),
           Expanded(
-            child: _filtered.isEmpty
-                ? const Center(
-                    child: Text(
-                      '검색 결과가 없어요',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xffaaaaaa),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _products.isEmpty
+                    ? Center(
+                        child: Text(
+                          _query.isEmpty ? '제품을 불러오는 중...' : '검색 결과가 없어요',
+                          style: const TextStyle(fontSize: 14, color: Color(0xffaaaaaa)),
+                        ),
+                      )
+                    : ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: _products.length,
+                        separatorBuilder: (_, __) =>
+                            const Divider(height: 1, color: Color(0xfff0f0f0)),
+                        itemBuilder: (context, index) {
+                          final product = _products[index];
+                          final imageUrl = product.imagePath;
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 6, horizontal: 0),
+                            leading: Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: const Color(0xfff5f5f5),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: imageUrl != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        imageUrl,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => const Icon(
+                                          Icons.face_retouching_natural,
+                                          color: Color(0xffcccccc),
+                                          size: 24,
+                                        ),
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.face_retouching_natural,
+                                      color: Color(0xffcccccc),
+                                      size: 24,
+                                    ),
+                            ),
+                            title: Text(
+                              product.name,
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black),
+                            ),
+                            subtitle: Text(
+                              product.brand,
+                              style: const TextStyle(
+                                  fontSize: 12, color: Color(0xff888888)),
+                            ),
+                            trailing: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: const BoxDecoration(
+                                color: Color(0xff9c27b0),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.add,
+                                  color: Colors.white, size: 18),
+                            ),
+                            onTap: () => Navigator.pop(context, product),
+                          );
+                        },
                       ),
-                    ),
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: _filtered.length,
-                    separatorBuilder: (_, _) =>
-                        const Divider(height: 1, color: Color(0xfff0f0f0)),
-                    itemBuilder: (context, index) {
-                      final product = _filtered[index];
-                      return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 6,
-                          horizontal: 0,
-                        ),
-                        leading: Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: const Color(0xfff5f5f5),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: product.imagePath != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.asset(
-                                    product.imagePath!,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : const Icon(
-                                  Icons.face_retouching_natural,
-                                  color: Color(0xffcccccc),
-                                  size: 24,
-                                ),
-                        ),
-                        title: Text(
-                          product.name,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black,
-                          ),
-                        ),
-                        subtitle: Text(
-                          product.brand,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xff888888),
-                          ),
-                        ),
-                        trailing: Container(
-                          width: 30,
-                          height: 30,
-                          decoration: const BoxDecoration(
-                            color: Color(0xff9c27b0),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ),
-                        onTap: () => Navigator.pop(context, product),
-                      );
-                    },
-                  ),
           ),
           const SizedBox(height: 24),
         ],

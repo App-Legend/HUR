@@ -19,6 +19,7 @@ import 'guest_upload_page.dart';
 class _StickerData {
   double xRatio;
   double yRatio;
+  final int productId;
   final String brandName;
   final String productName;
   final String? imagePath;
@@ -26,6 +27,7 @@ class _StickerData {
   _StickerData({
     required this.xRatio,
     required this.yRatio,
+    required this.productId,
     required this.brandName,
     required this.productName,
     this.imagePath,
@@ -116,6 +118,7 @@ class _UploadPageState extends State<UploadPage> {
       _stickers.add(_StickerData(
         xRatio: 0.5,
         yRatio: 0.5,
+        productId: product.id,
         brandName: product.brand,
         productName: product.name,
         imagePath: product.imagePath,
@@ -249,16 +252,11 @@ class _UploadPageState extends State<UploadPage> {
       request.fields['moods'] = jsonEncode(_selectedMoods.toList());
       request.fields['skinTones'] = jsonEncode(_selectedSkinTones.toList());
       request.fields['stickers'] = jsonEncode(
-        _stickers
-            .map(
-              (s) => {
-                'xRatio': s.xRatio,
-                'yRatio': s.yRatio,
-                'brandName': s.brandName,
-                'productName': s.productName,
-              },
-            )
-            .toList(),
+        _stickers.map((s) => {
+          'productId': s.productId,
+          'xRatio': s.xRatio,
+          'yRatio': s.yRatio,
+        }).toList(),
       );
 
       final response = await request.send();
@@ -330,7 +328,12 @@ class _UploadPageState extends State<UploadPage> {
               child: s.imagePath != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(s.imagePath!, fit: BoxFit.cover),
+                      child: s.imagePath!.startsWith('http')
+                          ? Image.network(s.imagePath!, fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                Icons.face_retouching_natural,
+                                color: Color(0xffcccccc), size: 26))
+                          : Image.asset(s.imagePath!, fit: BoxFit.cover),
                     )
                   : const Icon(
                       Icons.face_retouching_natural,

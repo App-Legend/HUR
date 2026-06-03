@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
-import 'package:hur_app/ui/pages/home/detail/detail_home_page.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/purchase_popup.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
@@ -252,21 +251,9 @@ class _PhotoTab extends StatelessWidget {
               childAspectRatio: 0.7,
             ),
             itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => DetailHomePage(
-                      imageUrl: _kDetailImages[index],
-                      nickname: '',
-                      title: '',
-                    ),
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(_kDetailImages[index], fit: BoxFit.cover),
-                ),
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(_kDetailImages[index], fit: BoxFit.cover),
               );
             },
           ),

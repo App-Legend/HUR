@@ -4,6 +4,14 @@ import 'package:material_symbols_icons/symbols.dart';
 /// imagePath가 'http'로 시작하면 NetworkImage, 아니면 AssetImage 사용
 Widget _productImage(String imagePath, {double? width, double? height}) {
   final fit = BoxFit.cover;
+  if (imagePath.isEmpty) {
+    return Container(
+      width: width,
+      height: height,
+      color: Colors.grey[200],
+      child: const Icon(Icons.face_retouching_natural, color: Colors.grey, size: 20),
+    );
+  }
   if (imagePath.startsWith('http')) {
     return Image.network(
       imagePath,

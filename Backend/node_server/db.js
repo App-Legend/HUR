@@ -1,4 +1,4 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
   host: 'localhost',
@@ -8,6 +8,7 @@ const pool = mysql.createPool({
   port: 3306,
   waitForConnections: true,
   connectionLimit: 10,
+  queueLimit: 0,
 });
 
-module.exports = pool.promise();
+module.exports = pool;

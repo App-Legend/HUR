@@ -29,7 +29,6 @@ class CategoryChip extends StatelessWidget {
           color: selected ? const Color(0xff9c27b0) : const Color(0xfff3f3f3),
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        alignment: Alignment.center,
         child: Text(
           text,
           style: TextStyle(

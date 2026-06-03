@@ -52,17 +52,17 @@ CREATE TABLE IF NOT EXISTS post_category (
   CONSTRAINT fk_post_category_post FOREIGN KEY (post_id) REFERENCES posts (post_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 게시글 제품 스티커 테이블 (이미지 위 좌표 + 상품 정보)
+-- 게시글 제품 스티커 테이블 (이미지 위 좌표 + 상품 FK)
 CREATE TABLE IF NOT EXISTS post_sticker (
   id           INT            NOT NULL AUTO_INCREMENT,
   post_id      INT            NOT NULL,
+  product_id   INT            NOT NULL,
   x_ratio      DECIMAL(5, 3)  NOT NULL COMMENT '이미지 내 X 좌표 비율 (0.000 ~ 1.000)',
   y_ratio      DECIMAL(5, 3)  NOT NULL COMMENT '이미지 내 Y 좌표 비율 (0.000 ~ 1.000)',
-  brand_name   VARCHAR(100)   NOT NULL,
-  product_name VARCHAR(255)   NOT NULL,
   created_at   TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  CONSTRAINT fk_post_sticker_post FOREIGN KEY (post_id) REFERENCES posts (post_id) ON DELETE CASCADE
+  CONSTRAINT fk_post_sticker_post    FOREIGN KEY (post_id)    REFERENCES posts    (post_id) ON DELETE CASCADE,
+  CONSTRAINT fk_post_sticker_product FOREIGN KEY (product_id) REFERENCES products (id)      ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 유저 카테고리 스코어 테이블 (추천 알고리즘용)
@@ -85,6 +85,30 @@ CREATE TABLE IF NOT EXISTS follow (
   PRIMARY KEY (follower_id, following_id),
   CONSTRAINT fk_follow_follower  FOREIGN KEY (follower_id)  REFERENCES users (user_id) ON DELETE CASCADE,
   CONSTRAINT fk_follow_following FOREIGN KEY (following_id) REFERENCES users (user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 좋아요 테이블
+CREATE TABLE IF NOT EXISTS post_likes (
+  like_id    INT       NOT NULL AUTO_INCREMENT,
+  post_id    INT       NOT NULL,
+  user_id    INT       NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (like_id),
+  UNIQUE KEY uq_post_likes (post_id, user_id),
+  CONSTRAINT fk_post_likes_post FOREIGN KEY (post_id) REFERENCES posts (post_id) ON DELETE CASCADE,
+  CONSTRAINT fk_post_likes_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 댓글 테이블
+CREATE TABLE IF NOT EXISTS post_comments (
+  comment_id INT          NOT NULL AUTO_INCREMENT,
+  post_id    INT          NOT NULL,
+  user_id    INT          NOT NULL,
+  content    TEXT         NOT NULL,
+  created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (comment_id),
+  CONSTRAINT fk_comments_post FOREIGN KEY (post_id) REFERENCES posts (post_id) ON DELETE CASCADE,
+  CONSTRAINT fk_comments_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 제품 테이블

@@ -7,6 +7,7 @@ import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 import 'package:hur_app/ui/common/widget/side_drawer.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'detail/detail_home_page.dart';
 
@@ -21,18 +22,26 @@ class _HomePageState extends State<HomePage> {
   String selectedTab = '발견';
   List<Map<String, dynamic>> _posts = [];
   bool _isLoading = true;
+  int? _userId;
 
   @override
   void initState() {
     super.initState();
-    _fetchFeed();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final prefs = await SharedPreferences.getInstance();
+    _userId = prefs.getInt('user_id');
+    await _fetchFeed();
   }
 
   Future<void> _fetchFeed() async {
     try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.baseUrl}/post/feed'),
+      final uri = Uri.parse('${ApiConstants.baseUrl}/post/feed').replace(
+        queryParameters: _userId != null ? {'user_id': _userId.toString()} : null,
       );
+      final response = await http.get(uri);
       if (!mounted) return;
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -117,9 +126,9 @@ class _HomePageState extends State<HomePage> {
                                               MaterialPageRoute(
                                                 builder: (_) => DetailHomePage(
                                                   imageUrl: imageUrl,
-                                                  nickname:
-                                                      post['nickname'] ?? '',
+                                                  nickname: post['nickname'] ?? '',
                                                   title: post['title'] ?? '',
+                                                  postId: post['post_id'] as int,
                                                 ),
                                               ),
                                             );
@@ -147,9 +156,9 @@ class _HomePageState extends State<HomePage> {
                                               MaterialPageRoute(
                                                 builder: (_) => DetailHomePage(
                                                   imageUrl: imageUrl,
-                                                  nickname:
-                                                      post['nickname'] ?? '',
+                                                  nickname: post['nickname'] ?? '',
                                                   title: post['title'] ?? '',
+                                                  postId: post['post_id'] as int,
                                                 ),
                                               ),
                                             );

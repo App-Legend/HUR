@@ -5,9 +5,12 @@ const getRanking = async (req, res) => {
         const { limit = 20 } = req.query;
 
         const [rows] = await pool.query(
-            `SELECT id, brand, name, image, source
-             FROM products
-             ORDER BY id ASC
+            `SELECT p.id, p.brand, p.name, p.image, p.source,
+                    COUNT(ps.id) AS tag_count
+             FROM products p
+             LEFT JOIN post_sticker ps ON p.id = ps.product_id
+             GROUP BY p.id
+             ORDER BY tag_count DESC, p.id ASC
              LIMIT ?`,
             [parseInt(limit)]
         );

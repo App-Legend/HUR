@@ -79,6 +79,16 @@ const signup = async (req, res) => {
             { expiresIn: '1h' }
         );
 
+        const initScores = [
+            ...['봄 웜톤', '가을 웜톤', '겨울 쿨톤', '여름쿨톤', '잘 모르겠음'].map(v => [result.insertId, 'personal_color', v, 0]),
+            ...['청순', '시크', '큐티', '섹시', '차분'].map(v => [result.insertId, 'mood', v, 0]),
+            ...['13호 ~ 17호', '21호', '23호', '25호', '27호'].map(v => [result.insertId, 'skin_tone', v, 0]),
+        ];
+        await pool.query(
+            'INSERT IGNORE INTO user_category_score (user_id, category_type, category_value, score) VALUES ?',
+            [initScores]
+        );
+
         res.status(201).json({
             message: '회원가입 성공',
             token,
