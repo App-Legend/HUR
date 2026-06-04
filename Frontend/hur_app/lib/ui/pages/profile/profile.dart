@@ -326,24 +326,68 @@ class _TabBar extends StatelessWidget {
   }
 }
 
-class _PostsGrid extends StatelessWidget {
+class _PostsGrid extends StatefulWidget {
+  @override
+  State<_PostsGrid> createState() => _PostsGridState();
+}
+
+class _PostsGridState extends State<_PostsGrid> {
+  List<Map<String, dynamic>> _posts = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPosts();
+  }
+
+  Future<void> _fetchPosts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('user_id');
+    if (userId == null) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
+    try {
+      final response = await http.get(Uri.parse('${ApiConstants.baseUrl}/post/user/$userId'));
+      if (response.statusCode == 200 && mounted) {
+        final data = jsonDecode(response.body);
+        setState(() => _posts = List<Map<String, dynamic>>.from(data['posts']));
+      }
+    } catch (_) {}
+    if (mounted) setState(() => _isLoading = false);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator(color: Colors.purple));
+    }
+    if (_posts.isEmpty) {
+      return const Center(
+        child: Text('게시물 없음', style: TextStyle(fontSize: 15, color: Colors.grey)),
+      );
+    }
     return GridView.builder(
       padding: const EdgeInsets.all(6),
-      itemCount: 9,
+      itemCount: _posts.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         mainAxisSpacing: 6,
         crossAxisSpacing: 6,
         childAspectRatio: 1,
       ),
-      itemBuilder: (_, index) => Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFD9D9D9),
+      itemBuilder: (_, index) {
+        final imageUrl = '${ApiConstants.baseUrl}${_posts[index]['post_image']}';
+        return ClipRRect(
           borderRadius: BorderRadius.circular(10),
-        ),
-      ),
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => Container(color: const Color(0xFFD9D9D9)),
+          ),
+        );
+      },
     );
   }
 }

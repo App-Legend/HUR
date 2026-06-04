@@ -23,6 +23,8 @@ class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> _posts = [];
   bool _isLoading = true;
   int? _userId;
+  String? _onboardingColor;
+  String? _onboardingSkinTone;
 
   @override
   void initState() {
@@ -33,13 +35,22 @@ class _HomePageState extends State<HomePage> {
   Future<void> _init() async {
     final prefs = await SharedPreferences.getInstance();
     _userId = prefs.getInt('user_id');
+    _onboardingColor = prefs.getString('onboarding_color');
+    _onboardingSkinTone = prefs.getString('onboarding_skin_tone');
     await _fetchFeed();
   }
 
   Future<void> _fetchFeed() async {
     try {
+      final Map<String, String> queryParams = {};
+      if (_userId != null) {
+        queryParams['user_id'] = _userId.toString();
+      } else {
+        if (_onboardingColor != null) queryParams['color'] = _onboardingColor!;
+        if (_onboardingSkinTone != null) queryParams['skin_tone'] = _onboardingSkinTone!;
+      }
       final uri = Uri.parse('${ApiConstants.baseUrl}/post/feed').replace(
-        queryParameters: _userId != null ? {'user_id': _userId.toString()} : null,
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
       );
       final response = await http.get(uri);
       if (!mounted) return;

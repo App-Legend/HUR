@@ -64,6 +64,9 @@ const getFeed = async (req, res) => {
     const limit = 20;
     const offset = page * limit;
 
+    const color = req.query.color || null;
+    const skinTone = req.query.skin_tone || null;
+
     let rows;
     if (userId) {
       ({ rows } = await pool.query(
@@ -97,6 +100,48 @@ const getFeed = async (req, res) => {
         LIMIT $2 OFFSET $3`,
         [userId, limit, offset]
       ));
+    } else if (color || skinTone) {
+      const params = [];
+      const categoryFilters = [];
+      if (color) {
+        params.push('personal_color', color);
+        categoryFilters.push(`(pc.category_type = $${params.length - 1} AND pc.category_value = $${params.length})`);
+      }
+      if (skinTone) {
+        params.push('skin_tone', skinTone);
+        categoryFilters.push(`(pc.category_type = $${params.length - 1} AND pc.category_value = $${params.length})`);
+      }
+      const filterExpr = categoryFilters.join(' OR ');
+      params.push(limit, offset);
+      const limitIdx = params.length - 1;
+      const offsetIdx = params.length;
+
+      ({ rows } = await pool.query(
+        `SELECT
+          p.post_id,
+          p.title,
+          p.post_image,
+          p.created_at,
+          u.nickname,
+          u.profile_image,
+          COALESCE(
+            (SELECT JSON_AGG(JSON_BUILD_OBJECT('type', pc.category_type, 'value', pc.category_value))
+             FROM post_category pc
+             WHERE pc.post_id = p.post_id),
+            '[]'::json
+          ) AS categories,
+          COALESCE(
+            (SELECT COUNT(*) FROM post_category pc
+             WHERE pc.post_id = p.post_id AND (${filterExpr})),
+            0
+          ) AS relevance_score
+        FROM posts p
+        JOIN users u ON p.user_id = u.user_id
+        WHERE p.created_at > NOW() - INTERVAL '7 days'
+        ORDER BY relevance_score DESC, p.created_at DESC
+        LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
+        params
+      ));
     } else {
       ({ rows } = await pool.query(
         `SELECT
@@ -121,6 +166,22 @@ const getFeed = async (req, res) => {
       ));
     }
 
+    res.json({ posts: rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const getUserPosts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { rows } = await pool.query(
+      `SELECT post_id, post_image, title, created_at
+       FROM posts
+       WHERE user_id = $1
+       ORDER BY created_at DESC`,
+      [parseInt(userId)]
+    );
     res.json({ posts: rows });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -350,4 +411,4 @@ const deleteComment = async (req, res) => {
     }
 };
 
-module.exports = { createPost, getFeed, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment };
+module.exports = { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment };
