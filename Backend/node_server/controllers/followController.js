@@ -14,7 +14,7 @@ const followUser = async (req, res) => {
         }
 
         await pool.query(
-            "INSERT IGNORE INTO follow (follower_id, following_id) VALUES (?, ?)",
+            "INSERT INTO follow (follower_id, following_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
             [follower_id, id]
         );
 
@@ -23,6 +23,7 @@ const followUser = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
 // 언팔 API
 const unfollowUser = async (req, res) => {
     try {
@@ -34,7 +35,7 @@ const unfollowUser = async (req, res) => {
         }
 
         await pool.query(
-            "DELETE FROM follow WHERE follower_id=? AND following_id=?",
+            "DELETE FROM follow WHERE follower_id=$1 AND following_id=$2",
             [follower_id, id]
         );
 
@@ -51,8 +52,8 @@ const checkFollow = async (req, res) => {
         const { me } = req.query;
         if (!me) return res.json({ is_following: false });
 
-        const [rows] = await pool.query(
-            "SELECT 1 FROM follow WHERE follower_id=? AND following_id=?",
+        const { rows } = await pool.query(
+            "SELECT 1 FROM follow WHERE follower_id=$1 AND following_id=$2",
             [me, id]
         );
         res.json({ is_following: rows.length > 0 });
@@ -65,10 +66,10 @@ const checkFollow = async (req, res) => {
 const getFollowers = async (req, res) => {
     try {
         const { id } = req.params;
-        const [rows] = await pool.query(
+        const { rows } = await pool.query(
             `SELECT u.user_id AS id, u.nickname, u.profile_image
              FROM follow f JOIN users u ON f.follower_id = u.user_id
-             WHERE f.following_id = ?`,
+             WHERE f.following_id = $1`,
             [id]
         );
         res.json(rows);
@@ -81,10 +82,10 @@ const getFollowers = async (req, res) => {
 const getFollowing = async (req, res) => {
     try {
         const { id } = req.params;
-        const [rows] = await pool.query(
+        const { rows } = await pool.query(
             `SELECT u.user_id AS id, u.nickname, u.profile_image
              FROM follow f JOIN users u ON f.following_id = u.user_id
-             WHERE f.follower_id = ?`,
+             WHERE f.follower_id = $1`,
             [id]
         );
         res.json(rows);

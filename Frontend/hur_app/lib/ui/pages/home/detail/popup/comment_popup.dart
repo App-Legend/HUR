@@ -100,12 +100,15 @@ class _CommentPopupState extends State<CommentPopup> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.48,
-      minChildSize: 0.35,
-      maxChildSize: 0.93,
-      expand: false,
-      builder: (context, scrollController) {
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 150),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: DraggableScrollableSheet(
+        initialChildSize: 0.48,
+        minChildSize: 0.35,
+        maxChildSize: 0.93,
+        expand: false,
+        builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -205,7 +208,7 @@ class _CommentPopupState extends State<CommentPopup> {
                   left: 16,
                   right: 16,
                   top: 10,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 10,
+                  bottom: MediaQuery.of(context).viewPadding.bottom + 10,
                 ),
                 child: Row(
                   children: [
@@ -253,7 +256,8 @@ class _CommentPopupState extends State<CommentPopup> {
             ],
           ),
         );
-      },
+        },
+      ),
     );
   }
 }
