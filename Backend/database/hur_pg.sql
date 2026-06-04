@@ -1,11 +1,6 @@
 -- HUR 프로젝트 PostgreSQL DDL
 -- Generated for PostgreSQL 14+
 
-CREATE DATABASE hur_test
-    ENCODING 'UTF8';
-
-\c hur_test;
-
 -- 사용자 테이블
 CREATE TABLE IF NOT EXISTS users (
   user_id          SERIAL       NOT NULL,
