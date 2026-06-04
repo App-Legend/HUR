@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  backend:
+    build: ./Backend/node_server
+    restart: always
+    environment:
+      - DB_HOST=postgres_db
+      - DB_USER=app_legend
+      - DB_PASSWORD=1234
+      - DB_NAME=Hur
+      - JWT_SECRET=HUR_prod_JWT_s3cr3t_2026_xK9mP2qR7nL
+    volumes:
+      - ./Backend/node_server/images/posts:/app/images/posts
+    networks:
+      - app-network
+    depends_on:
+      - postgres_db
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+  postgres_db:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=app_legend
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=Hur
+    networks:
+      - app-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

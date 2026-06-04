@@ -1,10 +1,8 @@
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
 
-// 환경변수에서 JWT 시크릿 키 가져오기
 const JWT_SECRET = process.env.JWT_SECRET || 'secretKey';
 
-// 토큰 검증 미들웨어
 const verifyToken = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
@@ -16,10 +14,11 @@ const verifyToken = async (req, res, next) => {
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const [[user]] = await pool.query(
-      'SELECT user_id AS id, email, nickname, name FROM users WHERE user_id = ?',
+    const { rows } = await pool.query(
+      'SELECT user_id AS id, email, nickname, name FROM users WHERE user_id = $1',
       [decoded.id]
     );
+    const user = rows[0];
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid token' });

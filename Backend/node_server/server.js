@@ -9,7 +9,7 @@ app.use(express.json());
 app.use((req, res, next) => { console.log(`${req.method} ${req.path}`); next(); });
 
 // 이미지 정적 파일 서빙
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'images/posts')));
 
 // 라우터 연결
 app.use('/auth', require('./routes/auth'));

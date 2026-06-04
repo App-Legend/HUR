@@ -9,7 +9,7 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const [rows] = await pool.query('SELECT * FROM users WHERE email=?', [email]);
+        const { rows } = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
         if (rows.length === 0) {
             return res.status(401).json({ message: '가입되지 않은 이메일입니다' });
         }
@@ -51,25 +51,26 @@ const signup = async (req, res) => {
             return res.status(400).json({ message: '모든 필드를 입력해주세요' });
         }
 
-        const [existingEmail] = await pool.query('SELECT user_id FROM users WHERE email=?', [email]);
+        const { rows: existingEmail } = await pool.query('SELECT user_id FROM users WHERE email=$1', [email]);
         if (existingEmail.length > 0) {
             return res.status(409).json({ message: '이미 사용 중인 이메일입니다' });
         }
 
-        const [existingNick] = await pool.query('SELECT user_id FROM users WHERE nickname=?', [nickname]);
+        const { rows: existingNick } = await pool.query('SELECT user_id FROM users WHERE nickname=$1', [nickname]);
         if (existingNick.length > 0) {
             return res.status(409).json({ message: '이미 사용 중인 닉네임입니다' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const [result] = await pool.query(
-            'INSERT INTO users (name, nickname, gender, birth_date, email, password_hash) VALUES (?, ?, ?, ?, ?, ?)',
+        const { rows: inserted } = await pool.query(
+            'INSERT INTO users (name, nickname, gender, birth_date, email, password_hash) VALUES ($1, $2, $3, $4, $5, $6) RETURNING user_id',
             [name, nickname, gender, birth, email, hashedPassword]
         );
+        const newUserId = inserted[0].user_id;
 
-        const [newUserRows] = await pool.query(
-            'SELECT user_id AS id, email, name, nickname FROM users WHERE user_id=?',
-            [result.insertId]
+        const { rows: newUserRows } = await pool.query(
+            'SELECT user_id AS id, email, name, nickname FROM users WHERE user_id=$1',
+            [newUserId]
         );
         const newUser = newUserRows[0];
 
@@ -80,13 +81,14 @@ const signup = async (req, res) => {
         );
 
         const initScores = [
-            ...['봄 웜톤', '가을 웜톤', '겨울 쿨톤', '여름쿨톤', '잘 모르겠음'].map(v => [result.insertId, 'personal_color', v, 0]),
-            ...['청순', '시크', '큐티', '섹시', '차분'].map(v => [result.insertId, 'mood', v, 0]),
-            ...['13호 ~ 17호', '21호', '23호', '25호', '27호'].map(v => [result.insertId, 'skin_tone', v, 0]),
+            ...['봄 웜톤', '가을 웜톤', '겨울 쿨톤', '여름쿨톤', '잘 모르겠음'].map(v => [newUserId, 'personal_color', v, 0]),
+            ...['청순', '시크', '큐티', '섹시', '차분'].map(v => [newUserId, 'mood', v, 0]),
+            ...['13호 ~ 17호', '21호', '23호', '25호', '27호'].map(v => [newUserId, 'skin_tone', v, 0]),
         ];
+        const scorePlaceholders = initScores.map((_, i) => `($${i*4+1}, $${i*4+2}, $${i*4+3}, $${i*4+4})`).join(', ');
         await pool.query(
-            'INSERT IGNORE INTO user_category_score (user_id, category_type, category_value, score) VALUES ?',
-            [initScores]
+            `INSERT INTO user_category_score (user_id, category_type, category_value, score) VALUES ${scorePlaceholders} ON CONFLICT DO NOTHING`,
+            initScores.flat()
         );
 
         res.status(201).json({
