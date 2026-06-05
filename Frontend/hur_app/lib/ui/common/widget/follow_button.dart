@@ -25,8 +25,8 @@ class FollowButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: onDark
               ? (isFollowing ? Colors.white38 : const Color(0xFF6B1F8A))
-              : (isFollowing ? const Color(0xff8b5cf6) : Colors.white),
-          border: onDark ? null : Border.all(color: const Color(0xff8b5cf6)),
+              : (isFollowing ? const Color(0xFF6B1F8A) : Colors.white),
+          border: onDark ? null : Border.all(color: const Color(0xFF6B1F8A)),
           borderRadius: BorderRadius.circular(onDark ? 24 : 20),
         ),
         child: Text(
@@ -36,7 +36,7 @@ class FollowButton extends StatelessWidget {
             fontWeight: FontWeight.w600,
             color: onDark
                 ? Colors.white
-                : (isFollowing ? Colors.white : const Color(0xff8b5cf6)),
+                : (isFollowing ? Colors.white : const Color(0xFF6B1F8A)),
           ),
         ),
       ),

@@ -1,7 +1,56 @@
+//  ————————————————————————————————
+//  |          회원 설정            |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/ui/pages/main_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('로그아웃'),
+        content: const Text('정말 로그아웃 하시겠어요?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('로그아웃', style: TextStyle(color: Color(0xFFE53935))),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+      await http.post(
+        Uri.parse('${ApiConstants.baseUrl}/auth/logout'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 5));
+    } catch (_) {}
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    await prefs.remove('user_id');
+
+    if (context.mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MainPage()),
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +97,7 @@ class SettingsPage extends StatelessWidget {
           _SettingsItem(
             label: '로그아웃',
             labelColor: const Color(0xFFE53935),
-            onTap: () {},
+            onTap: () => _logout(context),
           ),
           _SettingsItem(
             label: '회원탈퇴',

@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |        제목/설명 작성란         |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class UploadInputBox extends StatelessWidget {
@@ -19,6 +23,7 @@ class UploadInputBox extends StatelessWidget {
       child: TextField(
         controller: controller,
         maxLines: maxLines,
+        style: const TextStyle(color: Colors.black, fontSize: 14),
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,

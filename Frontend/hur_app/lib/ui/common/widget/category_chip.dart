@@ -26,13 +26,15 @@ class CategoryChip extends StatelessWidget {
         margin: const EdgeInsets.only(right: 3),
         padding: padding,
         decoration: BoxDecoration(
-          color: selected ? const Color(0xffcfcfcf) : const Color(0xfff3f3f3),
+          color: selected ? const Color(0xff9c27b0) : const Color(0xfff3f3f3),
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        alignment: Alignment.center,
         child: Text(
           text,
-          style: TextStyle(fontSize: fontSize, color: Colors.black),
+          style: TextStyle(
+            fontSize: fontSize,
+            color: selected ? Colors.white : Colors.black,
+          ),
         ),
       ),
     );

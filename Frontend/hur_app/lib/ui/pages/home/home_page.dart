@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
+import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 import 'package:hur_app/ui/common/widget/side_drawer.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'detail/detail_home_page.dart';
 
@@ -14,22 +20,50 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String selectedTab = '발견';
+  List<Map<String, dynamic>> _posts = [];
+  bool _isLoading = true;
+  int? _userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final prefs = await SharedPreferences.getInstance();
+    _userId = prefs.getInt('user_id');
+    await _fetchFeed();
+  }
+
+  Future<void> _fetchFeed() async {
+    try {
+      final uri = Uri.parse('${ApiConstants.baseUrl}/post/feed').replace(
+        queryParameters: _userId != null ? {'user_id': _userId.toString()} : null,
+      );
+      final response = await http.get(uri);
+      if (!mounted) return;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _posts = List<Map<String, dynamic>>.from(data['posts']);
+        });
+      }
+    } catch (_) {}
+    if (mounted) setState(() => _isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final leftImages = [
-      'assets/images/home/home1.jpg',
-      'AD',
-      'assets/images/home/home2.jpg',
-      'assets/images/home/home3.jpg',
-    ];
-
-    final rightImages = [
-      'assets/images/home/home4.jpg',
-      'assets/images/home/home5.jpg',
-      'assets/images/home/home6.jpg',
-      'assets/images/home/home7.jpg',
-    ];
+    final leftItems = <Map<String, dynamic>>[];
+    final rightItems = <Map<String, dynamic>>[];
+    for (int i = 0; i < _posts.length; i++) {
+      if (i.isEven) {
+        leftItems.add(_posts[i]);
+      } else {
+        rightItems.add(_posts[i]);
+      }
+    }
 
     return SafeArea(
       child: Scaffold(
@@ -55,73 +89,92 @@ class _HomePageState extends State<HomePage> {
 
             Expanded(
               child: selectedTab == '발견'
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 10,
-                      ),
-                      child: SingleChildScrollView(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                children: leftImages.map((item) {
-                                  if (item == 'AD') {
-                                    return const _AdBox();
-                                  }
-
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              DetailHomePage(imagePath: item),
-                                        ),
-                                      );
-                                    },
-                                    child: _ImageCard(
-                                      imagePath: item,
-                                      height: 160,
-                                    ),
-                                  );
-                                }).toList(),
+                  ? _isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.purple,
+                            ),
+                          )
+                        : _posts.isEmpty
+                        ? const Center(
+                            child: Text(
+                              '게시물이 없습니다.',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
                               ),
                             ),
-
-                            const SizedBox(width: 10),
-
-                            Expanded(
-                              child: Column(
-                                children: rightImages.asMap().entries.map((
-                                  entry,
-                                ) {
-                                  final index = entry.key;
-                                  final item = entry.value;
-
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              DetailHomePage(imagePath: item),
-                                        ),
-                                      );
-                                    },
-                                    child: _ImageCard(
-                                      imagePath: item,
-                                      height: index == 0 ? 300 : 130,
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 12,
+                            ),
+                            child: SingleChildScrollView(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      children: leftItems.map((post) {
+                                        final imageUrl =
+                                            '${ApiConstants.baseUrl}${post['post_image']}';
+                                        return GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => DetailHomePage(
+                                                  imageUrl: imageUrl,
+                                                  nickname: post['nickname'] ?? '',
+                                                  title: post['title'] ?? '',
+                                                  postId: post['post_id'] as int,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: _ImageCard(
+                                            imageUrl: imageUrl,
+                                            label: post['nickname'],
+                                          ),
+                                        );
+                                      }).toList(),
                                     ),
-                                  );
-                                }).toList(),
+                                  ),
+
+                                  const SizedBox(width: 8),
+
+                                  Expanded(
+                                    child: Column(
+                                      children: rightItems.map((post) {
+                                        final imageUrl =
+                                            '${ApiConstants.baseUrl}${post['post_image']}';
+                                        return GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => DetailHomePage(
+                                                  imageUrl: imageUrl,
+                                                  nickname: post['nickname'] ?? '',
+                                                  title: post['title'] ?? '',
+                                                  postId: post['post_id'] as int,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: _ImageCard(
+                                            imageUrl: imageUrl,
+                                            label: post['nickname'],
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    )
+                          )
                   : const Center(
                       child: Text(
                         '팔로우 화면입니다.',
@@ -261,46 +314,70 @@ class _HeaderTab extends StatelessWidget {
 }
 
 class _ImageCard extends StatelessWidget {
-  final String imagePath;
-  final double height;
+  final String imageUrl;
+  final String? label;
 
-  const _ImageCard({required this.imagePath, required this.height});
+  const _ImageCard({required this.imageUrl, this.label});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      height: height,
       margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
-      ),
-    );
-  }
-}
-
-class _AdBox extends StatelessWidget {
-  const _AdBox();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 215,
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xffd9d9d9),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: const Center(
-        child: Text(
-          'AD',
-          style: TextStyle(
-            fontSize: 64,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(5),
+            child: Image.network(
+              imageUrl,
+              width: double.infinity,
+              fit: BoxFit.fitWidth,
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) return child;
+                return AspectRatio(
+                  aspectRatio: 3 / 4,
+                  child: Container(color: const Color(0xFFEEEEEE)),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) => AspectRatio(
+                aspectRatio: 3 / 4,
+                child: Container(color: const Color(0xFFEEEEEE)),
+              ),
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 2, 0, 0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: label != null
+                      ? Text(
+                          label!,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => showPostMoreOptions(context),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Icon(
+                      Icons.more_horiz,
+                      size: 18,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

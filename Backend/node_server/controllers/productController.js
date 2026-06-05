@@ -4,14 +4,14 @@ const getRanking = async (req, res) => {
     try {
         const { limit = 20 } = req.query;
 
-        const [rows] = await pool.query(
+        const { rows } = await pool.query(
             `SELECT p.id, p.brand, p.name, p.image, p.source,
                     COUNT(ps.id) AS tag_count
              FROM products p
              LEFT JOIN post_sticker ps ON p.id = ps.product_id
              GROUP BY p.id
              ORDER BY tag_count DESC, p.id ASC
-             LIMIT ?`,
+             LIMIT $1`,
             [parseInt(limit)]
         );
 
@@ -22,7 +22,6 @@ const getRanking = async (req, res) => {
     }
 };
 
-// 상품 검색 API
 const searchProducts = async (req, res) => {
     try {
         const { q = "", limit = 20 } = req.query;
@@ -31,13 +30,13 @@ const searchProducts = async (req, res) => {
             return res.json([]);
         }
 
-        const [rows] = await pool.query(
+        const { rows } = await pool.query(
             `SELECT id, brand, name, image, source
              FROM products
-             WHERE name LIKE ? OR brand LIKE ?
+             WHERE name ILIKE $1 OR brand ILIKE $1
              ORDER BY id ASC
-             LIMIT ?`,
-            [`%${q.trim()}%`, `%${q.trim()}%`, parseInt(limit)]
+             LIMIT $2`,
+            [`%${q.trim()}%`, parseInt(limit)]
         );
 
         res.json(rows);
@@ -47,13 +46,12 @@ const searchProducts = async (req, res) => {
     }
 };
 
-// 상품 상세 조회 API
 const getProduct = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const [rows] = await pool.query(
-            "SELECT id, brand, name, image, source FROM products WHERE id = ?",
+        const { rows } = await pool.query(
+            "SELECT id, brand, name, image, source FROM products WHERE id = $1",
             [parseInt(id)]
         );
 

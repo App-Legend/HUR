@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'search_result_cosmetics_tab.dart';
+
 import 'search_result_accounts_tab.dart';
+import 'search_result_cosmetics_tab.dart';
 import 'search_result_feed_tab.dart';
 
 class SearchPage extends StatefulWidget {
@@ -9,10 +10,10 @@ class SearchPage extends StatefulWidget {
   const SearchPage({super.key, this.focusNode});
 
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  State<SearchPage> createState() => SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage>
+class SearchPageState extends State<SearchPage>
     with SingleTickerProviderStateMixin {
   late final FocusNode _searchFocusNode;
   late final bool _ownsNode;
@@ -21,8 +22,24 @@ class _SearchPageState extends State<SearchPage>
 
   bool _isSearchFocused = false;
   bool _hasSearched = false;
+  late final String _trendingUpdatedAt;
 
-  final searchHoverList = ['선크림', '립글로스', '쿠션 파운데이션', '클렌징밀크', '틴트', '비오틴 샴푸'];
+  final List<String> _recentKeywords = ['틴트', '워터밤 비오틴'];
+
+  static const _trendingKeywords = [
+    ['1', '선크림', '-'],
+    ['2', '립', 'up'],
+    ['3', '포켓몬', 'down'],
+    ['4', '비디오션', '-'],
+    ['5', '쿠션', '-'],
+    ['6', '클렌징밀크', '-'],
+    ['7', '페리페라', 'up'],
+    ['8', '포켓몬 에디션', 'down'],
+    ['9', '네일', '-'],
+    ['10', '샴푸', '-'],
+  ];
+
+  final _searchSuggestions = ['선크림', '립글로스', '쿠션 파운데이션', '클렌징밀크', '틴트', '비오틴 샴푸'];
 
   @override
   void initState() {
@@ -30,6 +47,8 @@ class _SearchPageState extends State<SearchPage>
     _ownsNode = widget.focusNode == null;
     _searchFocusNode = widget.focusNode ?? FocusNode();
     _tabController = TabController(length: 3, vsync: this);
+    final now = DateTime.now();
+    _trendingUpdatedAt = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
     _searchFocusNode.addListener(() {
       setState(() {
@@ -46,6 +65,14 @@ class _SearchPageState extends State<SearchPage>
     super.dispose();
   }
 
+  void resetSearch() {
+    _searchFocusNode.unfocus();
+    setState(() {
+      _hasSearched = false;
+      _searchController.clear();
+    });
+  }
+
   void _onSubmitted(String value) {
     if (value.trim().isEmpty) return;
     setState(() {
@@ -56,21 +83,6 @@ class _SearchPageState extends State<SearchPage>
 
   @override
   Widget build(BuildContext context) {
-    final recentKeywords = ['틴트', '워터밤 비오틴'];
-
-    final trendingKeywords = [
-      ['1', '선크림', '-'],
-      ['2', '립', 'up'],
-      ['3', '포켓몬', 'down'],
-      ['4', '비디오션', '-'],
-      ['5', '쿠션', '-'],
-      ['6', '클렌징밀크', '-'],
-      ['7', '페리페라', 'up'],
-      ['8', '포켓몬 에디션', 'down'],
-      ['9', '네일', '-'],
-      ['10', '샴푸', '-'],
-    ];
-
     return PopScope(
       canPop: !_isSearchFocused && !_hasSearched,
       onPopInvokedWithResult: (didPop, _) {
@@ -115,6 +127,7 @@ class _SearchPageState extends State<SearchPage>
                     textAlignVertical: TextAlignVertical.center,
                     textInputAction: TextInputAction.search,
                     onSubmitted: _onSubmitted,
+                    style: const TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       hintText: '검색어를 입력하세요',
                       prefixIcon: const Icon(
@@ -134,20 +147,21 @@ class _SearchPageState extends State<SearchPage>
                 ),
               ),
 
+              // 검색 결과 탭
               if (_hasSearched)
                 Expanded(
                   child: Column(
                     children: [
                       TabBar(
                         controller: _tabController,
-                        labelColor: const Color(0xff8b5cf6),
+                        labelColor: const Color(0xFF6B1F8A),
                         unselectedLabelColor: const Color(0xff9b9b9b),
                         labelStyle: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                         unselectedLabelStyle: const TextStyle(fontSize: 14),
-                        indicatorColor: const Color(0xff8b5cf6),
+                        indicatorColor: const Color(0xFF6B1F8A),
                         indicatorSize: TabBarIndicatorSize.tab,
                         dividerColor: const Color(0xffe5e5e5),
                         tabs: const [
@@ -159,10 +173,10 @@ class _SearchPageState extends State<SearchPage>
                       Expanded(
                         child: TabBarView(
                           controller: _tabController,
-                          children: const [
-                            SearchResultCosmeticsTab(),
-                            SearchResultAccountsTab(),
-                            SearchResultFeedTab(),
+                          children: [
+                            SearchResultCosmeticsTab(query: _searchController.text.trim()),
+                            SearchResultAccountsTab(query: _searchController.text.trim()),
+                            const SearchResultFeedTab(),
                           ],
                         ),
                       ),
@@ -170,17 +184,19 @@ class _SearchPageState extends State<SearchPage>
                   ),
                 ),
 
+              // 포커스 시 검색 기록
               if (!_hasSearched && _isSearchFocused)
                 Expanded(
                   child: ListView.builder(
                     padding: EdgeInsets.zero,
-                    itemCount: searchHoverList.length,
+                    itemCount: _searchSuggestions.length,
                     itemBuilder: (context, index) {
-                      return _SearchHistoryItem(text: searchHoverList[index]);
+                      return _SearchHistoryItem(text: _searchSuggestions[index]);
                     },
                   ),
                 ),
 
+              // 기본 화면 (최근/급상승 검색어)
               if (!_hasSearched && !_isSearchFocused)
                 Expanded(
                   child: Padding(
@@ -188,11 +204,10 @@ class _SearchPageState extends State<SearchPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 최근 검색어 제목
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
+                          children: [
+                            const Text(
                               '최근 검색어',
                               style: TextStyle(
                                 fontSize: 15,
@@ -200,32 +215,33 @@ class _SearchPageState extends State<SearchPage>
                                 color: Colors.black,
                               ),
                             ),
-                            Text(
-                              '전체 삭제',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Color(0xffc4c4c4),
+                            GestureDetector(
+                              onTap: () => setState(() => _recentKeywords.clear()),
+                              child: const Text(
+                                '전체 삭제',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Color(0xffc4c4c4),
+                                ),
                               ),
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 12),
-
                         Wrap(
                           spacing: 6,
-                          children: recentKeywords.map((keyword) {
-                            return _RecentKeywordChip(text: keyword);
+                          children: _recentKeywords.map((keyword) {
+                            return _RecentKeywordChip(
+                              text: keyword,
+                              onDelete: () => setState(() => _recentKeywords.remove(keyword)),
+                            );
                           }).toList(),
                         ),
-
                         const SizedBox(height: 42),
-
-                        // 급상승 검색어 제목
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
+                          children: [
+                            const Text(
                               '급상승 검색어',
                               style: TextStyle(
                                 fontSize: 15,
@@ -234,24 +250,21 @@ class _SearchPageState extends State<SearchPage>
                               ),
                             ),
                             Text(
-                              '00:00 기준',
-                              style: TextStyle(
+                              '$_trendingUpdatedAt 기준',
+                              style: const TextStyle(
                                 fontSize: 10,
                                 color: Color(0xffc4c4c4),
                               ),
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 16),
-
-                        // 급상승 검색어 2열
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
                               child: Column(
-                                children: trendingKeywords
+                                children: _trendingKeywords
                                     .take(5)
                                     .map(
                                       (item) => _TrendingKeywordItem(
@@ -266,7 +279,7 @@ class _SearchPageState extends State<SearchPage>
                             const SizedBox(width: 28),
                             Expanded(
                               child: Column(
-                                children: trendingKeywords
+                                children: _trendingKeywords
                                     .skip(5)
                                     .map(
                                       (item) => _TrendingKeywordItem(
@@ -320,8 +333,9 @@ class _SearchHistoryItem extends StatelessWidget {
 
 class _RecentKeywordChip extends StatelessWidget {
   final String text;
+  final VoidCallback onDelete;
 
-  const _RecentKeywordChip({required this.text});
+  const _RecentKeywordChip({required this.text, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -341,11 +355,14 @@ class _RecentKeywordChip extends StatelessWidget {
             style: const TextStyle(fontSize: 10, color: Color(0xff9b9b9b)),
           ),
           const SizedBox(width: 3),
-          const Icon(
-            Symbols.close,
-            size: 12,
-            color: Color(0xffbdbdbd),
-            weight: 400,
+          GestureDetector(
+            onTap: onDelete,
+            child: const Icon(
+              Symbols.close,
+              size: 12,
+              color: Color(0xffbdbdbd),
+              weight: 400,
+            ),
           ),
         ],
       ),

@@ -1,3 +1,7 @@
+//  ————————————————————————————————
+//  |      좋아요/댓글/북마크 바      |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
@@ -5,6 +9,7 @@ class DetailIconActionBar extends StatelessWidget {
   final bool isLiked;
   final bool isBookmark;
   final int likeCount;
+  final int commentCount;
   final int bookmarkCount;
   final VoidCallback onLikeTap;
   final VoidCallback onCommentTap;
@@ -15,6 +20,7 @@ class DetailIconActionBar extends StatelessWidget {
     required this.isLiked,
     required this.isBookmark,
     required this.likeCount,
+    required this.commentCount,
     required this.bookmarkCount,
     required this.onLikeTap,
     required this.onCommentTap,
@@ -55,7 +61,7 @@ class DetailIconActionBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 3),
-          const Text('12', style: TextStyle(color: Colors.grey, fontSize: 14)),
+          Text('$commentCount', style: const TextStyle(color: Colors.grey, fontSize: 14)),
 
           const SizedBox(width: 12),
 

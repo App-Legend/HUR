@@ -1,17 +1,17 @@
+//  ————————————————————————————————
+//  |    이미지에 태그된 제품 팝업    |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 
 class ProductTagPopup extends StatelessWidget {
-  final String imagePath;
   final String brandName;
   final String productName;
-  final String price;
 
   const ProductTagPopup({
     super.key,
-    required this.imagePath,
     required this.brandName,
     required this.productName,
-    required this.price,
   });
 
   @override
@@ -21,23 +21,22 @@ class ProductTagPopup extends StatelessWidget {
       height: 54,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
-              imagePath,
-              width: 36,
-              height: 36,
-              fit: BoxFit.cover,
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.white24,
+              borderRadius: BorderRadius.circular(10),
             ),
+            child: const Icon(Icons.face_retouching_natural,
+                color: Colors.white70, size: 20),
           ),
-
           const SizedBox(width: 8),
-
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -55,18 +54,9 @@ class ProductTagPopup extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: Colors.white, fontSize: 10),
                 ),
-                Text(
-                  price,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               ],
             ),
           ),
-
           const Icon(Icons.chevron_right, color: Colors.white, size: 20),
         ],
       ),

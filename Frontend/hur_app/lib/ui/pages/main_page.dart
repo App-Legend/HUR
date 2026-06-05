@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart' hide RankingPage;
-import 'package:hur_app/ui/pages/profile/profile_page.dart';
+import 'package:hur_app/ui/pages/profile/guest_profile.dart';
+import 'package:hur_app/ui/pages/profile/profile.dart';
 import 'package:hur_app/ui/pages/ranking/ranking_page.dart';
 import 'package:hur_app/ui/pages/search/search_page.dart';
 import 'package:hur_app/ui/pages/upload/upload_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/navigation/bottom_nav.dart';
 import 'home/home_page.dart';
@@ -16,7 +18,9 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
+  bool _isLoggedIn = false;
   final FocusNode _searchFocusNode = FocusNode();
+  final GlobalKey<SearchPageState> _searchPageKey = GlobalKey<SearchPageState>();
   late final List<Widget> _pages;
 
   @override
@@ -25,10 +29,16 @@ class _MainPageState extends State<MainPage> {
     _pages = [
       const HomePage(),
       const RankingPage(),
-      const UploadPage(),
-      SearchPage(focusNode: _searchFocusNode),
-      const ProfilePage(),
+      UploadPage(onPostSuccess: () => setState(() => _currentIndex = 0)),
+      SearchPage(key: _searchPageKey, focusNode: _searchFocusNode),
     ];
+    _checkLogin();
+  }
+
+  Future<void> _checkLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() => _isLoggedIn = prefs.getInt('user_id') != null);
   }
 
   @override
@@ -39,40 +49,33 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget currentPage = _currentIndex == 4
+        ? (_isLoggedIn ? const MyPage() : const ProfilePage())
+        : _pages[_currentIndex];
+
     return Scaffold(
       backgroundColor: Colors.white,
 
-      body: SafeArea(
-        child: Column(children: [Expanded(child: _pages[_currentIndex])]),
+      body: MediaQuery.removePadding(
+        context: context,
+        removeBottom: true,
+        child: SafeArea(
+          bottom: false,
+          child: Column(children: [Expanded(child: currentPage)]),
+        ),
       ),
 
       bottomNavigationBar: BottomNav(
         currentIndex: _currentIndex,
         onTap: (index) {
           if (index == _currentIndex && index == 3) {
-            _searchFocusNode.unfocus();
+            _searchPageKey.currentState?.resetSearch();
           } else {
             setState(() {
               _currentIndex = index;
             });
           }
         },
-      ),
-    );
-  }
-}
-
-class _PlaceholderPage extends StatelessWidget {
-  final String label;
-
-  const _PlaceholderPage({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 24, color: Colors.grey),
       ),
     );
   }

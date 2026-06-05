@@ -1,118 +1,123 @@
+//  ————————————————————————————————
+//  |    이미지 영역(태그 기능)       |
+//  ————————————————————————————————
+
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/product_tag_popup.dart';
 
 class ImageTagSection extends StatefulWidget {
-  final String imagePath;
+  final String imageUrl;
+  final List<Map<String, dynamic>> stickers;
 
-  const ImageTagSection({super.key, required this.imagePath});
+  const ImageTagSection({
+    super.key,
+    required this.imageUrl,
+    this.stickers = const [],
+  });
 
   @override
   State<ImageTagSection> createState() => _ImageTagSectionState();
 }
 
 class _ImageTagSectionState extends State<ImageTagSection> {
-  bool showProductIcons = false;
-  bool showProductPopup = false;
+  final GlobalKey _stackKey = GlobalKey();
+  Size? _containerSize;
+  bool _showPins = false;
+  int? _tappedIndex;
 
-  void _toggleProductIcons() {
-    setState(() {
-      showProductIcons = !showProductIcons;
-      showProductPopup = false;
-    });
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateSize());
   }
 
-  void _toggleProductPopup() {
-    setState(() {
-      showProductPopup = !showProductPopup;
-    });
+  void _updateSize() {
+    final box = _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box != null && mounted) {
+      setState(() => _containerSize = box.size);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = _containerSize;
+
     return SizedBox(
+      key: _stackKey,
       width: double.infinity,
-      height: 460,
       child: Stack(
         children: [
           GestureDetector(
-            onTap: _toggleProductIcons,
-            child: Image.asset(
-              widget.imagePath,
+            onTap: () => setState(() {
+              _showPins = !_showPins;
+              _tappedIndex = null;
+            }),
+            child: Image.network(
+              widget.imageUrl,
               width: double.infinity,
-              height: 460,
               fit: BoxFit.cover,
-            ),
-          ),
-
-          _ProductLocationIcon(
-            left: 210,
-            top: 145,
-            visible: showProductIcons,
-            onTap: _toggleProductPopup,
-          ),
-
-          _ProductLocationIcon(
-            left: 145,
-            top: 215,
-            visible: showProductIcons,
-            onTap: _toggleProductPopup,
-          ),
-
-          if (showProductPopup)
-            const Positioned(
-              left: 170,
-              top: 250,
-              child: ProductTagPopup(
-                imagePath: 'assets/images/ranking/detail1.jpg',
-                brandName: '립 포션',
-                productName: '카라멜 글레이즈',
-                price: '18,900원~',
+              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                if (frame != null) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) => _updateSize());
+                }
+                return child;
+              },
+              errorBuilder: (context, error, stackTrace) => AspectRatio(
+                aspectRatio: 3 / 4,
+                child: Container(color: const Color(0xFFEEEEEE)),
               ),
             ),
+          ),
+
+          if (_showPins && size != null)
+            ...widget.stickers.asMap().entries.expand((entry) {
+              final i = entry.key;
+              final s = entry.value;
+              final xRatio = double.tryParse(s['x_ratio'].toString()) ?? 0.5;
+              final yRatio = double.tryParse(s['y_ratio'].toString()) ?? 0.5;
+              final pinLeft = xRatio * size.width - 17;
+              final pinTop = yRatio * size.height - 17;
+
+              return [
+                Positioned(
+                  left: pinLeft,
+                  top: pinTop,
+                  child: GestureDetector(
+                    onTap: () => setState(() =>
+                        _tappedIndex = _tappedIndex == i ? null : i),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: const Color(0xff9c27b0),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.add,
+                          color: Colors.white, size: 18),
+                    ),
+                  ),
+                ),
+                if (_tappedIndex == i)
+                  Positioned(
+                    left: (pinLeft + 34 + 185 > size.width)
+                        ? pinLeft - 185
+                        : pinLeft + 34,
+                    top: pinTop - 10,
+                    child: ProductTagPopup(
+                      brandName: s['brand_name'] ?? '',
+                      productName: s['product_name'] ?? '',
+                    ),
+                  ),
+              ];
+            }),
         ],
-      ),
-    );
-  }
-}
-
-class _ProductLocationIcon extends StatelessWidget {
-  final double left;
-  final double top;
-  final bool visible;
-  final VoidCallback onTap;
-
-  const _ProductLocationIcon({
-    required this.left,
-    required this.top,
-    required this.visible,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: left,
-      top: top,
-      child: IgnorePointer(
-        ignoring: !visible,
-        child: AnimatedOpacity(
-          opacity: visible ? 1 : 0,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onTap,
-            child: const Padding(
-              padding: EdgeInsets.all(4),
-              child: Icon(
-                Icons.location_on,
-                color: Colors.white,
-                size: 34,
-                shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

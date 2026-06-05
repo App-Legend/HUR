@@ -92,7 +92,7 @@ class _FollowListPageState extends State<FollowListPage> {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => UserFeedPage(userId: user['id'] as int),
+                          builder: (_) => UserFeedPage(userId: user['id']),
                         ),
                       ),
                     );
