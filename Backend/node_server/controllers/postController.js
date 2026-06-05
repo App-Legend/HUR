@@ -4,13 +4,14 @@ const pool = require('../db');
 const createPost = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { title, description, stickers, personalColors, moods, skinTones } = req.body;
+    const { title, description, stickers, personalColors, moods, skinTones, visibility } = req.body;
 
     if (!title || title.trim() === '') {
       return res.status(400).json({ message: '제목은 필수입니다.' });
     }
 
     const postImage = req.file ? `/uploads/${req.file.filename}` : null;
+    const visibilityValue = visibility || '모든 사람';
 
     const stickerList = stickers ? JSON.parse(stickers) : [];
     const personalColorList = (personalColors ? JSON.parse(personalColors) : [])
@@ -19,9 +20,9 @@ const createPost = async (req, res) => {
     const skinToneList = skinTones ? JSON.parse(skinTones) : [];
 
     const { rows: [{ post_id: postId }] } = await pool.query(
-      `INSERT INTO posts (user_id, title, post_content, post_image)
-       VALUES ($1, $2, $3, $4) RETURNING post_id`,
-      [userId, title.trim(), description?.trim() ?? null, postImage]
+      `INSERT INTO posts (user_id, title, post_content, post_image, visibility)
+       VALUES ($1, $2, $3, $4, $5) RETURNING post_id`,
+      [userId, title.trim(), description?.trim() ?? null, postImage, visibilityValue]
     );
 
     const categories = [
@@ -64,6 +65,9 @@ const getFeed = async (req, res) => {
     const limit = 20;
     const offset = page * limit;
 
+    const color = req.query.color || null;
+    const skinTone = req.query.skin_tone || null;
+
     let rows;
     if (userId) {
       ({ rows } = await pool.query(
@@ -92,10 +96,56 @@ const getFeed = async (req, res) => {
           ) AS relevance_score
         FROM posts p
         JOIN users u ON p.user_id = u.user_id
-        WHERE p.created_at > NOW() - INTERVAL '7 days'
+        WHERE (p.visibility = '모든 사람' OR (p.visibility = '팔로워만' AND EXISTS (
+                SELECT 1 FROM follow WHERE follower_id = $1 AND following_id = p.user_id
+              )))
+          AND p.created_at > NOW() - INTERVAL '7 days'
         ORDER BY relevance_score DESC, p.created_at DESC
         LIMIT $2 OFFSET $3`,
         [userId, limit, offset]
+      ));
+    } else if (color || skinTone) {
+      const params = [];
+      const categoryFilters = [];
+      if (color) {
+        params.push('personal_color', color);
+        categoryFilters.push(`(pc.category_type = $${params.length - 1} AND pc.category_value = $${params.length})`);
+      }
+      if (skinTone) {
+        params.push('skin_tone', skinTone);
+        categoryFilters.push(`(pc.category_type = $${params.length - 1} AND pc.category_value = $${params.length})`);
+      }
+      const filterExpr = categoryFilters.join(' OR ');
+      params.push(limit, offset);
+      const limitIdx = params.length - 1;
+      const offsetIdx = params.length;
+
+      ({ rows } = await pool.query(
+        `SELECT
+          p.post_id,
+          p.title,
+          p.post_image,
+          p.created_at,
+          u.nickname,
+          u.profile_image,
+          COALESCE(
+            (SELECT JSON_AGG(JSON_BUILD_OBJECT('type', pc.category_type, 'value', pc.category_value))
+             FROM post_category pc
+             WHERE pc.post_id = p.post_id),
+            '[]'::json
+          ) AS categories,
+          COALESCE(
+            (SELECT COUNT(*) FROM post_category pc
+             WHERE pc.post_id = p.post_id AND (${filterExpr})),
+            0
+          ) AS relevance_score
+        FROM posts p
+        JOIN users u ON p.user_id = u.user_id
+        WHERE p.visibility = '모든 사람'
+          AND p.created_at > NOW() - INTERVAL '7 days'
+        ORDER BY relevance_score DESC, p.created_at DESC
+        LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
+        params
       ));
     } else {
       ({ rows } = await pool.query(
@@ -114,13 +164,52 @@ const getFeed = async (req, res) => {
           ) AS categories
         FROM posts p
         JOIN users u ON p.user_id = u.user_id
-        WHERE p.created_at > NOW() - INTERVAL '7 days'
+        WHERE p.visibility = '모든 사람'
+          AND p.created_at > NOW() - INTERVAL '7 days'
         ORDER BY p.created_at DESC
         LIMIT $1 OFFSET $2`,
         [limit, offset]
       ));
     }
 
+    res.json({ posts: rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const getUserPosts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const userIdInt = parseInt(userId);
+    const viewerIdRaw = req.query.viewer_id;
+    const viewerId = viewerIdRaw ? parseInt(viewerIdRaw) : null;
+
+    let query, params;
+    if (viewerId === userIdInt) {
+      query = `SELECT p.post_id, p.post_image, p.title, p.created_at, u.nickname
+               FROM posts p JOIN users u ON p.user_id = u.user_id
+               WHERE p.user_id = $1
+               ORDER BY p.created_at DESC`;
+      params = [userIdInt];
+    } else if (viewerId) {
+      query = `SELECT p.post_id, p.post_image, p.title, p.created_at, u.nickname
+               FROM posts p JOIN users u ON p.user_id = u.user_id
+               WHERE p.user_id = $1
+                 AND (p.visibility = '모든 사람' OR (p.visibility = '팔로워만' AND EXISTS (
+                   SELECT 1 FROM follow WHERE follower_id = $2 AND following_id = $1
+                 )))
+               ORDER BY p.created_at DESC`;
+      params = [userIdInt, viewerId];
+    } else {
+      query = `SELECT p.post_id, p.post_image, p.title, p.created_at, u.nickname
+               FROM posts p JOIN users u ON p.user_id = u.user_id
+               WHERE p.user_id = $1 AND p.visibility = '모든 사람'
+               ORDER BY p.created_at DESC`;
+      params = [userIdInt];
+    }
+
+    const { rows } = await pool.query(query, params);
     res.json({ posts: rows });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -237,10 +326,11 @@ const updateScore = async (req, res) => {
 const getPostDetail = async (req, res) => {
     try {
         const { id: postId } = req.params;
+        const viewerId = req.query.viewer_id ? parseInt(req.query.viewer_id) : null;
 
         const { rows } = await pool.query(
             `SELECT p.post_id, p.user_id, p.title, p.post_content, p.post_image, p.post_like,
-                    u.nickname, u.profile_image
+                    p.visibility, u.nickname, u.profile_image
              FROM posts p
              JOIN users u ON p.user_id = u.user_id
              WHERE p.post_id = $1`,
@@ -248,6 +338,21 @@ const getPostDetail = async (req, res) => {
         );
         const post = rows[0];
         if (!post) return res.status(404).json({ message: '게시물이 없습니다' });
+
+        if (post.visibility === '팔로워만') {
+            if (!viewerId) {
+                return res.status(403).json({ message: '팔로우한 사람만 볼 수 있는 게시물이에요.' });
+            }
+            if (viewerId !== post.user_id) {
+                const { rows: followCheck } = await pool.query(
+                    'SELECT 1 FROM follow WHERE follower_id = $1 AND following_id = $2',
+                    [viewerId, post.user_id]
+                );
+                if (followCheck.length === 0) {
+                    return res.status(403).json({ message: '팔로우한 사람만 볼 수 있는 게시물이에요.' });
+                }
+            }
+        }
 
         const { rows: categories } = await pool.query(
             'SELECT category_type, category_value FROM post_category WHERE post_id = $1', [postId]
@@ -369,4 +474,4 @@ const getPostsByProduct = async (req, res) => {
     }
 };
 
-module.exports = { createPost, getFeed, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, getPostsByProduct };
+module.exports = { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, getPostsByProduct };

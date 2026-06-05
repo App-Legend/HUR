@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/ui/pages/home/detail/detail_home_page.dart';
 
 class UserFeedPage extends StatefulWidget {
   final int userId;
@@ -113,7 +114,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
                   ),
                   Expanded(
                     child: _selectedTab == 0
-                        ? _PostsGrid()
+                        ? _PostsGrid(userId: widget.userId, viewerId: _myId)
                         : const _EmptyTab(icon: Icons.location_on_outlined),
                   ),
                 ],
@@ -292,24 +293,85 @@ class _FeedTabBar extends StatelessWidget {
   }
 }
 
-class _PostsGrid extends StatelessWidget {
+class _PostsGrid extends StatefulWidget {
+  final int userId;
+  final int? viewerId;
+  const _PostsGrid({required this.userId, this.viewerId});
+
+  @override
+  State<_PostsGrid> createState() => _PostsGridState();
+}
+
+class _PostsGridState extends State<_PostsGrid> {
+  List<Map<String, dynamic>> _posts = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPosts();
+  }
+
+  Future<void> _fetchPosts() async {
+    try {
+      final viewerId = widget.viewerId;
+      final uri = viewerId != null
+          ? Uri.parse('${ApiConstants.baseUrl}/post/user/${widget.userId}')
+              .replace(queryParameters: {'viewer_id': viewerId.toString()})
+          : Uri.parse('${ApiConstants.baseUrl}/post/user/${widget.userId}');
+      final response = await http.get(uri);
+      if (response.statusCode == 200 && mounted) {
+        final data = jsonDecode(response.body);
+        setState(() => _posts = List<Map<String, dynamic>>.from(data['posts']));
+      }
+    } catch (_) {}
+    if (mounted) setState(() => _isLoading = false);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator(color: Colors.purple));
+    }
+    if (_posts.isEmpty) {
+      return const Center(
+        child: Text('게시물 없음', style: TextStyle(fontSize: 15, color: Colors.grey)),
+      );
+    }
     return GridView.builder(
       padding: const EdgeInsets.all(6),
-      itemCount: 9,
+      itemCount: _posts.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         mainAxisSpacing: 6,
         crossAxisSpacing: 6,
         childAspectRatio: 1,
       ),
-      itemBuilder: (_, index) => Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFD9D9D9),
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
+      itemBuilder: (_, index) {
+        final post = _posts[index];
+        final imageUrl = '${ApiConstants.baseUrl}${post['post_image']}';
+        return GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DetailHomePage(
+                imageUrl: imageUrl,
+                nickname: post['nickname'] ?? '',
+                title: post['title'] ?? '',
+                postId: post['post_id'] as int,
+              ),
+            ),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => Container(color: const Color(0xFFD9D9D9)),
+            ),
+          ),
+        );
+      },
     );
   }
 }
