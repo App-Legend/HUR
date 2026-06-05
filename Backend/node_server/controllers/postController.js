@@ -460,7 +460,13 @@ const getPostsByProduct = async (req, res) => {
     try {
         const { productId } = req.params;
         const { rows } = await pool.query(
-            `SELECT DISTINCT p.post_id, p.title, p.post_image, u.nickname, u.profile_image
+            `SELECT DISTINCT p.post_id, p.title, p.post_image, u.nickname, u.profile_image,
+                    COALESCE(
+                        (SELECT JSON_AGG(pc.category_value)
+                         FROM post_category pc
+                         WHERE pc.post_id = p.post_id AND pc.category_type = 'personal_color'),
+                        '[]'::json
+                    ) AS personal_colors
              FROM posts p
              JOIN post_sticker ps ON ps.post_id = p.post_id
              JOIN users u ON p.user_id = u.user_id

@@ -139,6 +139,14 @@ class _PhotoTabState extends State<_PhotoTab> {
   List<Map<String, dynamic>> _posts = [];
   bool _isLoading = true;
 
+  List<Map<String, dynamic>> get _filteredPosts {
+    if (widget.selectedCategory == '전체') return _posts;
+    return _posts.where((post) {
+      final colors = (post['personal_colors'] as List?)?.cast<String>() ?? [];
+      return colors.contains(widget.selectedCategory);
+    }).toList();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -276,16 +284,18 @@ class _PhotoTabState extends State<_PhotoTab> {
         Expanded(
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : _posts.isEmpty
-                  ? const Center(
+              : _filteredPosts.isEmpty
+                  ? Center(
                       child: Text(
-                        '이 제품이 태그된 게시물이 없어요',
-                        style: TextStyle(color: Colors.black38, fontSize: 14),
+                        widget.selectedCategory == '전체'
+                            ? '이 제품이 태그된 게시물이 없어요'
+                            : '${widget.selectedCategory} 게시물이 없어요',
+                        style: const TextStyle(color: Colors.black38, fontSize: 14),
                       ),
                     )
                   : GridView.builder(
                       padding: const EdgeInsets.fromLTRB(10, 14, 10, 10),
-                      itemCount: _posts.length,
+                      itemCount: _filteredPosts.length,
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         mainAxisSpacing: 14,
@@ -293,7 +303,7 @@ class _PhotoTabState extends State<_PhotoTab> {
                         childAspectRatio: 0.7,
                       ),
                       itemBuilder: (context, index) {
-                        final post = _posts[index];
+                        final post = _filteredPosts[index];
                         final imageUrl = '${ApiConstants.baseUrl}${post['post_image'] ?? ''}';
                         return GestureDetector(
                           onTap: () => Navigator.push(
