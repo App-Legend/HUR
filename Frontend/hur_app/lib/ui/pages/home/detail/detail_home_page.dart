@@ -244,7 +244,9 @@ class _DetailHomePage extends State<DetailHomePage> {
                 child: Column(
                   children: [
                     DetailProfileHeader(
-                        nickname: widget.nickname, onFollowTap: () {}),
+                        nickname: widget.nickname,
+                        userId: _post?['user_id'] as int?,
+                        onFollowTap: () {}),
                     const SizedBox(height: 12),
                     ImageTagSection(
                       imageUrl: widget.imageUrl,
