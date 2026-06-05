@@ -22,14 +22,33 @@ class _HomePageState extends State<HomePage> {
   String selectedTab = '발견';
   List<Map<String, dynamic>> _posts = [];
   bool _isLoading = true;
+  bool _isFetchingMore = false;
+  bool _hasMore = true;
+  int _page = 0;
   int? _userId;
   String? _onboardingColor;
   String? _onboardingSkinTone;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _init();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 300
+        && !_isFetchingMore
+        && _hasMore) {
+      _loadMore();
+    }
   }
 
   Future<void> _init() async {
@@ -37,12 +56,12 @@ class _HomePageState extends State<HomePage> {
     _userId = prefs.getInt('user_id');
     _onboardingColor = prefs.getString('onboarding_color');
     _onboardingSkinTone = prefs.getString('onboarding_skin_tone');
-    await _fetchFeed();
+    await _fetchFeed(page: 0);
   }
 
-  Future<void> _fetchFeed() async {
+  Future<void> _fetchFeed({required int page}) async {
     try {
-      final Map<String, String> queryParams = {};
+      final Map<String, String> queryParams = {'page': page.toString()};
       if (_userId != null) {
         queryParams['user_id'] = _userId.toString();
       } else {
@@ -50,18 +69,32 @@ class _HomePageState extends State<HomePage> {
         if (_onboardingSkinTone != null) queryParams['skin_tone'] = _onboardingSkinTone!;
       }
       final uri = Uri.parse('${ApiConstants.baseUrl}/post/feed').replace(
-        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+        queryParameters: queryParams,
       );
       final response = await http.get(uri);
       if (!mounted) return;
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        final fetched = List<Map<String, dynamic>>.from(data['posts']);
         setState(() {
-          _posts = List<Map<String, dynamic>>.from(data['posts']);
+          if (page == 0) {
+            _posts = fetched;
+          } else {
+            _posts = [..._posts, ...fetched];
+          }
+          _hasMore = fetched.length >= 20;
+          _page = page;
         });
       }
     } catch (_) {}
     if (mounted) setState(() => _isLoading = false);
+  }
+
+  Future<void> _loadMore() async {
+    if (_isFetchingMore || !_hasMore) return;
+    setState(() => _isFetchingMore = true);
+    await _fetchFeed(page: _page + 1);
+    if (mounted) setState(() => _isFetchingMore = false);
   }
 
   @override
@@ -122,66 +155,76 @@ class _HomePageState extends State<HomePage> {
                               vertical: 12,
                             ),
                             child: SingleChildScrollView(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              controller: _scrollController,
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    child: Column(
-                                      children: leftItems.map((post) {
-                                        final imageUrl =
-                                            '${ApiConstants.baseUrl}${post['post_image']}';
-                                        return GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => DetailHomePage(
-                                                  imageUrl: imageUrl,
-                                                  nickname: post['nickname'] ?? '',
-                                                  title: post['title'] ?? '',
-                                                  postId: post['post_id'] as int,
-                                                ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          children: leftItems.map((post) {
+                                            final imageUrl =
+                                                '${ApiConstants.baseUrl}${post['post_image']}';
+                                            return GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) => DetailHomePage(
+                                                      imageUrl: imageUrl,
+                                                      nickname: post['nickname'] ?? '',
+                                                      title: post['title'] ?? '',
+                                                      postId: post['post_id'] as int,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: _ImageCard(
+                                                imageUrl: imageUrl,
+                                                label: post['nickname'],
                                               ),
                                             );
-                                          },
-                                          child: _ImageCard(
-                                            imageUrl: imageUrl,
-                                            label: post['nickname'],
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
+                                          }).toList(),
+                                        ),
+                                      ),
 
-                                  const SizedBox(width: 8),
+                                      const SizedBox(width: 8),
 
-                                  Expanded(
-                                    child: Column(
-                                      children: rightItems.map((post) {
-                                        final imageUrl =
-                                            '${ApiConstants.baseUrl}${post['post_image']}';
-                                        return GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => DetailHomePage(
-                                                  imageUrl: imageUrl,
-                                                  nickname: post['nickname'] ?? '',
-                                                  title: post['title'] ?? '',
-                                                  postId: post['post_id'] as int,
-                                                ),
+                                      Expanded(
+                                        child: Column(
+                                          children: rightItems.map((post) {
+                                            final imageUrl =
+                                                '${ApiConstants.baseUrl}${post['post_image']}';
+                                            return GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) => DetailHomePage(
+                                                      imageUrl: imageUrl,
+                                                      nickname: post['nickname'] ?? '',
+                                                      title: post['title'] ?? '',
+                                                      postId: post['post_id'] as int,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: _ImageCard(
+                                                imageUrl: imageUrl,
+                                                label: post['nickname'],
                                               ),
                                             );
-                                          },
-                                          child: _ImageCard(
-                                            imageUrl: imageUrl,
-                                            label: post['nickname'],
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                  if (_isFetchingMore)
+                                    const Padding(
+                                      padding: EdgeInsets.symmetric(vertical: 16),
+                                      child: CircularProgressIndicator(color: Colors.purple),
+                                    ),
                                 ],
                               ),
                             ),

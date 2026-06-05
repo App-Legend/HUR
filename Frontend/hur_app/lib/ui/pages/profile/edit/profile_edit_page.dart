@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/app/auth_utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -57,7 +58,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       );
       if (response.statusCode == 200 && mounted) {
         final data = jsonDecode(response.body);
-        final prefs2 = await SharedPreferences.getInstance();
         setState(() {
           _user = data;
           _nickname = data['nickname'] ?? '';
@@ -65,9 +65,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           _aestheticTag = data['aesthetic_tag'];
           _profileImageUrl = data['profile_image'];
           _backgroundImageUrl = data['background_image'];
-          _personalColor = prefs2.getString('onboarding_color');
-          _skinTone = prefs2.getString('onboarding_skin_tone');
+          _personalColor = data['personal_color'];
+          _skinTone = data['skin_tone'];
         });
+      } else if (response.statusCode == 401 && mounted) {
+        await handleUnauthorized(context);
+        return;
       }
     } catch (_) {
     } finally {
@@ -83,9 +86,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     setState(() => _isSaving = true);
     try {
-      if (_personalColor != null) await prefs.setString('onboarding_color', _personalColor!);
-      if (_skinTone != null) await prefs.setString('onboarding_skin_tone', _skinTone!);
-
       final response = await http.put(
         Uri.parse('${ApiConstants.baseUrl}/user/$userId'),
         headers: {
@@ -98,8 +98,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           'aesthetic_tag': _aestheticTag,
           'profile_image': _profileImageUrl,
           'background_image': _backgroundImageUrl,
+          'personal_color': _personalColor,
+          'skin_tone': _skinTone,
         }),
       );
+
+      if (_personalColor != null) await prefs.setString('onboarding_color', _personalColor!);
+      if (_skinTone != null) await prefs.setString('onboarding_skin_tone', _skinTone!);
       final data = jsonDecode(response.body);
       if (!mounted) return;
       if (response.statusCode == 200) {
@@ -107,6 +112,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           const SnackBar(content: Text('프로필이 저장됐어요')),
         );
         Navigator.pop(context);
+      } else if (response.statusCode == 401) {
+        await handleUnauthorized(context);
+        return;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(data['message'] ?? '저장 실패')),
