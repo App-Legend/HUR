@@ -96,7 +96,7 @@ const getFeed = async (req, res) => {
           ) AS relevance_score
         FROM posts p
         JOIN users u ON p.user_id = u.user_id
-        WHERE (p.visibility = '모든 사람' OR (p.visibility = '팔로워만' AND EXISTS (
+        WHERE (p.visibility IS NULL OR p.visibility = '모든 사람' OR (p.visibility = '팔로워만' AND EXISTS (
                 SELECT 1 FROM follow WHERE follower_id = $1 AND following_id = p.user_id
               )))
           AND p.created_at > NOW() - INTERVAL '7 days'
@@ -141,7 +141,7 @@ const getFeed = async (req, res) => {
           ) AS relevance_score
         FROM posts p
         JOIN users u ON p.user_id = u.user_id
-        WHERE p.visibility = '모든 사람'
+        WHERE (p.visibility IS NULL OR p.visibility = '모든 사람')
           AND p.created_at > NOW() - INTERVAL '7 days'
         ORDER BY relevance_score DESC, p.created_at DESC
         LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
@@ -164,7 +164,7 @@ const getFeed = async (req, res) => {
           ) AS categories
         FROM posts p
         JOIN users u ON p.user_id = u.user_id
-        WHERE p.visibility = '모든 사람'
+        WHERE (p.visibility IS NULL OR p.visibility = '모든 사람')
           AND p.created_at > NOW() - INTERVAL '7 days'
         ORDER BY p.created_at DESC
         LIMIT $1 OFFSET $2`,
@@ -196,7 +196,7 @@ const getUserPosts = async (req, res) => {
       query = `SELECT p.post_id, p.post_image, p.title, p.created_at, u.nickname
                FROM posts p JOIN users u ON p.user_id = u.user_id
                WHERE p.user_id = $1
-                 AND (p.visibility = '모든 사람' OR (p.visibility = '팔로워만' AND EXISTS (
+                 AND (p.visibility IS NULL OR p.visibility = '모든 사람' OR (p.visibility = '팔로워만' AND EXISTS (
                    SELECT 1 FROM follow WHERE follower_id = $2 AND following_id = $1
                  )))
                ORDER BY p.created_at DESC`;
@@ -204,7 +204,7 @@ const getUserPosts = async (req, res) => {
     } else {
       query = `SELECT p.post_id, p.post_image, p.title, p.created_at, u.nickname
                FROM posts p JOIN users u ON p.user_id = u.user_id
-               WHERE p.user_id = $1 AND p.visibility = '모든 사람'
+               WHERE p.user_id = $1 AND (p.visibility IS NULL OR p.visibility = '모든 사람')
                ORDER BY p.created_at DESC`;
       params = [userIdInt];
     }
