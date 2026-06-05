@@ -460,7 +460,7 @@ const getPostsByProduct = async (req, res) => {
     try {
         const { productId } = req.params;
         const { rows } = await pool.query(
-            `SELECT DISTINCT p.post_id, p.title, p.post_image, u.nickname, u.profile_image,
+            `SELECT p.post_id, p.title, p.post_image, u.nickname, u.profile_image,
                     COALESCE(
                         (SELECT JSON_AGG(pc.category_value)
                          FROM post_category pc
@@ -471,6 +471,7 @@ const getPostsByProduct = async (req, res) => {
              JOIN post_sticker ps ON ps.post_id = p.post_id
              JOIN users u ON p.user_id = u.user_id
              WHERE ps.product_id = $1
+             GROUP BY p.post_id, p.title, p.post_image, u.nickname, u.profile_image
              ORDER BY p.post_id DESC`,
             [productId]
         );
