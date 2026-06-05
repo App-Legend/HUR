@@ -350,4 +350,34 @@ const deleteComment = async (req, res) => {
     }
 };
 
-module.exports = { createPost, getFeed, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment };
+// 게시물 검색 (제목/내용 + 닉네임 + 제품명/브랜드)
+const searchPosts = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim() === '') {
+      return res.json({ posts: [] });
+    }
+
+    const { rows } = await pool.query(
+      `SELECT DISTINCT p.post_id, p.title, p.post_image, p.created_at, u.nickname, u.profile_image
+       FROM posts p
+       JOIN users u ON p.user_id = u.user_id
+       LEFT JOIN post_sticker ps ON ps.post_id = p.post_id
+       LEFT JOIN products pr ON ps.product_id = pr.id
+       WHERE p.title ILIKE $1
+          OR p.post_content ILIKE $1
+          OR u.nickname ILIKE $1
+          OR pr.name ILIKE $1
+          OR pr.brand ILIKE $1
+       ORDER BY p.created_at DESC
+       LIMIT 40`,
+      [`%${q.trim()}%`]
+    );
+
+    res.json({ posts: rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = { createPost, getFeed, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts };

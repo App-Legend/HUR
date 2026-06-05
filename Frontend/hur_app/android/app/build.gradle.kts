@@ -1,5 +1,7 @@
 plugins {
     id("com.android.application")
+    // kotlinOptions 블록 사용을 위해 Kotlin Android 플러그인 적용
+    id("org.jetbrains.kotlin.android")
     // The Flutter Gradle Plugin must be applied after the Android Gradle plugin.
     id("dev.flutter.flutter-gradle-plugin")
 }

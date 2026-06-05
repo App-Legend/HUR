@@ -176,7 +176,7 @@ class SearchPageState extends State<SearchPage>
                           children: [
                             SearchResultCosmeticsTab(query: _searchController.text.trim()),
                             SearchResultAccountsTab(query: _searchController.text.trim()),
-                            const SearchResultFeedTab(),
+                            SearchResultFeedTab(query: _searchController.text.trim()),
                           ],
                         ),
                       ),
