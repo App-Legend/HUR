@@ -350,4 +350,23 @@ const deleteComment = async (req, res) => {
     }
 };
 
-module.exports = { createPost, getFeed, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment };
+// 제품 태그된 게시물 조회
+const getPostsByProduct = async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const { rows } = await pool.query(
+            `SELECT DISTINCT p.post_id, p.title, p.post_image, u.nickname, u.profile_image
+             FROM posts p
+             JOIN post_sticker ps ON ps.post_id = p.post_id
+             JOIN users u ON p.user_id = u.user_id
+             WHERE ps.product_id = $1
+             ORDER BY p.post_id DESC`,
+            [productId]
+        );
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+module.exports = { createPost, getFeed, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, getPostsByProduct };

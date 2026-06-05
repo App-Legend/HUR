@@ -224,6 +224,7 @@ class _RankingPageState extends State<RankingPage> {
           imagePath: item.imagePath,
           brand: item.brand,
           name: item.name,
+          productId: item.id,
         ),
       ),
     );
