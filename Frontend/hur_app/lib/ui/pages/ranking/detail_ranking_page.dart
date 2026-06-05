@@ -12,7 +12,7 @@ import 'package:hur_app/ui/pages/home/detail/detail_home_page.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/purchase_popup.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-const _kDetailCategories = ['전체', '봄 웜', '가을 웜', '여름 쿨', '겨울 쿨'];
+const _kDetailCategories = ['전체', '봄 웜톤', '가을 웜톤', '여름쿨톤', '겨울 쿨톤'];
 
 class DetailRankingPage extends StatefulWidget {
   final String rank;
