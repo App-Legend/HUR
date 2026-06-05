@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/follow_button.dart';
 
 class UserFeedPage extends StatefulWidget {
-  const UserFeedPage({super.key});
+  final int userId;
+
+  const UserFeedPage({super.key, required this.userId});
 
   @override
   State<UserFeedPage> createState() => _UserFeedPageState();

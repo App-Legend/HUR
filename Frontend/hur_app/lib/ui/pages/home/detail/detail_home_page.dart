@@ -91,7 +91,7 @@ class _DetailHomePage extends State<DetailHomePage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    DetailProfileHeader(nickname: '닉네임', onFollowTap: () {}),
+                    DetailProfileHeader(nickname: '닉네임', userId: 0, onFollowTap: () {}),
 
                     const SizedBox(height: 12),
 

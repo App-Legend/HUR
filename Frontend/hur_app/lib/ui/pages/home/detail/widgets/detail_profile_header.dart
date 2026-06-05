@@ -3,11 +3,13 @@ import 'package:hur_app/ui/pages/profile/feed/user_feed_page.dart';
 
 class DetailProfileHeader extends StatelessWidget {
   final String nickname;
+  final int userId;
   final VoidCallback onFollowTap;
 
   const DetailProfileHeader({
     super.key,
     required this.nickname,
+    required this.userId,
     required this.onFollowTap,
   });
 
@@ -20,7 +22,7 @@ class DetailProfileHeader extends StatelessWidget {
           GestureDetector(
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const UserFeedPage()),
+              MaterialPageRoute(builder: (_) => UserFeedPage(userId: userId)),
             ),
             child: Container(
               width: 40,
@@ -38,7 +40,7 @@ class DetailProfileHeader extends StatelessWidget {
             child: GestureDetector(
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const UserFeedPage()),
+                MaterialPageRoute(builder: (_) => UserFeedPage(userId: userId)),
               ),
               child: Text(
                 nickname,

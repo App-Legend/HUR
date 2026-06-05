@@ -39,6 +39,12 @@ dependencies:
   material_symbols_icons: ^4.2785.0
   http: ^1.2.0
 
+  #로컬 저장
+  shared_preferences: ^2.3.2
+
+  #스플래시
+  flutter_native_splash: ^2.4.4
+
   #사진 업로드
   image_picker: ^1.1.2
 
@@ -77,6 +83,7 @@ flutter:
     - assets/images/ranking/
     - assets/images/search/
     - assets/icons/
+    - assets/splash/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
