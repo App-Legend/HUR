@@ -6,6 +6,7 @@ import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:hur_app/ui/common/widget/product_more_popup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'detail_ranking_page.dart';
 
 import 'package:hur_app/app/constants.dart';
@@ -60,10 +61,17 @@ class _RankingPageState extends State<RankingPage> {
   List<RankingProduct> _products = [];
   bool _isLoading = true;
   String? _error;
+  int? _userId;
 
   @override
   void initState() {
     super.initState();
+    _loadUserAndFetch();
+  }
+
+  Future<void> _loadUserAndFetch() async {
+    final prefs = await SharedPreferences.getInstance();
+    _userId = prefs.getInt('user_id');
     _fetchRanking('틴트');
   }
 
@@ -73,12 +81,15 @@ class _RankingPageState extends State<RankingPage> {
       _error = null;
     });
     try {
+      final queryParams = {
+        'category': category,
+        'limit': '20',
+        if (_userId != null) 'user_id': _userId.toString(),
+      };
       final response = await http
           .get(
-            Uri.parse(
-              '${ApiConstants.baseUrl}/products/ranking'
-              '?category=${Uri.encodeComponent(category)}&limit=20',
-            ),
+            Uri.parse('${ApiConstants.baseUrl}/products/ranking')
+                .replace(queryParameters: queryParams),
           )
           .timeout(const Duration(seconds: 10));
 
@@ -224,6 +235,7 @@ class _RankingPageState extends State<RankingPage> {
           imagePath: item.imagePath,
           brand: item.brand,
           name: item.name,
+          productId: item.id,
         ),
       ),
     );

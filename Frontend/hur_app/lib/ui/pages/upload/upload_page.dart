@@ -258,6 +258,7 @@ class _UploadPageState extends State<UploadPage> {
           'yRatio': s.yRatio,
         }).toList(),
       );
+      request.fields['visibility'] = _publicScope;
 
       final response = await request.send();
 

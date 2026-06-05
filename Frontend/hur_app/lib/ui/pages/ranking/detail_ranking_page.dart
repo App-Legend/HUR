@@ -2,30 +2,24 @@
 //  |        상품 상세 페이지         |
 //  ————————————————————————————————
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
+import 'package:hur_app/ui/pages/home/detail/detail_home_page.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/purchase_popup.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 const _kDetailCategories = ['전체', '봄 웜', '가을 웜', '여름 쿨', '겨울 쿨'];
-
-const _kDetailImages = [
-  'assets/images/ranking/detail1.jpg',
-  'assets/images/ranking/detail2.jpg',
-  'assets/images/ranking/detail3.jpg',
-  'assets/images/ranking/detail4.jpg',
-  'assets/images/ranking/detail1.jpg',
-  'assets/images/ranking/detail2.jpg',
-  'assets/images/ranking/detail3.jpg',
-  'assets/images/ranking/detail4.jpg',
-];
 
 class DetailRankingPage extends StatefulWidget {
   final String rank;
   final String imagePath;
   final String brand;
   final String name;
+  final int? productId;
 
   const DetailRankingPage({
     super.key,
@@ -33,6 +27,7 @@ class DetailRankingPage extends StatefulWidget {
     required this.imagePath,
     required this.brand,
     required this.name,
+    this.productId,
   });
 
   @override
@@ -103,6 +98,7 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
                 child: _PhotoTab(
                   imagePath: widget.imagePath,
                   rank: widget.rank,
+                  productId: widget.productId,
                   selectedCategory: selectedCategory,
                   onCategorySelected: (cat) =>
                       setState(() => selectedCategory = cat),
@@ -118,9 +114,10 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
   }
 }
 
-class _PhotoTab extends StatelessWidget {
+class _PhotoTab extends StatefulWidget {
   final String imagePath;
   final String rank;
+  final int? productId;
   final String selectedCategory;
   final ValueChanged<String> onCategorySelected;
   final VoidCallback onPurchaseTap;
@@ -128,10 +125,54 @@ class _PhotoTab extends StatelessWidget {
   const _PhotoTab({
     required this.imagePath,
     required this.rank,
+    required this.productId,
     required this.selectedCategory,
     required this.onCategorySelected,
     required this.onPurchaseTap,
   });
+
+  @override
+  State<_PhotoTab> createState() => _PhotoTabState();
+}
+
+class _PhotoTabState extends State<_PhotoTab> {
+  List<Map<String, dynamic>> _posts = [];
+  bool _isLoading = true;
+
+  List<Map<String, dynamic>> get _filteredPosts {
+    if (widget.selectedCategory == '전체') return _posts;
+    return _posts.where((post) {
+      final colors = (post['personal_colors'] as List?)?.cast<String>() ?? [];
+      return colors.contains(widget.selectedCategory);
+    }).toList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPosts();
+  }
+
+  Future<void> _fetchPosts() async {
+    if (widget.productId == null) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
+    try {
+      final res = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/post/by-product/${widget.productId}'),
+      );
+      if (res.statusCode == 200 && mounted) {
+        final List data = jsonDecode(res.body);
+        setState(() {
+          _posts = data.cast<Map<String, dynamic>>();
+        });
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,8 +190,8 @@ class _PhotoTab extends StatelessWidget {
               final cat = _kDetailCategories[index];
               return CategoryChip(
                 text: cat,
-                selected: selectedCategory == cat,
-                onTap: () => onCategorySelected(cat),
+                selected: widget.selectedCategory == cat,
+                onTap: () => widget.onCategorySelected(cat),
               );
             },
           ),
@@ -174,9 +215,9 @@ class _PhotoTab extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: imagePath.startsWith('http')
+                  child: widget.imagePath.startsWith('http')
                       ? Image.network(
-                          imagePath,
+                          widget.imagePath,
                           width: 84,
                           height: 84,
                           fit: BoxFit.cover,
@@ -187,7 +228,7 @@ class _PhotoTab extends StatelessWidget {
                             child: const Icon(Icons.image_not_supported, color: Colors.grey),
                           ),
                         )
-                      : Image.asset(imagePath, width: 84, height: 84, fit: BoxFit.cover),
+                      : Image.asset(widget.imagePath, width: 84, height: 84, fit: BoxFit.cover),
                 ),
 
                 const SizedBox(width: 24),
@@ -198,7 +239,7 @@ class _PhotoTab extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 1),
                       child: Text(
-                        rank,
+                        widget.rank,
                         style: const TextStyle(
                           fontSize: 17,
                           color: Colors.black,
@@ -211,14 +252,14 @@ class _PhotoTab extends StatelessWidget {
 
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           '오늘 조회 3206',
                           style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
                         Text(
-                          '총 47회 사용',
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
+                          '총 ${_posts.length}회 사용',
+                          style: const TextStyle(fontSize: 13, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -226,7 +267,7 @@ class _PhotoTab extends StatelessWidget {
                     const SizedBox(width: 30),
 
                     GestureDetector(
-                      onTap: onPurchaseTap,
+                      onTap: widget.onPurchaseTap,
                       child: const Icon(
                         Symbols.open_in_new,
                         weight: 400,
@@ -241,22 +282,55 @@ class _PhotoTab extends StatelessWidget {
         ),
 
         Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.fromLTRB(10, 14, 10, 10),
-            itemCount: _kDetailImages.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 14,
-              crossAxisSpacing: 6,
-              childAspectRatio: 0.7,
-            ),
-            itemBuilder: (context, index) {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(_kDetailImages[index], fit: BoxFit.cover),
-              );
-            },
-          ),
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _filteredPosts.isEmpty
+                  ? Center(
+                      child: Text(
+                        widget.selectedCategory == '전체'
+                            ? '이 제품이 태그된 게시물이 없어요'
+                            : '${widget.selectedCategory} 게시물이 없어요',
+                        style: const TextStyle(color: Colors.black38, fontSize: 14),
+                      ),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.fromLTRB(10, 14, 10, 10),
+                      itemCount: _filteredPosts.length,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 14,
+                        crossAxisSpacing: 6,
+                        childAspectRatio: 0.7,
+                      ),
+                      itemBuilder: (context, index) {
+                        final post = _filteredPosts[index];
+                        final imageUrl = '${ApiConstants.baseUrl}${post['post_image'] ?? ''}';
+                        return GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DetailHomePage(
+                                imageUrl: imageUrl,
+                                nickname: post['nickname'] ?? '',
+                                title: post['title'] ?? '',
+                                postId: post['post_id'] as int,
+                              ),
+                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => Container(
+                                color: Colors.grey[200],
+                                child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
         ),
       ],
     );

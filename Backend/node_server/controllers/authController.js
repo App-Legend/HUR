@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secretKey';
 // 로그인
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, keep_logged_in } = req.body;
 
         const { rows } = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
         if (rows.length === 0) {
@@ -23,7 +23,7 @@ const login = async (req, res) => {
         const token = jwt.sign(
             { id: user.user_id, email: user.email },
             JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: keep_logged_in ? '30d' : '1h' }
         );
 
         res.json({

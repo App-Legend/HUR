@@ -26,6 +26,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Future<void> _finish() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_done', true);
+    if (_color != null) await prefs.setString('onboarding_color', _color!);
+    if (_skinTone != null) await prefs.setString('onboarding_skin_tone', _skinTone!);
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const MainPage()),

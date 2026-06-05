@@ -30,6 +30,7 @@ const getProfile = async (req, res) => {
         const { rows } = await pool.query(
             `SELECT u.user_id AS id, u.email, u.name, u.nickname, u.gender, u.birth_date,
                     u.bio, u.profile_image, u.background_image, u.aesthetic_tag,
+                    u.personal_color, u.skin_tone,
                     COUNT(DISTINCT f_in.follower_id)   AS follower_count,
                     COUNT(DISTINCT f_out.following_id) AS following_count
              FROM users u
@@ -52,7 +53,7 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nickname, bio, profile_image, background_image, aesthetic_tag } = req.body;
+        const { nickname, bio, profile_image, background_image, aesthetic_tag, personal_color, skin_tone } = req.body;
 
         const { rows: existing } = await pool.query('SELECT user_id FROM users WHERE user_id=$1', [id]);
         if (existing.length === 0) {
@@ -70,13 +71,34 @@ const updateProfile = async (req, res) => {
                  bio              = COALESCE($2, bio),
                  profile_image    = COALESCE($3, profile_image),
                  background_image = COALESCE($4, background_image),
-                 aesthetic_tag    = COALESCE($5, aesthetic_tag)
-             WHERE user_id=$6`,
-            [nickname, bio, profile_image, background_image, aesthetic_tag, id]
+                 aesthetic_tag    = COALESCE($5, aesthetic_tag),
+                 personal_color   = COALESCE($6, personal_color),
+                 skin_tone        = COALESCE($7, skin_tone)
+             WHERE user_id=$8`,
+            [nickname, bio, profile_image, background_image, aesthetic_tag, personal_color, skin_tone, id]
         );
 
+        if (personal_color) {
+            await pool.query(
+                `INSERT INTO user_category_score (user_id, category_type, category_value, score)
+                 VALUES ($1, 'personal_color', $2, 5)
+                 ON CONFLICT (user_id, category_type, category_value) DO NOTHING`,
+                [id, personal_color]
+            );
+        }
+        if (skin_tone) {
+            await pool.query(
+                `INSERT INTO user_category_score (user_id, category_type, category_value, score)
+                 VALUES ($1, 'skin_tone', $2, 5)
+                 ON CONFLICT (user_id, category_type, category_value) DO NOTHING`,
+                [id, skin_tone]
+            );
+        }
+
         const { rows: updated } = await pool.query(
-            'SELECT user_id AS id, email, name, nickname, bio, profile_image, background_image, aesthetic_tag FROM users WHERE user_id=$1',
+            `SELECT user_id AS id, email, name, nickname, bio, profile_image, background_image,
+                    aesthetic_tag, personal_color, skin_tone
+             FROM users WHERE user_id=$1`,
             [id]
         );
 

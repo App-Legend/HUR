@@ -20,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  bool _keepLoggedIn = false;
 
   Future<void> _login() async {
     final email = _emailController.text.trim();
@@ -37,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
       final response = await http.post(
         Uri.parse('${ApiConstants.baseUrl}/auth/login'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({'email': email, 'password': password, 'keep_logged_in': _keepLoggedIn}),
       );
 
       if (!mounted) return;
@@ -151,20 +152,38 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: Checkbox(
+                          value: _keepLoggedIn,
+                          onChanged: (v) => setState(() => _keepLoggedIn = v ?? false),
+                          activeColor: const Color(0xFF6B1F8A),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('로그인 유지', style: TextStyle(color: Colors.black54, fontSize: 13)),
+                    ],
                   ),
-                  child: const Text(
-                    '비밀번호를 잊으셨나요?',
-                    style: TextStyle(color: Colors.black54, fontSize: 13),
+                  TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text(
+                      '비밀번호를 잊으셨나요?',
+                      style: TextStyle(color: Colors.black54, fontSize: 13),
+                    ),
                   ),
-                ),
+                ],
               ),
               const SizedBox(height: 12),
               SizedBox(

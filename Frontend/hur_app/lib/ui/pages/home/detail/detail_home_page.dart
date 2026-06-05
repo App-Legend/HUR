@@ -45,6 +45,7 @@ class _DetailHomePage extends State<DetailHomePage> {
 
   Map<String, dynamic>? _post;
   bool _postLoading = true;
+  bool _isRestricted = false;
 
   @override
   void initState() {
@@ -60,15 +61,17 @@ class _DetailHomePage extends State<DetailHomePage> {
 
   Future<void> _loadPostDetail() async {
     try {
-      final res = await http.get(
-        Uri.parse('${ApiConstants.baseUrl}/post/${widget.postId}'),
-      );
+      final uri = Uri.parse('${ApiConstants.baseUrl}/post/${widget.postId}')
+          .replace(queryParameters: _userId != null ? {'viewer_id': _userId.toString()} : null);
+      final res = await http.get(uri);
       if (res.statusCode == 200 && mounted) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         setState(() {
           _post = data;
           _commentCount = data['comment_count'] ?? 0;
         });
+      } else if (res.statusCode == 403 && mounted) {
+        setState(() => _isRestricted = true);
       }
     } catch (_) {
     } finally {
@@ -210,11 +213,40 @@ class _DetailHomePage extends State<DetailHomePage> {
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             ),
             Expanded(
-              child: SingleChildScrollView(
+              child: _isRestricted
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.lock_outline, size: 64, color: Colors.black26),
+                          const SizedBox(height: 16),
+                          const Text(
+                            '팔로우한 사람만 볼 수 있는 게시물이에요.',
+                            style: TextStyle(color: Colors.black54, fontSize: 15),
+                          ),
+                          if (_userId == null) ...[
+                            const SizedBox(height: 16),
+                            TextButton(
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const LoginPage()),
+                              ),
+                              child: const Text(
+                                '로그인하기',
+                                style: TextStyle(color: Color(0xFF6B1F8A), fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    )
+                  : SingleChildScrollView(
                 child: Column(
                   children: [
                     DetailProfileHeader(
-                        nickname: widget.nickname, onFollowTap: () {}),
+                        nickname: widget.nickname,
+                        userId: _post?['user_id'] as int?,
+                        onFollowTap: () {}),
                     const SizedBox(height: 12),
                     ImageTagSection(
                       imageUrl: widget.imageUrl,
@@ -294,3 +326,4 @@ class _DetailHomePage extends State<DetailHomePage> {
     );
   }
 }
+

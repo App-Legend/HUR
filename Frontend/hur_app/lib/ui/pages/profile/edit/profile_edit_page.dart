@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/app/auth_utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,8 +28,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   String? _aestheticTag;
   String? _profileImageUrl;
   String? _backgroundImageUrl;
+  String? _personalColor;
+  String? _skinTone;
 
   static const _aestheticOptions = ['청순', '섹시', '차분', '시크', '큐티'];
+  static const _colorOptions = ['봄 웜톤', '가을 웜톤', '겨울 쿨톤', '여름 쿨톤', '잘 모르겠음'];
+  static const _skinToneOptions = ['13~17호', '21호', '23호', '25호', '27호'];
   final _picker = ImagePicker();
 
   @override
@@ -60,7 +65,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           _aestheticTag = data['aesthetic_tag'];
           _profileImageUrl = data['profile_image'];
           _backgroundImageUrl = data['background_image'];
+          _personalColor = data['personal_color'];
+          _skinTone = data['skin_tone'];
         });
+      } else if (response.statusCode == 401 && mounted) {
+        await handleUnauthorized(context);
+        return;
       }
     } catch (_) {
     } finally {
@@ -88,8 +98,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           'aesthetic_tag': _aestheticTag,
           'profile_image': _profileImageUrl,
           'background_image': _backgroundImageUrl,
+          'personal_color': _personalColor,
+          'skin_tone': _skinTone,
         }),
       );
+
+      if (_personalColor != null) await prefs.setString('onboarding_color', _personalColor!);
+      if (_skinTone != null) await prefs.setString('onboarding_skin_tone', _skinTone!);
       final data = jsonDecode(response.body);
       if (!mounted) return;
       if (response.statusCode == 200) {
@@ -97,6 +112,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           const SnackBar(content: Text('프로필이 저장됐어요')),
         );
         Navigator.pop(context);
+      } else if (response.statusCode == 401) {
+        await handleUnauthorized(context);
+        return;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(data['message'] ?? '저장 실패')),
@@ -168,6 +186,86 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 ),
                 child: Text(
                   tag,
+                  style: TextStyle(
+                    color: selected ? Colors.white : Colors.black87,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('닫기')),
+        ],
+      ),
+    );
+  }
+
+  void _selectPersonalColor() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('퍼스널컬러 선택'),
+        content: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _colorOptions.map((opt) {
+            final selected = _personalColor == opt;
+            return GestureDetector(
+              onTap: () {
+                setState(() => _personalColor = opt);
+                Navigator.pop(context);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: selected ? const Color(0xFF6B1F8A) : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: selected ? const Color(0xFF6B1F8A) : Colors.black26),
+                ),
+                child: Text(
+                  opt,
+                  style: TextStyle(
+                    color: selected ? Colors.white : Colors.black87,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('닫기')),
+        ],
+      ),
+    );
+  }
+
+  void _selectSkinTone() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('피부톤 선택'),
+        content: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _skinToneOptions.map((opt) {
+            final selected = _skinTone == opt;
+            return GestureDetector(
+              onTap: () {
+                setState(() => _skinTone = opt);
+                Navigator.pop(context);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: selected ? const Color(0xFF6B1F8A) : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: selected ? const Color(0xFF6B1F8A) : Colors.black26),
+                ),
+                child: Text(
+                  opt,
                   style: TextStyle(
                     color: selected ? Colors.white : Colors.black87,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
@@ -291,8 +389,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         value: _user?['birth_date']?.toString().substring(0, 10) ?? '',
                         editable: false,
                       ),
-                      _EditRow(label: '퍼스널컬러', value: '가을 웜톤', editable: false),
-                      _EditRow(label: '피부톤', value: '21호', editable: false),
+                      _EditRow(
+                        label: '퍼스널컬러',
+                        value: _personalColor ?? '선택하지않음',
+                        onTap: _selectPersonalColor,
+                      ),
+                      _EditRow(
+                        label: '피부톤',
+                        value: _skinTone ?? '선택하지않음',
+                        onTap: _selectSkinTone,
+                      ),
                     ],
                   ),
                 ],
