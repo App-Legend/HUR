@@ -154,6 +154,29 @@ const getFeed = async (req, res) => {
         LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
         params
       ));
+    } else if (req.query.random === 'true') {
+      ({ rows } = await pool.query(
+        `SELECT
+          p.post_id,
+          p.title,
+          p.post_image,
+          p.created_at,
+          u.nickname,
+          u.profile_image,
+          COALESCE(
+            (SELECT JSON_AGG(JSON_BUILD_OBJECT('type', pc.category_type, 'value', pc.category_value))
+             FROM post_category pc
+             WHERE pc.post_id = p.post_id),
+            '[]'::json
+          ) AS categories
+        FROM posts p
+        JOIN users u ON p.user_id = u.user_id
+        WHERE (p.visibility IS NULL OR p.visibility = '모든 사람')
+          AND p.post_image IS NOT NULL
+        ORDER BY RANDOM()
+        LIMIT $1`,
+        [limit]
+      ));
     } else {
       ({ rows } = await pool.query(
         `SELECT

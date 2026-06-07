@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
@@ -29,7 +28,7 @@ class _OnboardingAestheticState extends State<OnboardingAesthetic> {
   Future<void> _fetchImages() async {
     try {
       final uri = Uri.parse('${ApiConstants.baseUrl}/post/feed')
-          .replace(queryParameters: {'page': '0'});
+          .replace(queryParameters: {'random': 'true'});
       final response = await http.get(uri);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -38,7 +37,6 @@ class _OnboardingAestheticState extends State<OnboardingAesthetic> {
             .where((p) => p['post_image'] != null)
             .map((p) => '${ApiConstants.baseUrl}${p['post_image']}' as String)
             .toList();
-        urls.shuffle(Random());
         if (mounted) setState(() => _images = urls);
       }
     } catch (_) {}
