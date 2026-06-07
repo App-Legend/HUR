@@ -1,11 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
 
 const _purple = Color(0xFF7B2D8B);
-
-const _moods = ['청순', '시크', '큐티', '섹시', '차분'];
 
 class OnboardingAesthetic extends StatefulWidget {
   final ValueChanged<List<String>> onFinish;
@@ -17,40 +16,40 @@ class OnboardingAesthetic extends StatefulWidget {
 }
 
 class _OnboardingAestheticState extends State<OnboardingAesthetic> {
-  final Set<String> _selected = {};
-  final Map<String, String?> _moodImages = {};
+  final Set<int> _selected = {};
+  List<String> _images = [];
   bool _loadingImages = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchMoodImages();
+    _fetchImages();
   }
 
-  Future<void> _fetchMoodImages() async {
-    await Future.wait(_moods.map((mood) async {
-      try {
-        final uri = Uri.parse('${ApiConstants.baseUrl}/post/feed')
-            .replace(queryParameters: {'mood': mood, 'page': '0'});
-        final response = await http.get(uri);
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final posts = List<Map<String, dynamic>>.from(data['posts']);
-          if (posts.isNotEmpty) {
-            final imageUrl = '${ApiConstants.baseUrl}${posts.first['post_image']}';
-            if (mounted) setState(() => _moodImages[mood] = imageUrl);
-          }
-        }
-      } catch (_) {}
-    }));
+  Future<void> _fetchImages() async {
+    try {
+      final uri = Uri.parse('${ApiConstants.baseUrl}/post/feed')
+          .replace(queryParameters: {'page': '0'});
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final posts = List<Map<String, dynamic>>.from(data['posts']);
+        final urls = posts
+            .where((p) => p['post_image'] != null)
+            .map((p) => '${ApiConstants.baseUrl}${p['post_image']}' as String)
+            .toList();
+        urls.shuffle(Random());
+        if (mounted) setState(() => _images = urls);
+      }
+    } catch (_) {}
     if (mounted) setState(() => _loadingImages = false);
   }
 
-  void _toggle(String mood) => setState(() {
-        if (_selected.contains(mood)) {
-          _selected.remove(mood);
+  void _toggle(int i) => setState(() {
+        if (_selected.contains(i)) {
+          _selected.remove(i);
         } else {
-          _selected.add(mood);
+          _selected.add(i);
         }
       });
 
@@ -89,41 +88,21 @@ class _OnboardingAestheticState extends State<OnboardingAesthetic> {
                   mainAxisSpacing: 8,
                   childAspectRatio: 0.85,
                 ),
-                itemCount: _moods.length,
+                itemCount: _loadingImages ? 6 : _images.length,
                 itemBuilder: (context, i) {
-                  final mood = _moods[i];
-                  final isSelected = _selected.contains(mood);
-                  final imageUrl = _moodImages[mood];
+                  final isSelected = _selected.contains(i);
 
                   return GestureDetector(
-                    onTap: () => _toggle(mood),
+                    onTap: () => _toggle(i),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          if (_loadingImages || imageUrl == null)
+                          if (_loadingImages || i >= _images.length)
                             Container(color: const Color(0xFFEEEEEE))
                           else
-                            Image.network(imageUrl, fit: BoxFit.cover),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              color: Colors.black.withValues(alpha: 0.4),
-                              child: Text(
-                                mood,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
+                            Image.network(_images[i], fit: BoxFit.cover),
                           if (isSelected) ...[
                             Container(color: _purple.withValues(alpha: 0.3)),
                             const Positioned(
@@ -146,7 +125,7 @@ class _OnboardingAestheticState extends State<OnboardingAesthetic> {
             Padding(
               padding: const EdgeInsets.fromLTRB(28, 20, 28, 36),
               child: GestureDetector(
-                onTap: () => widget.onFinish(_selected.toList()),
+                onTap: () => widget.onFinish([]),
                 child: Container(
                   width: double.infinity,
                   height: 52,
