@@ -67,6 +67,7 @@ const getFeed = async (req, res) => {
 
     const color = req.query.color || null;
     const skinTone = req.query.skin_tone || null;
+    const mood = req.query.mood || null;
 
     let rows;
     if (userId) {
@@ -104,7 +105,7 @@ const getFeed = async (req, res) => {
         LIMIT $2 OFFSET $3`,
         [userId, limit, offset]
       ));
-    } else if (color || skinTone) {
+    } else if (color || skinTone || mood) {
       const params = [];
       const categoryFilters = [];
       if (color) {
@@ -114,6 +115,12 @@ const getFeed = async (req, res) => {
       if (skinTone) {
         params.push('skin_tone', skinTone);
         categoryFilters.push(`(pc.category_type = $${params.length - 1} AND pc.category_value = $${params.length})`);
+      }
+      if (mood) {
+        for (const m of mood.split(',').map(v => v.trim()).filter(Boolean)) {
+          params.push('mood', m);
+          categoryFilters.push(`(pc.category_type = $${params.length - 1} AND pc.category_value = $${params.length})`);
+        }
       }
       const filterExpr = categoryFilters.join(' OR ');
       params.push(limit, offset);

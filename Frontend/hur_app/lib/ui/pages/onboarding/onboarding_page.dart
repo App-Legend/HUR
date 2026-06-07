@@ -23,11 +23,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
         curve: Curves.easeInOut,
       );
 
-  Future<void> _finish() async {
+  Future<void> _finish(List<String> moods) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_done', true);
     if (_color != null) await prefs.setString('onboarding_color', _color!);
     if (_skinTone != null) await prefs.setString('onboarding_skin_tone', _skinTone!);
+    if (moods.isNotEmpty) await prefs.setString('onboarding_mood', moods.join(','));
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const MainPage()),
@@ -47,13 +48,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
             selected: _color,
             onSelect: (v) => setState(() => _color = v),
             onNext: _next,
-            onSkip: _finish,
+            onSkip: () => _finish([]),
           ),
           OnboardingSkinTone(
             selected: _skinTone,
             onSelect: (v) => setState(() => _skinTone = v),
             onNext: _next,
-            onSkip: _finish,
+            onSkip: () => _finish([]),
           ),
           OnboardingAesthetic(onFinish: _finish),
         ],
