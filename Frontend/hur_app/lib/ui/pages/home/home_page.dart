@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   int? _userId;
   String? _onboardingColor;
   String? _onboardingSkinTone;
+  String? _onboardingMood;
   final _scrollController = ScrollController();
 
   @override
@@ -56,6 +57,7 @@ class _HomePageState extends State<HomePage> {
     _userId = prefs.getInt('user_id');
     _onboardingColor = prefs.getString('onboarding_color');
     _onboardingSkinTone = prefs.getString('onboarding_skin_tone');
+    _onboardingMood = prefs.getString('onboarding_mood');
     await _fetchFeed(page: 0);
   }
 
@@ -67,6 +69,7 @@ class _HomePageState extends State<HomePage> {
       } else {
         if (_onboardingColor != null) queryParams['color'] = _onboardingColor!;
         if (_onboardingSkinTone != null) queryParams['skin_tone'] = _onboardingSkinTone!;
+        if (_onboardingMood != null) queryParams['mood'] = _onboardingMood!;
       }
       final uri = Uri.parse('${ApiConstants.baseUrl}/post/feed').replace(
         queryParameters: queryParams,
