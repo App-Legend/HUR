@@ -134,9 +134,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   Future<String?> _uploadImage(XFile file) async {
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('${ApiConstants.baseUrl}/upload'),
+      Uri.parse('${ApiConstants.baseUrl}/upload/profile'),
     );
-
     request.files.add(await http.MultipartFile.fromPath('image', file.path));
     final response = await request.send();
     if (response.statusCode == 200) {
@@ -436,7 +435,10 @@ class _ProfileImageSection extends StatelessWidget {
               color: const Color(0xFFB0B0B0),
               borderRadius: BorderRadius.circular(14),
               image: backgroundImageUrl != null
-                  ? DecorationImage(image: NetworkImage(backgroundImageUrl!), fit: BoxFit.cover)
+                  ? DecorationImage(
+                      image: NetworkImage('${ApiConstants.baseUrl}$backgroundImageUrl'),
+                      fit: BoxFit.cover,
+                    )
                   : null,
             ),
             child: backgroundImageUrl == null
@@ -479,7 +481,10 @@ class _ProfileImageSection extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 3),
                     image: profileImageUrl != null
-                        ? DecorationImage(image: NetworkImage(profileImageUrl!), fit: BoxFit.cover)
+                        ? DecorationImage(
+                            image: NetworkImage('${ApiConstants.baseUrl}$profileImageUrl'),
+                            fit: BoxFit.cover,
+                          )
                         : null,
                   ),
                   child: profileImageUrl == null

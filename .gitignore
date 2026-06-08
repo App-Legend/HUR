@@ -57,3 +57,8 @@ Thumbs.db
 logs/
 *.log
 coverage/
+
+############
+# Uploads
+############
+Backend/node_server/images/

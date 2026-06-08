@@ -120,7 +120,7 @@ class _UserItem extends StatelessWidget {
           CircleAvatar(
             radius: 26,
             backgroundColor: const Color(0xFFE0E0E0),
-            backgroundImage: profileImage != null ? NetworkImage(profileImage) : null,
+            backgroundImage: profileImage != null ? NetworkImage('${ApiConstants.baseUrl}$profileImage') : null,
             child: profileImage == null
                 ? const Icon(Icons.person, color: Colors.white, size: 26)
                 : null,

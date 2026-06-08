@@ -1,4 +1,6 @@
 const pool = require('../db');
+const fs = require('fs');
+const path = require('path');
 
 const searchUsers = async (req, res) => {
     try {
@@ -63,6 +65,22 @@ const updateProfile = async (req, res) => {
         if (nickname) {
             const { rows: dup } = await pool.query('SELECT user_id FROM users WHERE nickname=$1 AND user_id!=$2', [nickname, id]);
             if (dup.length > 0) return res.status(409).json({ message: "이미 사용 중인 닉네임입니다" });
+        }
+
+        const { rows: current } = await pool.query(
+            'SELECT profile_image, background_image FROM users WHERE user_id=$1', [id]
+        );
+        const deleteProfileFile = (filePath) => {
+            if (!filePath || filePath.startsWith('http')) return;
+            const filename = filePath.split('/').pop();
+            const fullPath = path.join(__dirname, '../images/profiles', filename);
+            try { if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath); } catch (_) {}
+        };
+        if (profile_image && profile_image !== current[0]?.profile_image) {
+            deleteProfileFile(current[0]?.profile_image);
+        }
+        if (background_image && background_image !== current[0]?.background_image) {
+            deleteProfileFile(current[0]?.background_image);
         }
 
         await pool.query(

@@ -130,7 +130,10 @@ class _ProfileHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFB0B0B0),
         image: backgroundImage != null
-            ? DecorationImage(image: NetworkImage(backgroundImage), fit: BoxFit.cover)
+            ? DecorationImage(
+                image: NetworkImage('${ApiConstants.baseUrl}$backgroundImage'),
+                fit: BoxFit.cover,
+              )
             : null,
       ),
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 28),
@@ -182,7 +185,10 @@ class _ProfileHeader extends StatelessWidget {
                   color: const Color(0xFF9E9E9E),
                   shape: BoxShape.circle,
                   image: profileImage != null
-                      ? DecorationImage(image: NetworkImage(profileImage), fit: BoxFit.cover)
+                      ? DecorationImage(
+                          image: NetworkImage('${ApiConstants.baseUrl}$profileImage'),
+                          fit: BoxFit.cover,
+                        )
                       : null,
                 ),
                 child: isLoading

@@ -149,7 +149,10 @@ class _UserProfileHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFB0B0B0),
         image: backgroundImage != null
-            ? DecorationImage(image: NetworkImage(backgroundImage), fit: BoxFit.cover)
+            ? DecorationImage(
+                image: NetworkImage('${ApiConstants.baseUrl}$backgroundImage'),
+                fit: BoxFit.cover,
+              )
             : null,
       ),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -176,7 +179,7 @@ class _UserProfileHeader extends StatelessWidget {
               CircleAvatar(
                 radius: 40,
                 backgroundColor: const Color(0xFF9E9E9E),
-                backgroundImage: profileImage != null ? NetworkImage(profileImage) : null,
+                backgroundImage: profileImage != null ? NetworkImage('${ApiConstants.baseUrl}$profileImage') : null,
                 child: profileImage == null
                     ? const Icon(Icons.person, color: Colors.white, size: 36)
                     : null,
