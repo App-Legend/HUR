@@ -43,14 +43,19 @@ const createPost = async (req, res) => {
       .filter((v) => v !== '잘 모르겠음');
     let moodList = moods ? JSON.parse(moods) : [];
     let skinToneList = skinTones ? JSON.parse(skinTones) : [];
+    let postEmbedding = null;
 
-    // 클라이언트가 personal_color/mood를 아예 안 보냈으면(=태그 선택 UI를 안 쓰는 경우)
-    // 업로드된 사진으로 자동 분류한다. ml_server가 응답 안 하면 태그 없이 게시물만 등록.
-    if (req.file && personalColorList.length === 0 && moodList.length === 0) {
+    // 이미지가 있으면 항상 CLIP으로 분석한다 — 홈 피드 유사도 정렬(posts.embedding)에 필요하기 때문.
+    // 클라이언트가 personal_color/mood를 아예 안 보냈을 때만(=태그 선택 UI를 안 쓰는 경우) 자동 분류 결과를 태그로도 사용.
+    // ml_server가 응답 안 하면 태그/임베딩 없이 게시물만 등록.
+    if (req.file) {
       try {
         const classified = await classifyImage(req.file.location);
-        personalColorList = [classified.personal_color];
-        moodList = classified.moods;
+        postEmbedding = classified.embedding;
+        if (personalColorList.length === 0 && moodList.length === 0) {
+          personalColorList = [classified.personal_color];
+          moodList = classified.moods;
+        }
       } catch (classifyErr) {
         console.error('[auto classify error]', classifyErr.message);
       }
@@ -66,10 +71,12 @@ const createPost = async (req, res) => {
       }
     }
 
+    const embeddingLiteral = postEmbedding ? `[${postEmbedding.join(',')}]` : null;
+
     const { rows: [{ post_id: postId }] } = await pool.query(
-      `INSERT INTO posts (user_id, title, post_content, post_image, visibility)
-       VALUES ($1, $2, $3, $4, $5) RETURNING post_id`,
-      [userId, title.trim(), description?.trim() ?? null, postImage, visibilityValue]
+      `INSERT INTO posts (user_id, title, post_content, post_image, visibility, embedding)
+       VALUES ($1, $2, $3, $4, $5, $6::vector) RETURNING post_id`,
+      [userId, title.trim(), description?.trim() ?? null, postImage, visibilityValue, embeddingLiteral]
     );
 
     const categories = [
@@ -118,8 +125,21 @@ const getFeed = async (req, res) => {
 
     let rows;
     if (userId) {
+      // 홈 피드 정렬 기준(anchor) 벡터를 우선순위대로 하나 고른다:
+      // ① 내 최신 게시물 임베딩 → ② 내가 가장 최근에 좋아요한 게시물 임베딩 → ③ 온보딩/프로필 선호 벡터(users.embedding)
+      // 셋 다 없으면(신규 유저) anchor.vec은 NULL이 되고, 기존처럼 태그 점수/최신순으로만 정렬된다.
       ({ rows } = await pool.query(
-        `SELECT
+        `WITH anchor AS (
+          SELECT COALESCE(
+            (SELECT embedding FROM posts WHERE user_id = $1 AND embedding IS NOT NULL ORDER BY created_at DESC LIMIT 1),
+            (SELECT p2.embedding FROM post_likes pl
+             JOIN posts p2 ON p2.post_id = pl.post_id
+             WHERE pl.user_id = $1 AND p2.embedding IS NOT NULL
+             ORDER BY pl.created_at DESC LIMIT 1),
+            (SELECT embedding FROM users WHERE user_id = $1)
+          ) AS vec
+        )
+        SELECT
           p.post_id,
           p.title,
           p.post_image,
@@ -144,11 +164,16 @@ const getFeed = async (req, res) => {
           ) AS relevance_score
         FROM posts p
         JOIN users u ON p.user_id = u.user_id
+        CROSS JOIN anchor
         WHERE (p.visibility IS NULL OR p.visibility = '모든 사람' OR (p.visibility = '팔로워만' AND EXISTS (
                 SELECT 1 FROM follow WHERE follower_id = $1 AND following_id = p.user_id
               )))
           AND p.created_at > NOW() - INTERVAL '7 days'
-        ORDER BY relevance_score DESC, p.created_at DESC
+        ORDER BY
+          CASE WHEN anchor.vec IS NOT NULL AND p.embedding IS NOT NULL
+               THEN p.embedding <=> anchor.vec END ASC NULLS LAST,
+          relevance_score DESC,
+          p.created_at DESC
         LIMIT $2 OFFSET $3`,
         [userId, limit, offset]
       ));

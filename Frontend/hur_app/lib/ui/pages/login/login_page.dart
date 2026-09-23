@@ -22,6 +22,32 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _keepLoggedIn = false;
 
+  // 온보딩은 로그인 전에도 볼 수 있어서 그때는 유저 ID가 없어 로컬(SharedPreferences)에만 저장해뒀다.
+  // 로그인에 성공한 시점에 유저 ID가 생기니, 여기서 한 번 서버로 동기화한다.
+  Future<void> _syncOnboardingPreferences(int userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final color = prefs.getString('onboarding_color');
+    final moodRaw = prefs.getString('onboarding_mood');
+    if (color == null && moodRaw == null) return;
+
+    final mood = moodRaw != null && moodRaw.isNotEmpty ? moodRaw.split(',').first : null;
+
+    try {
+      await http.put(
+        Uri.parse('${ApiConstants.baseUrl}/user/$userId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          if (color != null) 'personal_color': color,
+          if (mood != null) 'aesthetic_tag': mood,
+        }),
+      );
+      await prefs.remove('onboarding_color');
+      await prefs.remove('onboarding_mood');
+    } catch (_) {
+      // 동기화 실패해도 로그인은 막지 않음 — 로컬 값을 안 지웠으니 다음 로그인 때 다시 시도됨
+    }
+  }
+
   Future<void> _login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -50,6 +76,7 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('auth_token', body['token']);
         await prefs.setInt('user_id', body['user']['id']);
         await prefs.setString('user_name', body['user']['name']);
+        await _syncOnboardingPreferences(body['user']['id']);
 
         if (!mounted) return;
         Navigator.of(context).pushReplacement(

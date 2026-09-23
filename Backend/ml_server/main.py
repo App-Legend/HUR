@@ -1,16 +1,19 @@
 """
 이미지를 CLIP 임베딩 벡터로 변환하거나(/embed), 미리 정해둔 카테고리 중
 가장 가까운 걸 자동으로 골라주는(/classify) 마이크로서비스.
+텍스트 선호값(퍼스널컬러/분위기)도 같은 벡터공간의 벡터로 변환한다(/preference_embedding).
 
 /embed  -> productController.js(recommendByImage)가 벡터 유사도 검색에 사용
-/classify -> postController.js(createPost)가 게시물 업로드 시 자동 태깅에 사용
+/classify -> postController.js(createPost)가 게시물 업로드 시 자동 태깅 + posts.embedding에 사용
+/preference_embedding -> userController.js(updateProfile)가 users.embedding 계산에 사용
 """
 import base64
 import io
+from typing import Optional
 
 import open_clip
 import torch
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from PIL import Image
 from pydantic import BaseModel
 
@@ -73,7 +76,26 @@ class EmbedResponse(BaseModel):
 class ClassifyResponse(BaseModel):
     personal_color: str
     moods: list[str]
+    embedding: list[float]  # 이미 계산된 이미지 특징 벡터 (posts.embedding에 그대로 저장 가능, /embed 재호출 불필요)
     model_version: str
+
+
+class PreferenceRequest(BaseModel):
+    personal_color: Optional[str] = None
+    moods: Optional[list[str]] = None
+
+
+class PreferenceResponse(BaseModel):
+    embedding: list[float]
+    model_version: str
+
+
+def _label_embedding(category_type: str, label: str) -> torch.Tensor | None:
+    labels = _CATEGORY_TEXT_EMBEDDINGS[category_type]["labels"]
+    if label not in labels:
+        return None
+    idx = labels.index(label)
+    return _CATEGORY_TEXT_EMBEDDINGS[category_type]["embeddings"][idx]
 
 
 def _image_features(image_b64: str) -> torch.Tensor:
@@ -121,5 +143,33 @@ def classify(req: EmbedRequest):
     return ClassifyResponse(
         personal_color=personal_color,
         moods=moods,
+        embedding=image_features[0].tolist(),
+        model_version=f"{MODEL_NAME}/{PRETRAINED}",
+    )
+
+
+@app.post("/preference_embedding", response_model=PreferenceResponse)
+def preference_embedding(req: PreferenceRequest):
+    vectors = []
+
+    if req.personal_color:
+        vec = _label_embedding("personal_color", req.personal_color)
+        if vec is not None:
+            vectors.append(vec)
+
+    for mood in req.moods or []:
+        vec = _label_embedding("mood", mood)
+        if vec is not None:
+            vectors.append(vec)
+
+    if not vectors:
+        raise HTTPException(status_code=404, detail="유효한 personal_color/moods 값이 없습니다")
+
+    stacked = torch.stack(vectors)
+    averaged = stacked.mean(dim=0)
+    averaged = averaged / averaged.norm()
+
+    return PreferenceResponse(
+        embedding=averaged.tolist(),
         model_version=f"{MODEL_NAME}/{PRETRAINED}",
     )

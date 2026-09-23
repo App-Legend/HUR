@@ -2,6 +2,8 @@ const pool = require('../db');
 const fs = require('fs');
 const path = require('path');
 
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+
 const searchUsers = async (req, res) => {
     try {
         const { q, me } = req.query;
@@ -119,6 +121,30 @@ const updateProfile = async (req, res) => {
              FROM users WHERE user_id=$1`,
             [id]
         );
+
+        // 퍼스널컬러/분위기가 바뀌었으면 온보딩 선호 벡터(users.embedding)도 같이 갱신한다.
+        // (aesthetic_tag는 '청순'/'시크' 등 mood 카테고리 값과 동일한 어휘를 씀)
+        if (personal_color || aesthetic_tag) {
+            try {
+                const prefRes = await fetch(`${ML_SERVICE_URL}/preference_embedding`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        personal_color: updated[0].personal_color,
+                        moods: updated[0].aesthetic_tag ? [updated[0].aesthetic_tag] : [],
+                    }),
+                });
+                if (prefRes.ok) {
+                    const { embedding } = await prefRes.json();
+                    await pool.query(
+                        'UPDATE users SET embedding = $1::vector WHERE user_id = $2',
+                        [`[${embedding.join(',')}]`, id]
+                    );
+                }
+            } catch (prefErr) {
+                console.error('[preference embedding error]', prefErr.message);
+            }
+        }
 
         res.json({ message: "프로필이 수정되었습니다", user: updated[0] });
     } catch (err) {

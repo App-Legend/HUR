@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
   personal_color   VARCHAR(50)  NULL,
   skin_tone        VARCHAR(50)  NULL,
   aesthetic_tag    VARCHAR(20)  NULL,
+  embedding        vector(512)  NULL,  -- 온보딩/프로필의 퍼스널컬러·분위기를 CLIP 텍스트 임베딩으로 변환한 선호 벡터
   created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id),
   CONSTRAINT uq_users_email    UNIQUE (email),
@@ -46,6 +47,7 @@ CREATE TABLE IF NOT EXISTS posts (
   post_image   VARCHAR(500) NULL,
   post_like    INT          NOT NULL DEFAULT 0,
   visibility   VARCHAR(20)  NOT NULL DEFAULT '모든 사람',
+  embedding    vector(512)  NULL,  -- 게시물 이미지의 CLIP 임베딩 (홈 피드 유사도 정렬용)
   created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (post_id),
@@ -161,5 +163,19 @@ CREATE INDEX IF NOT EXISTS idx_look_reference_user_id ON look_reference      (us
 -- 지금처럼 상품 수가 적을 땐 lists=10으로 시작하고 카탈로그가 커지면 DROP INDEX 후 재생성 권장.
 CREATE INDEX IF NOT EXISTS idx_products_embedding_cosine
   ON products
+  USING ivfflat (embedding vector_cosine_ops)
+  WITH (lists = 10);
+
+-- 이미 배포된 DB(테이블이 이미 존재)에도 새 컬럼이 반영되도록 (신규 설치 시엔 CREATE TABLE에서 이미 생성되어 no-op)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS embedding vector(512);
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS embedding vector(512);
+
+CREATE INDEX IF NOT EXISTS idx_users_embedding_cosine
+  ON users
+  USING ivfflat (embedding vector_cosine_ops)
+  WITH (lists = 10);
+
+CREATE INDEX IF NOT EXISTS idx_posts_embedding_cosine
+  ON posts
   USING ivfflat (embedding vector_cosine_ops)
   WITH (lists = 10);
