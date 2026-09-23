@@ -1,12 +1,16 @@
-const fs = require('fs');
 const pool = require('../db');
 
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
 // personal_color/mood를 사용자가 고르지 않았을 때, 업로드된 사진으로 CLIP 자동 분류한다.
 // skin_tone(파운데이션 호수)은 사진으로 유추할 수 있는 정보가 아니라 자동 분류 대상에서 제외.
-async function classifyImage(imagePath) {
-  const imageBase64 = fs.readFileSync(imagePath).toString('base64');
+// 이미지는 S3에 업로드된 상태라(req.file.location) URL에서 직접 받아와 base64로 변환한다.
+async function classifyImage(imageUrl) {
+  const imageRes = await fetch(imageUrl);
+  if (!imageRes.ok) {
+    throw new Error(`S3 이미지 다운로드 실패 (${imageRes.status}): ${imageUrl}`);
+  }
+  const imageBase64 = Buffer.from(await imageRes.arrayBuffer()).toString('base64');
 
   const res = await fetch(`${ML_SERVICE_URL}/classify`, {
     method: 'POST',
@@ -31,7 +35,7 @@ const createPost = async (req, res) => {
       return res.status(400).json({ message: '제목은 필수입니다.' });
     }
 
-    const postImage = req.file ? `/uploads/${req.file.filename}` : null;
+    const postImage = req.file ? req.file.location : null;
     const visibilityValue = visibility || '모든 사람';
 
     const stickerList = stickers ? JSON.parse(stickers) : [];
@@ -44,7 +48,7 @@ const createPost = async (req, res) => {
     // 업로드된 사진으로 자동 분류한다. ml_server가 응답 안 하면 태그 없이 게시물만 등록.
     if (req.file && personalColorList.length === 0 && moodList.length === 0) {
       try {
-        const classified = await classifyImage(req.file.path);
+        const classified = await classifyImage(req.file.location);
         personalColorList = [classified.personal_color];
         moodList = classified.moods;
       } catch (classifyErr) {

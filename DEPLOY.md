@@ -42,7 +42,13 @@ cp .env.example .env
 ```
 DB_PASSWORD=<원하는 안전한 비밀번호>
 JWT_SECRET=<랜덤한 긴 문자열, 예: openssl rand -hex 32 로 생성>
+AWS_ACCESS_KEY_ID=<S3 전용 IAM 사용자의 Access Key>
+AWS_SECRET_ACCESS_KEY=<S3 전용 IAM 사용자의 Secret Key>
+AWS_REGION=ap-northeast-2
+S3_BUCKET_NAME=<이미지 저장용 S3 버킷 이름>
 ```
+
+S3 버킷은 AWS 콘솔에서 미리 만들어져 있어야 합니다 (퍼블릭 읽기 허용 + 이 IAM 사용자에게 해당 버킷 PutObject/GetObject 권한).
 
 ## 4. 컨테이너 빌드 및 실행
 
@@ -70,7 +76,15 @@ ml_server가 뜬 상태에서 실행해야 합니다.
 docker compose exec backend node scripts/backfill_embeddings.js
 ```
 
-## 7. 정상 동작 확인
+## 7. 기존 상품 이미지를 S3로 이전 (최초 1회)
+
+시드 데이터의 상품 이미지가 외부 CDN(화해) 핫링크라 깨지기 쉬워요. 우리 S3로 옮깁니다.
+
+```bash
+docker compose exec backend node scripts/migrate_images_to_s3.js
+```
+
+## 8. 정상 동작 확인
 
 ```bash
 curl http://localhost/products/ranking
@@ -86,7 +100,7 @@ curl -X POST http://localhost/products/recommend \
   -d "{\"image\": \"<base64 인코딩된 이미지>\"}"
 ```
 
-## 8. 코드 업데이트 시 (이후 배포마다)
+## 9. 코드 업데이트 시 (이후 배포마다)
 
 ```bash
 git pull origin feature

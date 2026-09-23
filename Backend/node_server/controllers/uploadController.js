@@ -1,21 +1,9 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { s3Storage } = require('../s3');
 
 // 게시물 이미지
-const uploadDir = path.join(__dirname, '../images/posts');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadDir),
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
-        cb(null, `${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`);
-    },
-});
-
 const upload = multer({
-    storage,
+    storage: s3Storage('posts'),
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         const allowed = ["image/jpeg", "image/png", "image/webp"];
@@ -25,23 +13,12 @@ const upload = multer({
 
 const uploadImage = (req, res) => {
     if (!req.file) return res.status(400).json({ message: "파일이 없습니다" });
-    res.json({ url: `/uploads/${req.file.filename}` });
+    res.json({ url: req.file.location });
 };
 
 // 프로필/배경 이미지
-const profileUploadDir = path.join(__dirname, '../images/profiles');
-if (!fs.existsSync(profileUploadDir)) fs.mkdirSync(profileUploadDir, { recursive: true });
-
-const profileStorage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, profileUploadDir),
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
-        cb(null, `${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`);
-    },
-});
-
 const uploadProfile = multer({
-    storage: profileStorage,
+    storage: s3Storage('profiles'),
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         const allowed = ["image/jpeg", "image/png", "image/webp"];
@@ -51,7 +28,7 @@ const uploadProfile = multer({
 
 const uploadProfileImage = (req, res) => {
     if (!req.file) return res.status(400).json({ message: "파일이 없습니다" });
-    res.json({ url: `/profile-images/${req.file.filename}` });
+    res.json({ url: req.file.location });
 };
 
 module.exports = { upload, uploadImage, uploadProfile, uploadProfileImage };
