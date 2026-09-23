@@ -322,9 +322,7 @@ const getUserPosts = async (req, res) => {
 const toggleLike = async (req, res) => {
     try {
         const { id: postId } = req.params;
-        const { user_id } = req.body;
-
-        if (!user_id) return res.status(400).json({ message: 'user_id가 필요합니다' });
+        const user_id = req.user.id;
 
         const { rows: existing } = await pool.query(
             'SELECT like_id FROM post_likes WHERE post_id = $1 AND user_id = $2',
@@ -394,10 +392,11 @@ const getLikeStatus = async (req, res) => {
 const updateScore = async (req, res) => {
     try {
         const { id: postId } = req.params;
-        const { user_id, action } = req.body;
+        const user_id = req.user.id;
+        const { action } = req.body;
 
-        if (!user_id || !action) {
-            return res.status(400).json({ message: 'user_id와 action이 필요합니다' });
+        if (!action) {
+            return res.status(400).json({ message: 'action이 필요합니다' });
         }
 
         const delta = action === 'like' ? 2 : 1;
@@ -509,10 +508,11 @@ const getComments = async (req, res) => {
 const addComment = async (req, res) => {
     try {
         const { id: postId } = req.params;
-        const { user_id, content } = req.body;
+        const user_id = req.user.id;
+        const { content } = req.body;
 
-        if (!user_id || !content?.trim()) {
-            return res.status(400).json({ message: 'user_id와 내용이 필요합니다' });
+        if (!content?.trim()) {
+            return res.status(400).json({ message: '내용이 필요합니다' });
         }
 
         const { rows: [{ comment_id }] } = await pool.query(
@@ -539,7 +539,7 @@ const addComment = async (req, res) => {
 const deleteComment = async (req, res) => {
     try {
         const { commentId } = req.params;
-        const { user_id } = req.body;
+        const user_id = req.user.id;
 
         const { rows } = await pool.query(
             'SELECT user_id FROM post_comments WHERE comment_id = $1', [commentId]

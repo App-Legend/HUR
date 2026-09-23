@@ -4,11 +4,8 @@ const pool = require('../db');
 const followUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { follower_id } = req.body;
+        const follower_id = req.user.id;
 
-        if (!follower_id) {
-            return res.status(400).json({ message: "follower_id가 필요합니다" });
-        }
         if (Number(id) === Number(follower_id)) {
             return res.status(400).json({ message: "자기 자신을 팔로우할 수 없습니다" });
         }
@@ -28,11 +25,7 @@ const followUser = async (req, res) => {
 const unfollowUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { follower_id } = req.body;
-
-        if (!follower_id) {
-            return res.status(400).json({ message: "follower_id가 필요합니다" });
-        }
+        const follower_id = req.user.id;
 
         await pool.query(
             "DELETE FROM follow WHERE follower_id=$1 AND following_id=$2",

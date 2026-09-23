@@ -22,6 +22,7 @@ class _SearchResultAccountsTabState extends State<SearchResultAccountsTab> {
   List<Map<String, dynamic>> _accounts = [];
   bool _isLoading = true;
   int? _myId;
+  String? _token;
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _SearchResultAccountsTabState extends State<SearchResultAccountsTab> {
   Future<void> _loadAndFetch() async {
     final prefs = await SharedPreferences.getInstance();
     _myId = prefs.getInt('user_id');
+    _token = prefs.getString('auth_token');
     await _fetchUsers();
   }
 
@@ -77,17 +79,13 @@ class _SearchResultAccountsTabState extends State<SearchResultAccountsTab> {
 
     try {
       final uri = Uri.parse('${ApiConstants.baseUrl}/user/$targetId/follow');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      };
       final response = isFollowing
-          ? await http.delete(
-              uri,
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({'follower_id': _myId}),
-            )
-          : await http.post(
-              uri,
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({'follower_id': _myId}),
-            );
+          ? await http.delete(uri, headers: headers)
+          : await http.post(uri, headers: headers);
 
       if (response.statusCode != 200 && mounted) {
         // 실패 시 롤백

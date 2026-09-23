@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CommentPopup extends StatefulWidget {
   final int postId;
@@ -29,11 +30,18 @@ class _CommentPopupState extends State<CommentPopup> {
   List<Map<String, dynamic>> _comments = [];
   bool _isLoading = true;
   bool _isSending = false;
+  String? _token;
 
   @override
   void initState() {
     super.initState();
+    _loadToken();
     _loadComments();
+  }
+
+  Future<void> _loadToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('auth_token');
   }
 
   @override
@@ -71,8 +79,11 @@ class _CommentPopupState extends State<CommentPopup> {
     try {
       final res = await http.post(
         Uri.parse('${ApiConstants.baseUrl}/post/${widget.postId}/comments'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'user_id': widget.userId, 'content': text}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
+        body: jsonEncode({'content': text}),
       );
       if (res.statusCode == 201 && mounted) {
         final comment = jsonDecode(res.body) as Map<String, dynamic>;
@@ -89,8 +100,10 @@ class _CommentPopupState extends State<CommentPopup> {
     try {
       await http.delete(
         Uri.parse('${ApiConstants.baseUrl}/post/${widget.postId}/comments/$commentId'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'user_id': widget.userId}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
       );
       if (mounted) {
         setState(() => _comments.removeWhere((c) => c['comment_id'] == commentId));

@@ -25,6 +25,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
   Map<String, dynamic>? _user;
   bool _isLoading = true;
   int? _myId;
+  String? _token;
 
   @override
   void initState() {
@@ -35,6 +36,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
   Future<void> _init() async {
     final prefs = await SharedPreferences.getInstance();
     _myId = prefs.getInt('user_id');
+    _token = prefs.getString('auth_token');
     await _fetchUser();
   }
 
@@ -72,17 +74,13 @@ class _UserFeedPageState extends State<UserFeedPage> {
 
     try {
       final uri = Uri.parse('${ApiConstants.baseUrl}/user/${widget.userId}/follow');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      };
       final response = before
-          ? await http.delete(
-              uri,
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({'follower_id': _myId}),
-            )
-          : await http.post(
-              uri,
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({'follower_id': _myId}),
-            );
+          ? await http.delete(uri, headers: headers)
+          : await http.post(uri, headers: headers);
 
       if (response.statusCode != 200 && mounted) {
         setState(() => _isFollowing = before);

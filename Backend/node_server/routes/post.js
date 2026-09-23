@@ -21,11 +21,11 @@ router.get('/by-product/:productId', getPostsByProduct);
 router.get('/user/:userId', getUserPosts);
 router.get('/:id', getPostDetail);
 router.post('/', verifyToken, upload.single('image'), createPost);
-router.post('/:id/score', updateScore);
-router.post('/:id/like', toggleLike);
+router.post('/:id/score', verifyToken, updateScore);
+router.post('/:id/like', verifyToken, toggleLike);
 router.get('/:id/like', getLikeStatus);
 router.get('/:id/comments', getComments);
-router.post('/:id/comments', addComment);
-router.delete('/:id/comments/:commentId', deleteComment);
+router.post('/:id/comments', verifyToken, addComment);
+router.delete('/:id/comments/:commentId', verifyToken, deleteComment);
 
 module.exports = router;

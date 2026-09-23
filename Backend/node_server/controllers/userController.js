@@ -59,6 +59,10 @@ const updateProfile = async (req, res) => {
         const { id } = req.params;
         const { nickname, bio, profile_image, background_image, aesthetic_tag, personal_color, skin_tone } = req.body;
 
+        if (req.user.id !== parseInt(id)) {
+            return res.status(403).json({ message: "본인 프로필만 수정할 수 있습니다" });
+        }
+
         const { rows: existing } = await pool.query('SELECT user_id FROM users WHERE user_id=$1', [id]);
         if (existing.length === 0) {
             return res.status(404).json({ message: "유저를 찾을 수 없습니다" });

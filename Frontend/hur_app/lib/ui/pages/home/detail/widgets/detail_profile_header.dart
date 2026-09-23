@@ -29,6 +29,7 @@ class DetailProfileHeader extends StatefulWidget {
 class _DetailProfileHeaderState extends State<DetailProfileHeader> {
   bool _isFollowing = false;
   int? _myId;
+  String? _token;
 
   @override
   void initState() {
@@ -47,6 +48,7 @@ class _DetailProfileHeaderState extends State<DetailProfileHeader> {
   Future<void> _loadMyId() async {
     final prefs = await SharedPreferences.getInstance();
     _myId = prefs.getInt('user_id');
+    _token = prefs.getString('auth_token');
     if (mounted) setState(() {});
     if (widget.userId != null && _myId != null && _myId != widget.userId) {
       await _loadFollowStatus();
@@ -72,17 +74,13 @@ class _DetailProfileHeaderState extends State<DetailProfileHeader> {
     setState(() => _isFollowing = !before);
     try {
       final uri = Uri.parse('${ApiConstants.baseUrl}/user/${widget.userId}/follow');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      };
       final res = before
-          ? await http.delete(
-              uri,
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({'follower_id': _myId}),
-            )
-          : await http.post(
-              uri,
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({'follower_id': _myId}),
-            );
+          ? await http.delete(uri, headers: headers)
+          : await http.post(uri, headers: headers);
       if (res.statusCode != 200 && mounted) {
         setState(() => _isFollowing = before);
       }

@@ -42,6 +42,7 @@ class _DetailHomePage extends State<DetailHomePage> {
   int likeCount = 0;
   int _commentCount = 0;
   int? _userId;
+  String? _token;
 
   Map<String, dynamic>? _post;
   bool _postLoading = true;
@@ -56,6 +57,7 @@ class _DetailHomePage extends State<DetailHomePage> {
   Future<void> _init() async {
     final prefs = await SharedPreferences.getInstance();
     _userId = prefs.getInt('user_id');
+    _token = prefs.getString('auth_token');
     await Future.wait([_loadPostDetail(), _loadLikeStatus(), _recordView()]);
   }
 
@@ -99,8 +101,11 @@ class _DetailHomePage extends State<DetailHomePage> {
     try {
       await http.post(
         Uri.parse('${ApiConstants.baseUrl}/post/${widget.postId}/score'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'user_id': _userId, 'action': 'view'}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
+        body: jsonEncode({'action': 'view'}),
       );
     } catch (_) {}
   }
@@ -141,8 +146,10 @@ class _DetailHomePage extends State<DetailHomePage> {
     try {
       await http.post(
         Uri.parse('${ApiConstants.baseUrl}/post/${widget.postId}/like'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'user_id': _userId}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
       );
     } catch (_) {
       if (mounted) {
