@@ -100,7 +100,35 @@ curl -X POST http://localhost/products/recommend \
   -d "{\"image\": \"<base64 인코딩된 이미지>\"}"
 ```
 
-## 9. 코드 업데이트 시 (이후 배포마다)
+## 9. DB 자동 백업 설정 (최초 1회)
+
+매일 자정 근처에 DB를 덤프해서 S3(`backups/` 폴더)에 저장하도록 설정합니다.
+
+**AWS CLI 설치** (백업 스크립트가 S3 업로드에 사용):
+```bash
+sudo apt update && sudo apt install -y awscli
+```
+
+**스크립트 실행 권한 부여 + 한 번 수동 테스트**:
+```bash
+chmod +x scripts/backup_db.sh
+./scripts/backup_db.sh
+```
+`[backup] 완료: ...` 로그가 뜨면 성공. AWS 콘솔 S3 버킷의 `backups/` 폴더에 파일이 보이는지 확인.
+
+**cron으로 매일 자동 실행 등록** (새벽 3시):
+```bash
+crontab -e
+```
+편집기가 열리면 맨 아래에 아래 줄 추가(`HUR` 경로는 실제 clone된 절대경로로):
+```
+0 3 * * * cd /home/ubuntu/HUR && ./scripts/backup_db.sh >> /home/ubuntu/hur_backup.log 2>&1
+```
+저장하고 나오면 등록 완료. `crontab -l`로 등록됐는지 확인 가능.
+
+**(선택) 오래된 백업 자동 삭제** — S3 콘솔 → 버킷 → 관리(Management) 탭 → 수명 주기 규칙(Lifecycle rule) 생성 → `backups/` 접두사에 30일 지난 객체 만료(Expire) 규칙 추가. 안 해두면 백업이 계속 쌓여서 용량이 늘어남(스토리지 비용 자체는 저렴하지만).
+
+## 10. 코드 업데이트 시 (이후 배포마다)
 
 ```bash
 git pull origin feature
