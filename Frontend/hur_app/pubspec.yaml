@@ -48,6 +48,9 @@ dependencies:
   #사진 업로드
   image_picker: ^1.1.2
 
+  #스플래시 영상 재생
+  video_player: ^2.9.2
+
   #점선
   dotted_border: ^2.1.0
 

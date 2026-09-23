@@ -1,6 +1,9 @@
 -- HUR 프로젝트 PostgreSQL DDL
 -- Generated for PostgreSQL 14+
 
+-- 벡터 유사도 검색용 확장 (docker-compose의 postgres 이미지를 pgvector/pgvector:pg17로 교체해야 사용 가능)
+CREATE EXTENSION IF NOT EXISTS vector;
+
 -- 사용자 테이블
 CREATE TABLE IF NOT EXISTS users (
   user_id          SERIAL       NOT NULL,
@@ -24,11 +27,13 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- 제품 테이블 (post_sticker FK 참조 전 선언)
 CREATE TABLE IF NOT EXISTS products (
-  id     SERIAL       NOT NULL,
-  brand  VARCHAR(100) NULL,
-  name   TEXT         NOT NULL,
-  image  TEXT         NULL,
-  source VARCHAR(50)  NULL,
+  id             SERIAL       NOT NULL,
+  brand          VARCHAR(100) NULL,
+  name           TEXT         NOT NULL,
+  image          TEXT         NULL,
+  source         VARCHAR(50)  NULL,
+  embedding      vector(512)  NULL,  -- 상품 이미지의 CLIP 임베딩 (벡터 유사도 추천용)
+  model_version  VARCHAR(50)  NULL,  -- embedding을 생성한 모델 버전 (모델 교체 시 재계산 대상 식별용)
   PRIMARY KEY (id)
 );
 
@@ -130,6 +135,17 @@ CREATE TABLE IF NOT EXISTS post_comments (
   CONSTRAINT fk_comments_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
+-- 사용자가 업로드한 '추구미' 레퍼런스 사진 (알고리즘 입력 로그 + 재사용)
+CREATE TABLE IF NOT EXISTS look_reference (
+  id         SERIAL       NOT NULL,
+  user_id    INT          NULL,
+  image      TEXT         NOT NULL,
+  embedding  vector(512)  NULL,
+  created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_look_reference_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE SET NULL
+);
+
 -- 인덱스
 CREATE INDEX IF NOT EXISTS idx_posts_user_id          ON posts               (user_id);
 CREATE INDEX IF NOT EXISTS idx_posts_created_at       ON posts               (created_at);
@@ -138,3 +154,12 @@ CREATE INDEX IF NOT EXISTS idx_post_sticker_post_id   ON post_sticker        (po
 CREATE INDEX IF NOT EXISTS idx_ucs_user_id            ON user_category_score (user_id);
 CREATE INDEX IF NOT EXISTS idx_follow_follower_id     ON follow              (follower_id);
 CREATE INDEX IF NOT EXISTS idx_follow_following_id    ON follow              (following_id);
+CREATE INDEX IF NOT EXISTS idx_look_reference_user_id ON look_reference      (user_id);
+
+-- 벡터 코사인 유사도 검색 인덱스
+-- ivfflat은 lists 값을 데이터 양에 맞춰야 효과적이라(경험적으로 rows/1000, 최소 10),
+-- 지금처럼 상품 수가 적을 땐 lists=10으로 시작하고 카탈로그가 커지면 DROP INDEX 후 재생성 권장.
+CREATE INDEX IF NOT EXISTS idx_products_embedding_cosine
+  ON products
+  USING ivfflat (embedding vector_cosine_ops)
+  WITH (lists = 10);

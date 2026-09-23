@@ -7,7 +7,6 @@ import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/pages/upload/product_search_sheet.dart';
 import 'package:hur_app/ui/pages/upload/widgets/public_scope_page.dart';
-import 'package:hur_app/ui/pages/upload/widgets/tag_section.dart';
 import 'package:hur_app/ui/pages/upload/widgets/upload_image_box.dart';
 import 'package:hur_app/ui/pages/upload/widgets/upload_input_box.dart';
 import 'package:hur_app/ui/pages/upload/widgets/upload_menu_row.dart';
@@ -59,14 +58,6 @@ class _UploadPageState extends State<UploadPage> {
   bool _overTrash = false;
 
   String _publicScope = '모든 사람';
-
-  final Set<String> _selectedPersonalColors = {};
-  final Set<String> _selectedMoods = {};
-  final Set<String> _selectedSkinTones = {};
-
-  final List<String> _personalColors = ['봄 웜톤', '가을 웜톤', '겨울 쿨톤', '여름쿨톤', '잘 모르겠음'];
-  final List<String> _moods = ['청순', '시크', '큐티', '섹시', '차분'];
-  final List<String> _skinTones = ['13호 ~ 17호', '21호', '23호', '25호', '27호'];
 
   Size? get _imageSize {
     final box = _imageKey.currentContext?.findRenderObject() as RenderBox?;
@@ -159,40 +150,6 @@ class _UploadPageState extends State<UploadPage> {
     }
   }
 
-  void _togglePersonalColor(String tag) {
-    setState(() {
-      if (_selectedPersonalColors.contains(tag)) {
-        _selectedPersonalColors.remove(tag);
-      } else {
-        _selectedPersonalColors
-          ..clear()
-          ..add(tag);
-      }
-    });
-  }
-
-  void _toggleMood(String tag) {
-    setState(() {
-      if (_selectedMoods.contains(tag)) {
-        _selectedMoods.remove(tag);
-      } else if (_selectedMoods.length < 2) {
-        _selectedMoods.add(tag);
-      }
-    });
-  }
-
-  void _toggleSkinTone(String tag) {
-    setState(() {
-      if (_selectedSkinTones.contains(tag)) {
-        _selectedSkinTones.remove(tag);
-      } else {
-        _selectedSkinTones
-          ..clear()
-          ..add(tag);
-      }
-    });
-  }
-
   Future<void> _openPublicScopePage() async {
     final result = await Navigator.push<String>(
       context,
@@ -210,17 +167,6 @@ class _UploadPageState extends State<UploadPage> {
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('제목을 입력해주세요.')),
-      );
-      return;
-    }
-
-    final hasTag = _selectedPersonalColors.isNotEmpty ||
-        _selectedMoods.isNotEmpty ||
-        _selectedSkinTones.isNotEmpty;
-
-    if (!hasTag) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('추구미 태그를 최소 1개 이상 선택해주세요.')),
       );
       return;
     }
@@ -246,11 +192,7 @@ class _UploadPageState extends State<UploadPage> {
 
       request.fields['title'] = _titleController.text.trim();
       request.fields['description'] = _descriptionController.text.trim();
-      request.fields['personalColors'] = jsonEncode(
-        _selectedPersonalColors.toList(),
-      );
-      request.fields['moods'] = jsonEncode(_selectedMoods.toList());
-      request.fields['skinTones'] = jsonEncode(_selectedSkinTones.toList());
+      // personal_color/mood는 서버가 사진으로 자동 분류하고, skin_tone은 프로필 값을 그대로 쓴다.
       request.fields['stickers'] = jsonEncode(
         _stickers.map((s) => {
           'productId': s.productId,
@@ -651,47 +593,6 @@ class _UploadPageState extends State<UploadPage> {
                       controller: _descriptionController,
                       height: 130,
                       maxLines: 5,
-                    ),
-
-                    const SizedBox(height: 28),
-
-                    const Text(
-                      '추구미 태그',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    TagSection(
-                      title: '퍼스널 컬러',
-                      hint: '1개만 선택해주세요',
-                      tags: _personalColors,
-                      selectedTags: _selectedPersonalColors,
-                      onTap: _togglePersonalColor,
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    TagSection(
-                      title: '분위기',
-                      hint: '최대 2개 선택',
-                      tags: _moods,
-                      selectedTags: _selectedMoods,
-                      onTap: _toggleMood,
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    TagSection(
-                      title: '피부 톤',
-                      hint: '1개만 선택해주세요',
-                      tags: _skinTones,
-                      selectedTags: _selectedSkinTones,
-                      onTap: _toggleSkinTone,
                     ),
 
                     const SizedBox(height: 28),

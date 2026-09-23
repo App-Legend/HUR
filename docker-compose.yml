@@ -6,9 +6,10 @@ services:
     environment:
       - DB_HOST=postgres_db
       - DB_USER=app_legend
-      - DB_PASSWORD=1234
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=Hur
-      - JWT_SECRET=HUR_prod_JWT_s3cr3t_2026_xK9mP2qR7nL
+      - JWT_SECRET=${JWT_SECRET}
+      - ML_SERVICE_URL=http://ml_server:8000
     volumes:
       - ./Backend/node_server/images/posts:/app/images/posts
       - ./Backend/node_server/images/profiles:/app/images/profiles
@@ -29,18 +30,26 @@ services:
       - backend
 
   postgres_db:
-    image: postgres:17-alpine
+    image: pgvector/pgvector:pg17
     ports:
       - "5432:5432"
     restart: always
     environment:
       - POSTGRES_USER=app_legend
-      - POSTGRES_PASSWORD=1234
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=Hur
     networks:
       - app-network
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  ml_server:
+    build: ./Backend/ml_server
+    restart: always
+    networks:
+      - app-network
+    volumes:
+      - ml_model_cache:/root/.cache
 
 networks:
   app-network:
@@ -48,3 +57,4 @@ networks:
 
 volumes:
   postgres_data:
+  ml_model_cache:

@@ -1,5 +1,7 @@
 const pool = require('../db');
 
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+
 const getRanking = async (req, res) => {
     try {
         const { limit = 20, user_id } = req.query;
@@ -87,4 +89,45 @@ const getProduct = async (req, res) => {
     }
 };
 
-module.exports = { getRanking, searchProducts, getProduct };
+// 사용자가 올린 '추구미' 레퍼런스 사진을 CLIP 임베딩으로 바꿔서
+// 벡터가 가장 가까운(코사인 거리) 상품을 추천한다.
+const recommendByImage = async (req, res) => {
+    try {
+        const { image, limit = 10 } = req.body;
+
+        if (!image) {
+            return res.status(400).json({ message: "image is required (base64)" });
+        }
+
+        const embedRes = await fetch(`${ML_SERVICE_URL}/embed`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image }),
+        });
+
+        if (!embedRes.ok) {
+            const detail = await embedRes.text();
+            return res.status(502).json({ message: "ml_server error", detail });
+        }
+
+        const { embedding } = await embedRes.json();
+        const vectorLiteral = `[${embedding.join(",")}]`;
+
+        const { rows } = await pool.query(
+            `SELECT id, brand, name, image, source,
+                    embedding <=> $1::vector AS distance
+             FROM products
+             WHERE embedding IS NOT NULL
+             ORDER BY embedding <=> $1::vector
+             LIMIT $2`,
+            [vectorLiteral, parseInt(limit)]
+        );
+
+        res.json(rows);
+    } catch (err) {
+        console.error("products/recommend error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+module.exports = { getRanking, searchProducts, getProduct, recommendByImage };
