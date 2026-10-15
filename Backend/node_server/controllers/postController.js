@@ -35,7 +35,11 @@ const createPost = async (req, res) => {
       return res.status(400).json({ message: '제목은 필수입니다.' });
     }
 
-    const postImage = req.file ? req.file.location : null;
+    if (!req.file) {
+      return res.status(400).json({ message: '사진은 필수입니다.' });
+    }
+
+    const postImage = req.file.location;
     const visibilityValue = visibility || '모든 사람';
 
     const stickerList = stickers ? JSON.parse(stickers) : [];

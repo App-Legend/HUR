@@ -171,6 +171,13 @@ class _UploadPageState extends State<UploadPage> {
       return;
     }
 
+    if (_selectedImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('사진을 선택해주세요.')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {

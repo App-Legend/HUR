@@ -35,7 +35,7 @@ class _OnboardingAestheticState extends State<OnboardingAesthetic> {
         final posts = List<Map<String, dynamic>>.from(data['posts']);
         final urls = posts
             .where((p) => p['post_image'] != null)
-            .map((p) => '${ApiConstants.baseUrl}${p['post_image']}' as String)
+            .map((p) => ApiConstants.imageUrl(p['post_image']))
             .toList();
         if (mounted) setState(() => _images = urls);
       }

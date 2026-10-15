@@ -168,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                                         child: Column(
                                           children: leftItems.map((post) {
                                             final imageUrl =
-                                                '${ApiConstants.baseUrl}${post['post_image']}';
+                                                ApiConstants.imageUrl(post['post_image']);
                                             return GestureDetector(
                                               onTap: () {
                                                 Navigator.push(
@@ -198,7 +198,7 @@ class _HomePageState extends State<HomePage> {
                                         child: Column(
                                           children: rightItems.map((post) {
                                             final imageUrl =
-                                                '${ApiConstants.baseUrl}${post['post_image']}';
+                                                ApiConstants.imageUrl(post['post_image']);
                                             return GestureDetector(
                                               onTap: () {
                                                 Navigator.push(

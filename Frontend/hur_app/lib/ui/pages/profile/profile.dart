@@ -131,7 +131,7 @@ class _ProfileHeader extends StatelessWidget {
         color: const Color(0xFFB0B0B0),
         image: backgroundImage != null
             ? DecorationImage(
-                image: NetworkImage('${ApiConstants.baseUrl}$backgroundImage'),
+                image: NetworkImage(ApiConstants.imageUrl(backgroundImage)),
                 fit: BoxFit.cover,
               )
             : null,
@@ -186,7 +186,7 @@ class _ProfileHeader extends StatelessWidget {
                   shape: BoxShape.circle,
                   image: profileImage != null
                       ? DecorationImage(
-                          image: NetworkImage('${ApiConstants.baseUrl}$profileImage'),
+                          image: NetworkImage(ApiConstants.imageUrl(profileImage)),
                           fit: BoxFit.cover,
                         )
                       : null,
@@ -412,7 +412,7 @@ class _PostsGridState extends State<_PostsGrid> {
       ),
       itemBuilder: (_, index) {
         final post = _posts[index];
-        final imageUrl = '${ApiConstants.baseUrl}${post['post_image']}';
+        final imageUrl = ApiConstants.imageUrl(post['post_image']);
         return GestureDetector(
           onTap: () => Navigator.push(
             context,

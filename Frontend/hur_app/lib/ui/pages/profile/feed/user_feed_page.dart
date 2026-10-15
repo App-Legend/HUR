@@ -148,7 +148,7 @@ class _UserProfileHeader extends StatelessWidget {
         color: const Color(0xFFB0B0B0),
         image: backgroundImage != null
             ? DecorationImage(
-                image: NetworkImage('${ApiConstants.baseUrl}$backgroundImage'),
+                image: NetworkImage(ApiConstants.imageUrl(backgroundImage)),
                 fit: BoxFit.cover,
               )
             : null,
@@ -177,7 +177,7 @@ class _UserProfileHeader extends StatelessWidget {
               CircleAvatar(
                 radius: 40,
                 backgroundColor: const Color(0xFF9E9E9E),
-                backgroundImage: profileImage != null ? NetworkImage('${ApiConstants.baseUrl}$profileImage') : null,
+                backgroundImage: profileImage != null ? NetworkImage(ApiConstants.imageUrl(profileImage)) : null,
                 child: profileImage == null
                     ? const Icon(Icons.person, color: Colors.white, size: 36)
                     : null,
@@ -350,7 +350,7 @@ class _PostsGridState extends State<_PostsGrid> {
       ),
       itemBuilder: (_, index) {
         final post = _posts[index];
-        final imageUrl = '${ApiConstants.baseUrl}${post['post_image']}';
+        final imageUrl = ApiConstants.imageUrl(post['post_image']);
         return GestureDetector(
           onTap: () => Navigator.push(
             context,

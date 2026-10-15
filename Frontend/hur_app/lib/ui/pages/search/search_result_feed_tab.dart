@@ -136,7 +136,7 @@ class _SearchResultFeedTabState extends State<SearchResultFeedTab> {
   }
 
   Widget _buildPostCard(Map<String, dynamic> post) {
-    final imageUrl = '${ApiConstants.baseUrl}${post['post_image']}';
+    final imageUrl = ApiConstants.imageUrl(post['post_image']);
     return GestureDetector(
       onTap: () => Navigator.push(
         context,

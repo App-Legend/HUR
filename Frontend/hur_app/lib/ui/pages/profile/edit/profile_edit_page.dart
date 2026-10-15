@@ -436,7 +436,7 @@ class _ProfileImageSection extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               image: backgroundImageUrl != null
                   ? DecorationImage(
-                      image: NetworkImage('${ApiConstants.baseUrl}$backgroundImageUrl'),
+                      image: NetworkImage(ApiConstants.imageUrl(backgroundImageUrl)),
                       fit: BoxFit.cover,
                     )
                   : null,
@@ -482,7 +482,7 @@ class _ProfileImageSection extends StatelessWidget {
                     border: Border.all(color: Colors.white, width: 3),
                     image: profileImageUrl != null
                         ? DecorationImage(
-                            image: NetworkImage('${ApiConstants.baseUrl}$profileImageUrl'),
+                            image: NetworkImage(ApiConstants.imageUrl(profileImageUrl)),
                             fit: BoxFit.cover,
                           )
                         : null,

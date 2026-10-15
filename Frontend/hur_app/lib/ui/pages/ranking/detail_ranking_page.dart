@@ -304,7 +304,7 @@ class _PhotoTabState extends State<_PhotoTab> {
                       ),
                       itemBuilder: (context, index) {
                         final post = _filteredPosts[index];
-                        final imageUrl = '${ApiConstants.baseUrl}${post['post_image'] ?? ''}';
+                        final imageUrl = ApiConstants.imageUrl(post['post_image']);
                         return GestureDetector(
                           onTap: () => Navigator.push(
                             context,
