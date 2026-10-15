@@ -19,6 +19,7 @@ app.use('/user', require('./routes/user'));
 app.use('/user/:id/follow', require('./routes/follow'));
 app.use('/upload', require('./routes/upload'));
 app.use('/products', require('./routes/product'));
+app.use('/search', require('./routes/search'));
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,6 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:hur_app/app/constants.dart';
 import 'search_result_accounts_tab.dart';
 import 'search_result_cosmetics_tab.dart';
 import 'search_result_feed_tab.dart';
@@ -22,11 +27,15 @@ class SearchPageState extends State<SearchPage>
 
   bool _isSearchFocused = false;
   bool _hasSearched = false;
-  late final String _trendingUpdatedAt;
+  late String _trendingUpdatedAt;
 
-  final List<String> _recentKeywords = ['틴트', '워터밤 비오틴'];
+  // 로그인한 유저의 최근 검색어 (서버 저장). 로그인 전이면 비어 있다.
+  List<String> _recentKeywords = [];
 
-  static const _trendingKeywords = [
+  // 서버에서 급상승 검색어를 받아오기 전/실패 시에 보여줄 기본값
+  List<List<String>> _trending = _defaultTrending.map((e) => List<String>.from(e)).toList();
+
+  static const _defaultTrending = [
     ['1', '선크림', '-'],
     ['2', '립', 'up'],
     ['3', '포켓몬', 'down'],
@@ -39,22 +48,110 @@ class SearchPageState extends State<SearchPage>
     ['10', '샴푸', '-'],
   ];
 
-  final _searchSuggestions = ['선크림', '립글로스', '쿠션 파운데이션', '클렌징밀크', '틴트', '비오틴 샴푸'];
-
   @override
   void initState() {
     super.initState();
     _ownsNode = widget.focusNode == null;
     _searchFocusNode = widget.focusNode ?? FocusNode();
     _tabController = TabController(length: 3, vsync: this);
-    final now = DateTime.now();
-    _trendingUpdatedAt = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    _trendingUpdatedAt = _nowLabel();
 
     _searchFocusNode.addListener(() {
       setState(() {
         _isSearchFocused = _searchFocusNode.hasFocus;
       });
+      // 검색창을 누를 때마다 최신 상태로 (로그인 직후 등 토큰이 바뀐 경우 대비)
+      if (_searchFocusNode.hasFocus) _loadRecent();
     });
+
+    _loadRecent();
+    _loadTrending();
+  }
+
+  String _nowLabel() {
+    final now = DateTime.now();
+    return '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+  }
+
+  Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    return (token == null || token.isEmpty) ? null : token;
+  }
+
+  Future<void> _loadRecent() async {
+    final token = await _getToken();
+    if (token == null) {
+      if (mounted) setState(() => _recentKeywords = []);
+      return;
+    }
+    try {
+      final res = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/search/recent'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (res.statusCode == 200 && mounted) {
+        final keywords = List<String>.from(jsonDecode(res.body)['keywords']);
+        setState(() => _recentKeywords = keywords);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _loadTrending() async {
+    try {
+      final res = await http.get(Uri.parse('${ApiConstants.baseUrl}/search/trending'));
+      if (res.statusCode == 200 && mounted) {
+        final list = jsonDecode(res.body)['keywords'] as List;
+        if (list.isEmpty) return;
+        setState(() {
+          _trending = list
+              .map<List<String>>((e) => ['${e['rank']}', '${e['keyword']}', '${e['status']}'])
+              .toList();
+          _trendingUpdatedAt = _nowLabel();
+        });
+      }
+    } catch (_) {}
+  }
+
+  // 검색 기록은 실패해도 검색 자체를 막지 않는다.
+  Future<void> _logSearch(String keyword) async {
+    final token = await _getToken();
+    if (token == null) return;
+    try {
+      await http.post(
+        Uri.parse('${ApiConstants.baseUrl}/search/log'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'keyword': keyword}),
+      );
+    } catch (_) {}
+    await _loadRecent();
+  }
+
+  Future<void> _deleteRecent(String keyword) async {
+    setState(() => _recentKeywords.remove(keyword));
+    final token = await _getToken();
+    if (token == null) return;
+    try {
+      await http.delete(
+        Uri.parse('${ApiConstants.baseUrl}/search/recent/${Uri.encodeComponent(keyword)}'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } catch (_) {}
+  }
+
+  Future<void> _clearRecent() async {
+    setState(() => _recentKeywords = []);
+    final token = await _getToken();
+    if (token == null) return;
+    try {
+      await http.delete(
+        Uri.parse('${ApiConstants.baseUrl}/search/recent'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } catch (_) {}
   }
 
   @override
@@ -71,14 +168,19 @@ class SearchPageState extends State<SearchPage>
       _hasSearched = false;
       _searchController.clear();
     });
+    _loadRecent();
+    _loadTrending();
   }
 
   void _onSubmitted(String value) {
-    if (value.trim().isEmpty) return;
+    final keyword = value.trim();
+    if (keyword.isEmpty) return;
+    _searchController.text = keyword;
     setState(() {
       _hasSearched = true;
     });
     _searchFocusNode.unfocus();
+    _logSearch(keyword);
   }
 
   @override
@@ -189,9 +291,13 @@ class SearchPageState extends State<SearchPage>
                 Expanded(
                   child: ListView.builder(
                     padding: EdgeInsets.zero,
-                    itemCount: _searchSuggestions.length,
+                    itemCount: _recentKeywords.length,
                     itemBuilder: (context, index) {
-                      return _SearchHistoryItem(text: _searchSuggestions[index]);
+                      final keyword = _recentKeywords[index];
+                      return _SearchHistoryItem(
+                        text: keyword,
+                        onTap: () => _onSubmitted(keyword),
+                      );
                     },
                   ),
                 ),
@@ -204,40 +310,44 @@ class SearchPageState extends State<SearchPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              '최근 검색어',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => setState(() => _recentKeywords.clear()),
-                              child: const Text(
-                                '전체 삭제',
+                        if (_recentKeywords.isNotEmpty) ...[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                '최근 검색어',
                                 style: TextStyle(
-                                  fontSize: 10,
-                                  color: Color(0xffc4c4c4),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 6,
-                          children: _recentKeywords.map((keyword) {
-                            return _RecentKeywordChip(
-                              text: keyword,
-                              onDelete: () => setState(() => _recentKeywords.remove(keyword)),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 42),
+                              GestureDetector(
+                                onTap: _clearRecent,
+                                child: const Text(
+                                  '전체 삭제',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xffc4c4c4),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: _recentKeywords.map((keyword) {
+                              return _RecentKeywordChip(
+                                text: keyword,
+                                onTap: () => _onSubmitted(keyword),
+                                onDelete: () => _deleteRecent(keyword),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 42),
+                        ],
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -264,7 +374,7 @@ class SearchPageState extends State<SearchPage>
                           children: [
                             Expanded(
                               child: Column(
-                                children: _trendingKeywords
+                                children: _trending
                                     .take(5)
                                     .map(
                                       (item) => _TrendingKeywordItem(
@@ -279,7 +389,7 @@ class SearchPageState extends State<SearchPage>
                             const SizedBox(width: 28),
                             Expanded(
                               child: Column(
-                                children: _trendingKeywords
+                                children: _trending
                                     .skip(5)
                                     .map(
                                       (item) => _TrendingKeywordItem(
@@ -307,25 +417,29 @@ class SearchPageState extends State<SearchPage>
 
 class _SearchHistoryItem extends StatelessWidget {
   final String text;
+  final VoidCallback onTap;
 
-  const _SearchHistoryItem({required this.text});
+  const _SearchHistoryItem({required this.text, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      child: Row(
-        children: [
-          const Icon(Icons.search, size: 18, color: Color(0xffbdbdbd)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(fontSize: 13, color: Colors.black),
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Row(
+          children: [
+            const Icon(Icons.search, size: 18, color: Color(0xffbdbdbd)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(fontSize: 13, color: Colors.black),
+              ),
             ),
-          ),
-          const Icon(Icons.call_made, size: 16, color: Color(0xffbdbdbd)),
-        ],
+            const Icon(Icons.call_made, size: 16, color: Color(0xffbdbdbd)),
+          ],
+        ),
       ),
     );
   }
@@ -333,9 +447,14 @@ class _SearchHistoryItem extends StatelessWidget {
 
 class _RecentKeywordChip extends StatelessWidget {
   final String text;
+  final VoidCallback onTap;
   final VoidCallback onDelete;
 
-  const _RecentKeywordChip({required this.text, required this.onDelete});
+  const _RecentKeywordChip({
+    required this.text,
+    required this.onTap,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -350,9 +469,12 @@ class _RecentKeywordChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            text,
-            style: const TextStyle(fontSize: 10, color: Color(0xff9b9b9b)),
+          GestureDetector(
+            onTap: onTap,
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 10, color: Color(0xff9b9b9b)),
+            ),
           ),
           const SizedBox(width: 3),
           GestureDetector(

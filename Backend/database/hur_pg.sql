@@ -179,3 +179,28 @@ CREATE INDEX IF NOT EXISTS idx_posts_embedding_cosine
   ON posts
   USING ivfflat (embedding vector_cosine_ops)
   WITH (lists = 10);
+
+-- 유저별 최근 검색어 (같은 단어를 다시 검색하면 시간만 갱신, 유저당 최대 10개 유지)
+CREATE TABLE IF NOT EXISTS search_history (
+  user_id     INT         NOT NULL,
+  keyword     VARCHAR(30) NOT NULL,
+  searched_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, keyword),
+  CONSTRAINT fk_search_history_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_search_history_user_time
+  ON search_history (user_id, searched_at DESC);
+
+-- 전체 검색 로그 (급상승 검색어 계산용). 유저 탈퇴 후에도 집계는 남도록 user_id는 SET NULL
+CREATE TABLE IF NOT EXISTS search_log (
+  log_id      SERIAL      NOT NULL,
+  user_id     INT,
+  keyword     VARCHAR(30) NOT NULL,
+  searched_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (log_id),
+  CONSTRAINT fk_search_log_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_search_log_time
+  ON search_log (searched_at);
