@@ -64,7 +64,7 @@ docker compose up -d --build
 
 ```bash
 docker compose exec -T postgres_db psql -U app_legend -d Hur < Backend/database/hur_pg.sql
-docker compose exec -T postgres_db psql -U app_legend -d Hur < Backend/database/hur_pg_seed.sql
+docker compose exec -T postgres_db psql -U app_legend -d Hur < Backend/database/hur_pg_seed_oliveyoung.sql
 ```
 
 ## 6. 상품 임베딩 채우기 (최초 1회, 상품 추가될 때마다)
@@ -76,15 +76,7 @@ ml_server가 뜬 상태에서 실행해야 합니다.
 docker compose exec backend node scripts/backfill_embeddings.js
 ```
 
-## 7. 기존 상품 이미지를 S3로 이전 (최초 1회)
-
-시드 데이터의 상품 이미지가 외부 CDN(화해) 핫링크라 깨지기 쉬워요. 우리 S3로 옮깁니다.
-
-```bash
-docker compose exec backend node scripts/migrate_images_to_s3.js
-```
-
-## 8. 정상 동작 확인
+## 7. 정상 동작 확인
 
 ```bash
 curl http://localhost/products/ranking
@@ -100,7 +92,7 @@ curl -X POST http://localhost/products/recommend \
   -d "{\"image\": \"<base64 인코딩된 이미지>\"}"
 ```
 
-## 9. DB 자동 백업 설정 (최초 1회)
+## 8. DB 자동 백업 설정 (최초 1회)
 
 매일 자정 근처에 DB를 덤프해서 S3(`backups/` 폴더)에 저장하도록 설정합니다.
 
@@ -128,7 +120,7 @@ crontab -e
 
 **(선택) 오래된 백업 자동 삭제** — S3 콘솔 → 버킷 → 관리(Management) 탭 → 수명 주기 규칙(Lifecycle rule) 생성 → `backups/` 접두사에 30일 지난 객체 만료(Expire) 규칙 추가. 안 해두면 백업이 계속 쌓여서 용량이 늘어남(스토리지 비용 자체는 저렴하지만).
 
-## 10. 코드 업데이트 시 (이후 배포마다)
+## 9. 코드 업데이트 시 (이후 배포마다)
 
 ```bash
 git pull origin feature

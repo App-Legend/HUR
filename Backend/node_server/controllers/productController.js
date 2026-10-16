@@ -2,42 +2,23 @@ const pool = require('../db');
 
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
+// 랭킹: 리뷰 수가 많은 순 (리뷰 수가 없는 상품은 맨 뒤). 모든 유저에게 같은 순서로 보여준다.
 const getRanking = async (req, res) => {
     try {
-        const { limit = 20, user_id } = req.query;
-        const limitInt = parseInt(limit);
+        const { limit = 20 } = req.query;
+        const limitInt = parseInt(limit) || 20;
 
-        let rows;
-
-        if (user_id) {
-            ({ rows } = await pool.query(
-                `SELECT p.id, p.brand, p.name, p.image, p.source,
-                        COALESCE(SUM(ucs.score), 0) AS relevance_score,
-                        COUNT(DISTINCT ps.post_id) AS tag_count
-                 FROM products p
-                 LEFT JOIN post_sticker ps ON ps.product_id = p.id
-                 LEFT JOIN post_category pc ON pc.post_id = ps.post_id
-                 LEFT JOIN user_category_score ucs
-                   ON ucs.category_type = pc.category_type
-                   AND ucs.category_value = pc.category_value
-                   AND ucs.user_id = $1
-                 GROUP BY p.id
-                 ORDER BY relevance_score DESC, tag_count DESC, p.id ASC
-                 LIMIT $2`,
-                [parseInt(user_id), limitInt]
-            ));
-        } else {
-            ({ rows } = await pool.query(
-                `SELECT p.id, p.brand, p.name, p.image, p.source,
-                        COUNT(ps.id) AS tag_count
-                 FROM products p
-                 LEFT JOIN post_sticker ps ON p.id = ps.product_id
-                 GROUP BY p.id
-                 ORDER BY tag_count DESC, p.id ASC
-                 LIMIT $1`,
-                [limitInt]
-            ));
-        }
+        const { rows } = await pool.query(
+            `SELECT p.id, p.brand, p.name, p.image, p.source,
+                    p.price, p.original_price, p.discount_rate, p.rating, p.review_count,
+                    COUNT(ps.id) AS tag_count
+             FROM products p
+             LEFT JOIN post_sticker ps ON p.id = ps.product_id
+             GROUP BY p.id
+             ORDER BY p.review_count DESC NULLS LAST, tag_count DESC, p.id ASC
+             LIMIT $1`,
+            [limitInt]
+        );
 
         res.json(rows);
     } catch (err) {
