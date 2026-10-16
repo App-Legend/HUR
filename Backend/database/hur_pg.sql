@@ -219,3 +219,22 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS rating         NUMERIC(2,1);
 ALTER TABLE products ADD COLUMN IF NOT EXISTS review_count   INT;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS category       VARCHAR(30);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products (category);
+
+-- 상품 후기 (우리 앱 유저가 작성). 한 유저가 한 상품에 후기 1개만 가능하고 다시 쓰면 수정된다.
+CREATE TABLE IF NOT EXISTS product_reviews (
+  review_id  SERIAL       NOT NULL,
+  product_id INT          NOT NULL,
+  user_id    INT          NOT NULL,
+  rating     SMALLINT     NOT NULL,
+  content    VARCHAR(500) NOT NULL,
+  created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (review_id),
+  CONSTRAINT uq_product_reviews UNIQUE (product_id, user_id),
+  CONSTRAINT ck_product_reviews_rating CHECK (rating BETWEEN 1 AND 5),
+  CONSTRAINT fk_product_reviews_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+  CONSTRAINT fk_product_reviews_user    FOREIGN KEY (user_id)    REFERENCES users (user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_product_reviews_product_time
+  ON product_reviews (product_id, created_at DESC);

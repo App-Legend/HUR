@@ -10,6 +10,7 @@ import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
 import 'package:hur_app/ui/pages/home/detail/detail_home_page.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/purchase_popup.dart';
+import 'package:hur_app/ui/pages/ranking/product_reviews.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:hur_app/app/theme.dart';
 
@@ -107,7 +108,7 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
                 ),
               )
             else
-              const Expanded(child: _ReviewTab()),
+              Expanded(child: ProductReviewTab(productId: widget.productId)),
           ],
         ),
       ),
@@ -383,22 +384,6 @@ class _PhotoTabState extends State<_PhotoTab> {
   }
 }
 
-class _ReviewTab extends StatelessWidget {
-  const _ReviewTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      children: const [
-        _ReviewItem(userName: 'user_01', review: '색감이 예쁘고 데일리로 쓰기 좋아요.'),
-        _ReviewItem(userName: 'user_02', review: '발림성이 부드럽고 광택감이 마음에 들어요.'),
-        _ReviewItem(userName: 'user_03', review: '생각보다 지속력도 괜찮았습니다.'),
-      ],
-    );
-  }
-}
-
 class _TabText extends StatelessWidget {
   final String text;
   final bool selected;
@@ -423,43 +408,6 @@ class _TabText extends StatelessWidget {
           color: selected ? HurColors.accent : Colors.transparent,
         ),
       ],
-    );
-  }
-}
-
-class _ReviewItem extends StatelessWidget {
-  final String userName;
-  final String review;
-
-  const _ReviewItem({required this.userName, required this.review});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: HurColors.surfaceStrong,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            userName,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: HurColors.text,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            review,
-            style: const TextStyle(fontSize: 13, color: HurColors.text),
-          ),
-        ],
-      ),
     );
   }
 }

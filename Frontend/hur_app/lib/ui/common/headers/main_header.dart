@@ -7,6 +7,7 @@ class MainHeader extends StatelessWidget {
     this.title,
     this.titleFontSize = 24.0,
     this.subtitle,
+    this.subtitleFontSize = 14.0,
     this.subtitleAbove = false,
     this.leading,
     this.trailing,
@@ -19,6 +20,7 @@ class MainHeader extends StatelessWidget {
   final String? title;
   final double titleFontSize;
   final String? subtitle;
+  final double subtitleFontSize;
   final bool subtitleAbove;
   final Widget? leading;
   final Widget? trailing;
@@ -51,8 +53,8 @@ class MainHeader extends StatelessWidget {
                         if (subtitle != null && subtitleAbove) ...[
                           Text(
                             subtitle!,
-                            style: const TextStyle(
-                              fontSize: 14,
+                            style: TextStyle(
+                              fontSize: subtitleFontSize,
                               color: HurColors.muted,
                             ),
                           ),
@@ -70,8 +72,8 @@ class MainHeader extends StatelessWidget {
                           const SizedBox(height: 8),
                           Text(
                             subtitle!,
-                            style: const TextStyle(
-                              fontSize: 14,
+                            style: TextStyle(
+                              fontSize: subtitleFontSize,
                               color: HurColors.muted,
                             ),
                           ),

@@ -255,20 +255,13 @@ class _RankingHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: HurColors.panel,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+      color: HurColors.bg,
       child: const MainHeader(
         title: '내 추구미 랭킹',
+        titleFontSize: 19,
         subtitle: '피드 기반으로 측정됩니다',
-        padding: EdgeInsets.fromLTRB(18, 20, 18, 14),
+        subtitleFontSize: 12,
+        padding: EdgeInsets.fromLTRB(18, 20, 18, 6),
       ),
     );
   }
@@ -288,7 +281,7 @@ class _CategorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const categories = ['틴트', '피부', '렌즈', '볼터치', '섀도우'];
+    const categories = ['틴트', '피부', '볼터치', '섀도우', '렌즈'];
     return SizedBox(
       height: 36,
       child: ListView.separated(
