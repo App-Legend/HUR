@@ -147,10 +147,43 @@ class _PhotoTabState extends State<_PhotoTab> {
     }).toList();
   }
 
+  // 평점/리뷰 수/가격 (없는 상품은 null이라 화면에서 숨긴다)
+  num? _rating;
+  int? _reviewCount;
+  int? _price;
+
   @override
   void initState() {
     super.initState();
     _fetchPosts();
+    _fetchProductInfo();
+  }
+
+  Future<void> _fetchProductInfo() async {
+    if (widget.productId == null) return;
+    try {
+      final res = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/products/${widget.productId}'),
+      );
+      if (res.statusCode == 200 && mounted) {
+        final data = jsonDecode(res.body);
+        setState(() {
+          _rating = num.tryParse('${data['rating']}');
+          _reviewCount = int.tryParse('${data['review_count']}');
+          _price = int.tryParse('${data['price']}');
+        });
+      }
+    } catch (_) {}
+  }
+
+  String _withComma(int value) {
+    final s = value.toString();
+    final buf = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
+      buf.write(s[i]);
+    }
+    return buf.toString();
   }
 
   Future<void> _fetchPosts() async {
@@ -253,10 +286,22 @@ class _PhotoTabState extends State<_PhotoTab> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          '오늘 조회 3206',
-                          style: TextStyle(fontSize: 16, color: Colors.black),
+                        Text(
+                          _rating != null
+                              ? '★ ${_rating!.toStringAsFixed(1)}'
+                                  '${_reviewCount != null ? ' (${_withComma(_reviewCount!)})' : ''}'
+                              : '오늘 조회 3206',
+                          style: const TextStyle(fontSize: 16, color: Colors.black),
                         ),
+                        if (_price != null)
+                          Text(
+                            '${_withComma(_price!)}원',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         Text(
                           '총 ${_posts.length}회 사용',
                           style: const TextStyle(fontSize: 13, color: Colors.grey),

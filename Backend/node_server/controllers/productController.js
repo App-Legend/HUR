@@ -75,7 +75,9 @@ const getProduct = async (req, res) => {
         const { id } = req.params;
 
         const { rows } = await pool.query(
-            "SELECT id, brand, name, image, source FROM products WHERE id = $1",
+            `SELECT id, brand, name, image, source,
+                    price, original_price, discount_rate, rating, review_count
+             FROM products WHERE id = $1`,
             [parseInt(id)]
         );
 

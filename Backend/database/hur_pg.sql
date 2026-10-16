@@ -35,6 +35,11 @@ CREATE TABLE IF NOT EXISTS products (
   source         VARCHAR(50)  NULL,
   embedding      vector(512)  NULL,  -- 상품 이미지의 CLIP 임베딩 (벡터 유사도 추천용)
   model_version  VARCHAR(50)  NULL,  -- embedding을 생성한 모델 버전 (모델 교체 시 재계산 대상 식별용)
+  price          INT          NULL,  -- 판매가(원)
+  original_price INT          NULL,  -- 정가(원). 할인이 없으면 NULL
+  discount_rate  INT          NULL,  -- 할인율(%)
+  rating         NUMERIC(2,1) NULL,  -- 평점(0.0~5.0)
+  review_count   INT          NULL,  -- 리뷰 수
   PRIMARY KEY (id)
 );
 
@@ -204,3 +209,10 @@ CREATE TABLE IF NOT EXISTS search_log (
 
 CREATE INDEX IF NOT EXISTS idx_search_log_time
   ON search_log (searched_at);
+
+-- 상품 가격/평점 (이미 배포된 DB에도 반영)
+ALTER TABLE products ADD COLUMN IF NOT EXISTS price          INT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS original_price INT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS discount_rate  INT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS rating         NUMERIC(2,1);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS review_count   INT;
