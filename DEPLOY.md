@@ -66,6 +66,8 @@ docker compose up -d --build
 docker compose exec -T postgres_db psql -U app_legend -d Hur < Backend/database/hur_pg.sql
 docker compose exec -T postgres_db psql -U app_legend -d Hur < Backend/database/hur_pg_seed_oliveyoung_skin.sql
 docker compose exec -T postgres_db psql -U app_legend -d Hur < Backend/database/hur_pg_seed_oliveyoung_tint.sql
+docker compose exec -T postgres_db psql -U app_legend -d Hur < Backend/database/hur_pg_seed_oliveyoung_shadow.sql
+docker compose exec -T postgres_db psql -U app_legend -d Hur < Backend/database/hur_pg_seed_oliveyoung_blush.sql
 ```
 
 ## 6. 상품 임베딩 채우기 (최초 1회, 상품 추가될 때마다)
