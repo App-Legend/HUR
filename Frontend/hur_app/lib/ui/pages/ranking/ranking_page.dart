@@ -65,17 +65,10 @@ class _RankingPageState extends State<RankingPage> {
   List<RankingProduct> _products = [];
   bool _isLoading = true;
   String? _error;
-  int? _userId;
 
   @override
   void initState() {
     super.initState();
-    _loadUserAndFetch();
-  }
-
-  Future<void> _loadUserAndFetch() async {
-    final prefs = await SharedPreferences.getInstance();
-    _userId = prefs.getInt('user_id');
     _fetchRanking('틴트');
   }
 
@@ -85,15 +78,20 @@ class _RankingPageState extends State<RankingPage> {
       _error = null;
     });
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
       final queryParams = {
         'category': category,
         'limit': '20',
-        if (_userId != null) 'user_id': _userId.toString(),
       };
+      // 로그인했으면 토큰을 같이 보내서 '내 추구미' 기준 랭킹을 받는다.
       final response = await http
           .get(
             Uri.parse('${ApiConstants.baseUrl}/products/ranking')
                 .replace(queryParameters: queryParams),
+            headers: {
+              if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+            },
           )
           .timeout(const Duration(seconds: 10));
 

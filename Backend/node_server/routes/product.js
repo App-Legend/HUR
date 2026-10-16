@@ -1,11 +1,11 @@
 const express = require("express");
-const { verifyToken } = require("../middleware/auth");
+const { verifyToken, optionalAuth } = require("../middleware/auth");
 const { getRanking, searchProducts, getProduct, recommendByImage } = require("../controllers/productController");
 const { getReviews, saveReview, deleteMyReview } = require("../controllers/reviewController");
 
 const router = express.Router();
 
-router.get("/ranking", getRanking);
+router.get("/ranking", optionalAuth, getRanking);
 router.get("/search", searchProducts);
 router.post("/recommend", recommendByImage);
 router.get("/:id", getProduct);
