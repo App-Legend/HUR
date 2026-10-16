@@ -15,6 +15,7 @@ import 'follow_list_page.dart';
 import 'settings/settings_page.dart';
 import '../home/detail/detail_home_page.dart';
 import '../../../app/auth_utils.dart';
+import 'package:hur_app/app/theme.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -68,7 +69,7 @@ class _MyPageState extends State<MyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       drawer: const SideDrawer(),
       body: SafeArea(
         child: Column(
@@ -128,7 +129,7 @@ class _ProfileHeader extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFB0B0B0),
+        color: HurColors.surfaceStrong,
         image: backgroundImage != null
             ? DecorationImage(
                 image: NetworkImage(ApiConstants.imageUrl(backgroundImage)),
@@ -144,7 +145,7 @@ class _ProfileHeader extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () => Scaffold.of(context).openDrawer(),
-                child: const Icon(Icons.menu, color: Colors.white, size: 28),
+                child: const Icon(Icons.menu, color: HurColors.text, size: 28),
               ),
               const Spacer(),
               OutlinedButton.icon(
@@ -155,8 +156,8 @@ class _ProfileHeader extends StatelessWidget {
                   );
                   onRefresh();
                 },
-                icon: const Icon(Icons.edit_outlined, size: 14, color: Colors.white),
-                label: const Text('프로필 편집', style: TextStyle(color: Colors.white, fontSize: 13)),
+                icon: const Icon(Icons.edit_outlined, size: 14, color: HurColors.text),
+                label: const Text('프로필 편집', style: TextStyle(color: HurColors.text, fontSize: 13)),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.white54),
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
@@ -170,7 +171,7 @@ class _ProfileHeader extends StatelessWidget {
                   context,
                   MaterialPageRoute(builder: (_) => const SettingsPage()),
                 ),
-                child: const Icon(Icons.settings_outlined, color: Colors.white, size: 26),
+                child: const Icon(Icons.settings_outlined, color: HurColors.text, size: 26),
               ),
             ],
           ),
@@ -182,7 +183,7 @@ class _ProfileHeader extends StatelessWidget {
                 width: 88,
                 height: 88,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF9E9E9E),
+                  color: HurColors.surfaceStrong,
                   shape: BoxShape.circle,
                   image: profileImage != null
                       ? DecorationImage(
@@ -192,7 +193,7 @@ class _ProfileHeader extends StatelessWidget {
                       : null,
                 ),
                 child: isLoading
-                    ? const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    ? const Center(child: CircularProgressIndicator(color: HurColors.text, strokeWidth: 2))
                     : null,
               ),
               const SizedBox(width: 20),
@@ -201,7 +202,7 @@ class _ProfileHeader extends StatelessWidget {
                 children: [
                   Text(
                     nickname,
-                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: HurColors.text, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 6),
                 ],
@@ -216,7 +217,7 @@ class _ProfileHeader extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: '$postCount',
-                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                      style: const TextStyle(color: HurColors.text, fontSize: 14, fontWeight: FontWeight.bold),
                     ),
                     const TextSpan(
                       text: ' 게시물',
@@ -233,7 +234,7 @@ class _ProfileHeader extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: '$followerCount',
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: HurColors.text, fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       const TextSpan(
                         text: ' 팔로워',
@@ -251,7 +252,7 @@ class _ProfileHeader extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: '$followingCount',
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: HurColors.text, fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       const TextSpan(
                         text: ' 팔로잉',
@@ -300,11 +301,11 @@ class _TagChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: Colors.white),
+          Icon(icon, size: 13, color: HurColors.text),
           const SizedBox(width: 5),
           Text(
             label,
-            style: const TextStyle(color: Colors.white, fontSize: 12),
+            style: const TextStyle(color: HurColors.text, fontSize: 12),
           ),
         ],
       ),
@@ -337,7 +338,7 @@ class _TabBar extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: active ? const Color(0xFF6B1F8A) : Colors.transparent,
+                  color: active ? HurColors.accent : Colors.transparent,
                   width: 2.5,
                 ),
               ),
@@ -345,7 +346,7 @@ class _TabBar extends StatelessWidget {
             child: Icon(
               icons[i],
               size: 24,
-              color: active ? const Color(0xFF6B1F8A) : Colors.black38,
+              color: active ? HurColors.accent : HurColors.muted,
             ),
           ),
         );
@@ -394,11 +395,11 @@ class _PostsGridState extends State<_PostsGrid> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: Colors.purple));
+      return const Center(child: CircularProgressIndicator(color: HurColors.accent));
     }
     if (_posts.isEmpty) {
       return const Center(
-        child: Text('게시물 없음', style: TextStyle(fontSize: 15, color: Colors.grey)),
+        child: Text('게시물 없음', style: TextStyle(fontSize: 15, color: HurColors.muted)),
       );
     }
     return GridView.builder(
@@ -430,7 +431,7 @@ class _PostsGridState extends State<_PostsGrid> {
             child: Image.network(
               imageUrl,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(color: const Color(0xFFD9D9D9)),
+              errorBuilder: (_, _, _) => Container(color: HurColors.surfaceStrong),
             ),
           ),
         );
@@ -445,6 +446,6 @@ class _EmptyTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Icon(icon, size: 48, color: Colors.black12));
+    return Center(child: Icon(icon, size: 48, color: HurColors.line));
   }
 }

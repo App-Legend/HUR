@@ -3,6 +3,7 @@
 //  ————————————————————————————————
 
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 class ProductTagPopup extends StatelessWidget {
   final String brandName;
@@ -46,18 +47,18 @@ class ProductTagPopup extends StatelessWidget {
                   brandName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Color(0xffbbbbbb), fontSize: 8),
+                  style: const TextStyle(color: HurColors.muted, fontSize: 8),
                 ),
                 Text(
                   productName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontSize: 10),
+                  style: const TextStyle(color: HurColors.text, fontSize: 10),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right, color: Colors.white, size: 20),
+          const Icon(Icons.chevron_right, color: HurColors.text, size: 20),
         ],
       ),
     );

@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../login/login_page.dart';
 import 'profile.dart';
+import 'package:hur_app/app/theme.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -42,7 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: HurColors.bg,
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -50,13 +51,13 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_isLoggedIn) return const MyPage();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: HurColors.panel,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.08),
@@ -89,21 +90,21 @@ class _NotLoggedInBody extends StatelessWidget {
       child: Column(
         children: [
           const Spacer(),
-          const Icon(Icons.person_outline, size: 72, color: Color(0xFFBDBDBD)),
+          const Icon(Icons.person_outline, size: 72, color: HurColors.muted),
           const SizedBox(height: 20),
           const Text(
             '로그인이 필요해요',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: HurColors.text,
             ),
           ),
           const SizedBox(height: 10),
           const Text(
             '게시물 저장 등 더 많은 기능을 이용하려면\n로그인 해주세요',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.black45, height: 1.6),
+            style: TextStyle(fontSize: 13, color: HurColors.muted, height: 1.6),
           ),
           const Spacer(),
           SizedBox(
@@ -118,8 +119,8 @@ class _NotLoggedInBody extends StatelessWidget {
                 onLoginSuccess();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6B1F8A),
-                foregroundColor: Colors.white,
+                backgroundColor: HurColors.accent,
+                foregroundColor: HurColors.onAccent,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),

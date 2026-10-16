@@ -3,6 +3,7 @@
 //  ————————————————————————————————
 
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 class UploadMenuRow extends StatelessWidget {
   final IconData icon;
@@ -25,24 +26,24 @@ class UploadMenuRow extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, size: 28, color: Colors.black),
+          Icon(icon, size: 28, color: HurColors.text),
           const SizedBox(width: 16),
           Text(
             title,
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: HurColors.text,
             ),
           ),
           const Spacer(),
           if (value != null)
             Text(
               value!,
-              style: const TextStyle(fontSize: 12, color: Color(0xff777777)),
+              style: const TextStyle(fontSize: 12, color: HurColors.muted),
             ),
           const SizedBox(width: 8),
-          const Icon(Icons.chevron_right, size: 30, color: Colors.black),
+          const Icon(Icons.chevron_right, size: 30, color: HurColors.text),
         ],
       ),
     );

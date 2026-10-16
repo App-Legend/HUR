@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 void showPostMoreOptions(BuildContext context) {
   showModalBottomSheet(
@@ -12,27 +13,27 @@ void showPostMoreOptions(BuildContext context) {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: HurColors.panel,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Column(
                 children: [
                   _MoreOptionItem(
                     label: '신고',
-                    color: const Color(0xFFE53935),
+                    color: HurColors.peach,
                     onTap: () => Navigator.pop(context),
                   ),
-                  const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+                  const Divider(height: 1, thickness: 1, color: HurColors.line),
                   _MoreOptionItem(
                     label: '제한',
                     onTap: () => Navigator.pop(context),
                   ),
-                  const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+                  const Divider(height: 1, thickness: 1, color: HurColors.line),
                   _MoreOptionItem(
                     label: '차단',
                     onTap: () => Navigator.pop(context),
                   ),
-                  const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+                  const Divider(height: 1, thickness: 1, color: HurColors.line),
                   _MoreOptionItem(
                     label: '이 프로필 공유하기',
                     onTap: () => Navigator.pop(context),
@@ -44,7 +45,7 @@ void showPostMoreOptions(BuildContext context) {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: HurColors.panel,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: _MoreOptionItem(
@@ -83,7 +84,7 @@ class _MoreOptionItem extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
-              color: color ?? Colors.black87,
+              color: color ?? HurColors.text,
             ),
           ),
         ),

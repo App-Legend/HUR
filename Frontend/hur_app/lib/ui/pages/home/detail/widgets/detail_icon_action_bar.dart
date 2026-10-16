@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:hur_app/app/theme.dart';
 
 class DetailIconActionBar extends StatelessWidget {
   final bool isLiked;
@@ -37,7 +38,7 @@ class DetailIconActionBar extends StatelessWidget {
             onTap: onLikeTap,
             child: Icon(
               Symbols.favorite,
-              color: Colors.black,
+              color: HurColors.text,
               size: 26,
               weight: 400,
               fill: isLiked ? 1 : 0,
@@ -46,7 +47,7 @@ class DetailIconActionBar extends StatelessWidget {
           const SizedBox(width: 3),
           Text(
             '$likeCount',
-            style: const TextStyle(color: Colors.grey, fontSize: 14),
+            style: const TextStyle(color: HurColors.muted, fontSize: 14),
           ),
 
           const SizedBox(width: 12),
@@ -55,13 +56,13 @@ class DetailIconActionBar extends StatelessWidget {
             onTap: onCommentTap,
             child: Icon(
               Symbols.mode_comment,
-              color: Colors.black,
+              color: HurColors.text,
               size: 26,
               weight: 400,
             ),
           ),
           const SizedBox(width: 3),
-          Text('$commentCount', style: const TextStyle(color: Colors.grey, fontSize: 14)),
+          Text('$commentCount', style: const TextStyle(color: HurColors.muted, fontSize: 14)),
 
           const SizedBox(width: 12),
 
@@ -69,7 +70,7 @@ class DetailIconActionBar extends StatelessWidget {
             onTap: onBookmarkTap,
             child: Icon(
               Symbols.bookmarks,
-              color: Colors.black,
+              color: HurColors.text,
               size: 26,
               weight: 400,
               fill: isBookmark ? 0 : 1,
@@ -78,7 +79,7 @@ class DetailIconActionBar extends StatelessWidget {
           const SizedBox(width: 3),
           Text(
             '$bookmarkCount',
-            style: const TextStyle(color: Colors.grey, fontSize: 14),
+            style: const TextStyle(color: HurColors.muted, fontSize: 14),
           ),
         ],
       ),

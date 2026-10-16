@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hur_app/ui/common/widget/follow_button.dart';
 
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/app/theme.dart';
 
 class SearchResultAccountsTab extends StatefulWidget {
   final String query;
@@ -106,7 +107,7 @@ class _SearchResultAccountsTabState extends State<SearchResultAccountsTab> {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_accounts.isEmpty) {
       return const Center(
-        child: Text('검색 결과가 없어요', style: TextStyle(color: Colors.black38, fontSize: 14)),
+        child: Text('검색 결과가 없어요', style: TextStyle(color: HurColors.muted, fontSize: 14)),
       );
     }
     return ListView.builder(
@@ -146,10 +147,10 @@ class _AccountItem extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundColor: const Color(0xffe0e0e0),
+            backgroundColor: HurColors.surfaceStrong,
             backgroundImage: profileImage != null ? NetworkImage(profileImage!) : null,
             child: profileImage == null
-                ? const Icon(Icons.person, color: Colors.white, size: 24)
+                ? const Icon(Icons.person, color: HurColors.text, size: 24)
                 : null,
           ),
           const SizedBox(width: 12),
@@ -159,7 +160,7 @@ class _AccountItem extends StatelessWidget {
               children: [
                 Text(
                   nickname,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: HurColors.text),
                 ),
                 const SizedBox(height: 2),
               ],

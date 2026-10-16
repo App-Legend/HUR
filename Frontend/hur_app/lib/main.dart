@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:hur_app/app/theme.dart';
 import 'package:hur_app/ui/pages/splash/splash_page.dart';
 
 const _navBarStyle = SystemUiOverlayStyle(
   statusBarColor: Colors.transparent,
-  statusBarIconBrightness: Brightness.dark,
-  systemNavigationBarColor: Colors.white,
-  systemNavigationBarIconBrightness: Brightness.dark,
+  statusBarIconBrightness: Brightness.light,
+  systemNavigationBarColor: HurColors.bg,
+  systemNavigationBarIconBrightness: Brightness.light,
   systemNavigationBarContrastEnforced: false,
 );
 
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'HUR',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.black),
+        theme: HurTheme.dark(),
         home: const SplashPage(),
       ),
     );

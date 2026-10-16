@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/product_tag_popup.dart';
+import 'package:hur_app/app/theme.dart';
 
 class ImageTagSection extends StatefulWidget {
   final String imageUrl;
@@ -64,7 +65,7 @@ class _ImageTagSectionState extends State<ImageTagSection> {
               },
               errorBuilder: (context, error, stackTrace) => AspectRatio(
                 aspectRatio: 3 / 4,
-                child: Container(color: const Color(0xFFEEEEEE)),
+                child: Container(color: HurColors.surfaceStrong),
               ),
             ),
           ),
@@ -89,7 +90,7 @@ class _ImageTagSectionState extends State<ImageTagSection> {
                       width: 34,
                       height: 34,
                       decoration: BoxDecoration(
-                        color: const Color(0xff9c27b0),
+                        color: HurColors.accent,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
@@ -100,7 +101,7 @@ class _ImageTagSectionState extends State<ImageTagSection> {
                         ],
                       ),
                       child: const Icon(Icons.add,
-                          color: Colors.white, size: 18),
+                          color: HurColors.onAccent, size: 18),
                     ),
                   ),
                 ),

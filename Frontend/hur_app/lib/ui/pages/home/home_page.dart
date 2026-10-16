@@ -10,6 +10,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'detail/detail_home_page.dart';
+import 'package:hur_app/app/theme.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -114,7 +115,7 @@ class _HomePageState extends State<HomePage> {
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: HurColors.bg,
         drawer: const SideDrawer(),
         body: Column(
           children: [
@@ -139,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                   ? _isLoading
                         ? const Center(
                             child: CircularProgressIndicator(
-                              color: Colors.purple,
+                              color: HurColors.accent,
                             ),
                           )
                         : _posts.isEmpty
@@ -148,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                               '게시물이 없습니다.',
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.grey,
+                                color: HurColors.muted,
                               ),
                             ),
                           )
@@ -226,7 +227,7 @@ class _HomePageState extends State<HomePage> {
                                   if (_isFetchingMore)
                                     const Padding(
                                       padding: EdgeInsets.symmetric(vertical: 16),
-                                      child: CircularProgressIndicator(color: Colors.purple),
+                                      child: CircularProgressIndicator(color: HurColors.accent),
                                     ),
                                 ],
                               ),
@@ -235,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                   : const Center(
                       child: Text(
                         '팔로우 화면입니다.',
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                        style: TextStyle(fontSize: 16, color: HurColors.muted),
                       ),
                     ),
             ),
@@ -266,7 +267,7 @@ class _HomeHeader extends StatelessWidget {
               icon: const Icon(
                 Symbols.menu,
                 size: 25,
-                color: Colors.black,
+                color: HurColors.text,
                 weight: 400,
               ),
             ),
@@ -303,7 +304,7 @@ class _HomeHeader extends StatelessWidget {
                   icon: const Icon(
                     Symbols.notifications_none,
                     size: 28,
-                    color: Colors.black,
+                    color: HurColors.text,
                     weight: 400,
                   ),
                 ),
@@ -314,7 +315,7 @@ class _HomeHeader extends StatelessWidget {
                     width: 6,
                     height: 6,
                     decoration: const BoxDecoration(
-                      color: Colors.purple,
+                      color: HurColors.accent,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -354,14 +355,14 @@ class _HeaderTab extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: selected ? Colors.purple : Colors.black,
+                color: selected ? HurColors.accent : HurColors.text,
               ),
             ),
             const SizedBox(height: 7),
             Container(
               width: 42,
               height: 2,
-              color: selected ? Colors.purple : Colors.transparent,
+              color: selected ? HurColors.accent : Colors.transparent,
             ),
           ],
         ),
@@ -393,12 +394,12 @@ class _ImageCard extends StatelessWidget {
                 if (progress == null) return child;
                 return AspectRatio(
                   aspectRatio: 3 / 4,
-                  child: Container(color: const Color(0xFFEEEEEE)),
+                  child: Container(color: HurColors.surfaceStrong),
                 );
               },
               errorBuilder: (context, error, stackTrace) => AspectRatio(
                 aspectRatio: 3 / 4,
-                child: Container(color: const Color(0xFFEEEEEE)),
+                child: Container(color: HurColors.surfaceStrong),
               ),
             ),
           ),
@@ -413,7 +414,7 @@ class _ImageCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black,
+                            color: HurColors.text,
                           ),
                           overflow: TextOverflow.ellipsis,
                         )
@@ -427,7 +428,7 @@ class _ImageCard extends StatelessWidget {
                     child: Icon(
                       Icons.more_horiz,
                       size: 18,
-                      color: Colors.black54,
+                      color: HurColors.muted,
                     ),
                   ),
                 ),

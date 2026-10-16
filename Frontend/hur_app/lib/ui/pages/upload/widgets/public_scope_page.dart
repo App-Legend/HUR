@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:hur_app/app/theme.dart';
 
 class PublicScopePage extends StatefulWidget {
   final String selectedScope;
@@ -34,7 +35,7 @@ class _PublicScopePageState extends State<PublicScopePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: Column(
           children: [
@@ -55,14 +56,14 @@ class _PublicScopePageState extends State<PublicScopePage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: HurColors.text,
                     ),
                   ),
                 ],
               ),
             ),
 
-            Container(height: 1, color: const Color(0xffdddddd)),
+            Container(height: 1, color: HurColors.surfaceStrong),
 
             Expanded(
               child: Padding(
@@ -74,7 +75,7 @@ class _PublicScopePageState extends State<PublicScopePage> {
                       '내 게시물을 볼 수 있는 사람',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xff888888),
+                        color: HurColors.muted,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -127,17 +128,17 @@ class _ScopeOption extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, size: 28, color: Colors.black),
+          Icon(icon, size: 28, color: HurColors.text),
           const SizedBox(width: 20),
           Text(
             title,
-            style: const TextStyle(fontSize: 15, color: Colors.black),
+            style: const TextStyle(fontSize: 15, color: HurColors.text),
           ),
           const Spacer(),
           Icon(
             selected ? Icons.radio_button_checked : Icons.radio_button_off,
             size: 24,
-            color: Colors.black,
+            color: HurColors.text,
           ),
         ],
       ),

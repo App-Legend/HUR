@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 class CategoryChip extends StatelessWidget {
   final String text;
@@ -13,8 +14,8 @@ class CategoryChip extends StatelessWidget {
     required this.text,
     this.selected = false,
     this.onTap,
-    this.padding = const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-    this.fontSize = 13,
+    this.padding = const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+    this.fontSize = 12,
     this.borderRadius = 20,
   });
 
@@ -26,14 +27,18 @@ class CategoryChip extends StatelessWidget {
         margin: const EdgeInsets.only(right: 3),
         padding: padding,
         decoration: BoxDecoration(
-          color: selected ? const Color(0xff9c27b0) : const Color(0xfff3f3f3),
+          color: selected ? HurColors.accent : HurColors.surface,
           borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.all(
+            color: selected ? HurColors.accent : HurColors.border,
+          ),
         ),
         child: Text(
           text,
           style: TextStyle(
             fontSize: fontSize,
-            color: selected ? Colors.white : Colors.black,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+            color: selected ? HurColors.onAccent : HurColors.text,
           ),
         ),
       ),

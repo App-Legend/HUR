@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/common/widget/follow_button.dart';
 import 'package:hur_app/ui/pages/profile/feed/user_feed_page.dart';
+import 'package:hur_app/app/theme.dart';
 
 class DetailProfileHeader extends StatefulWidget {
   final String nickname;
@@ -110,7 +111,7 @@ class _DetailProfileHeaderState extends State<DetailProfileHeader> {
               width: 40,
               height: 40,
               decoration: const BoxDecoration(
-                color: Color(0xffdddddd),
+                color: HurColors.surfaceStrong,
                 shape: BoxShape.circle,
               ),
             ),
@@ -131,7 +132,7 @@ class _DetailProfileHeaderState extends State<DetailProfileHeader> {
               child: Text(
                 widget.nickname,
                 style: const TextStyle(
-                  color: Colors.black,
+                  color: HurColors.text,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),

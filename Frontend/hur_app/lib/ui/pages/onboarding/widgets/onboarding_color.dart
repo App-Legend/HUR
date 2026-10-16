@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
+import 'package:hur_app/ui/pages/onboarding/widgets/step_dots.dart';
 
-const _purple = Color(0xFF7B2D8B);
-
+// (색 점, 이름)
 const _options = [
-  ('🌸', '봄 웜톤'),
-  ('🍂', '가을 웜톤'),
-  ('❄️', '겨울 쿨톤'),
-  ('🌿', '여름 쿨톤'),
+  (Color(0xFFF2C4A0), '봄 웜톤'),
+  (Color(0xFFB5703E), '가을 웜톤'),
+  (Color(0xFF8C9CC0), '겨울 쿨톤'),
+  (Color(0xFFC9B8D6), '여름 쿨톤'),
 ];
 
 class OnboardingColor extends StatelessWidget {
@@ -30,23 +31,25 @@ class OnboardingColor extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 28),
         child: Column(
           children: [
-            const SizedBox(height: 56),
+            const SizedBox(height: 28),
+            const StepDots(current: 1),
+            const SizedBox(height: 52),
             const Text(
               '당신이 좋아하는\n퍼스널 컬러는 무엇인가요?',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1A1A1A),
+                fontWeight: FontWeight.w500,
+                color: HurColors.text,
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 12),
             const Text(
               'Which personal color suits you best?',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
+              style: TextStyle(fontSize: 13, color: HurColors.muted),
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 44),
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -56,7 +59,7 @@ class OnboardingColor extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               children: _options
                   .map((opt) => _Chip(
-                        emoji: opt.$1,
+                        dot: opt.$1,
                         label: opt.$2,
                         selected: selected == opt.$2,
                         onTap: () => onSelect(opt.$2),
@@ -65,10 +68,10 @@ class OnboardingColor extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             SizedBox(
-              width: 160,
+              width: 172,
               height: 48,
               child: _Chip(
-                emoji: '🤍',
+                dot: null,
                 label: '잘 모르겠음',
                 selected: selected == '잘 모르겠음',
                 onTap: () => onSelect('잘 모르겠음'),
@@ -76,15 +79,16 @@ class OnboardingColor extends StatelessWidget {
             ),
             const Spacer(),
             _ContinueButton(enabled: selected != null, onTap: onNext),
-            const SizedBox(height: 16),
-            GestureDetector(
-              onTap: onSkip,
-              child: const Text(
-                'Skip for now',
-                style: TextStyle(color: Colors.grey, fontSize: 13),
+            const SizedBox(height: 6),
+            TextButton(
+              onPressed: onSkip,
+              style: TextButton.styleFrom(
+                minimumSize: const Size(0, 44),
+                foregroundColor: HurColors.muted,
               ),
+              child: const Text('Skip for now', style: TextStyle(fontSize: 13)),
             ),
-            const SizedBox(height: 36),
+            const SizedBox(height: 30),
           ],
         ),
       ),
@@ -93,13 +97,13 @@ class OnboardingColor extends StatelessWidget {
 }
 
 class _Chip extends StatelessWidget {
-  final String emoji;
+  final Color? dot;
   final String label;
   final bool selected;
   final VoidCallback onTap;
 
   const _Chip({
-    required this.emoji,
+    required this.dot,
     required this.label,
     required this.selected,
     required this.onTap,
@@ -111,23 +115,33 @@ class _Chip extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: selected ? _purple : Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          color: selected ? HurColors.accent : HurColors.surface,
+          borderRadius: BorderRadius.circular(28),
           border: Border.all(
-            color: selected ? _purple : const Color(0xFFE0E0E0),
+            color: selected ? HurColors.accent : HurColors.border,
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 18)),
-            const SizedBox(width: 8),
+            Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: dot,
+                border: dot == null
+                    ? Border.all(color: HurColors.muted, width: 1.5)
+                    : null,
+              ),
+            ),
+            const SizedBox(width: 10),
             Text(
               label,
               style: TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: selected ? Colors.white : const Color(0xFF333333),
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                color: selected ? HurColors.onAccent : HurColors.text,
               ),
             ),
           ],
@@ -151,14 +165,14 @@ class _ContinueButton extends StatelessWidget {
         width: double.infinity,
         height: 52,
         decoration: BoxDecoration(
-          color: enabled ? _purple : const Color(0xFFDDDDDD),
+          color: enabled ? HurColors.accent : HurColors.surfaceStrong,
           borderRadius: BorderRadius.circular(26),
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             '계속하기',
             style: TextStyle(
-              color: Colors.white,
+              color: enabled ? HurColors.onAccent : HurColors.muted,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),

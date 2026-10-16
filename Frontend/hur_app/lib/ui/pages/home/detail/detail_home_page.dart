@@ -17,6 +17,7 @@ import 'package:hur_app/ui/pages/home/detail/widgets/used_product_header.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/used_product_list.dart';
 import 'package:hur_app/ui/pages/login/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hur_app/app/theme.dart';
 
 class DetailHomePage extends StatefulWidget {
   final String imageUrl;
@@ -114,20 +115,20 @@ class _DetailHomePage extends State<DetailHomePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('로그인이 필요해요', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.black)),
-        content: const Text('이 기능은 로그인 후 이용할 수 있어요.', style: TextStyle(color: Colors.black54)),
-        backgroundColor: Colors.white,
+        title: const Text('로그인이 필요해요', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: HurColors.text)),
+        content: const Text('이 기능은 로그인 후 이용할 수 있어요.', style: TextStyle(color: HurColors.muted)),
+        backgroundColor: HurColors.bg,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('취소', style: TextStyle(color: Colors.grey)),
+            child: const Text('취소', style: TextStyle(color: HurColors.muted)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginPage()));
             },
-            child: const Text('로그인', style: TextStyle(color: Color(0xFF6B1F8A), fontWeight: FontWeight.bold)),
+            child: const Text('로그인', style: TextStyle(color: HurColors.accent, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -201,17 +202,17 @@ class _DetailHomePage extends State<DetailHomePage> {
         [];
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: Column(
           children: [
             MainHeader(
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+                icon: const Icon(Icons.arrow_back_ios, color: HurColors.text),
                 onPressed: () => Navigator.pop(context),
               ),
               trailing: IconButton(
-                icon: const Icon(Icons.share_outlined, color: Color(0xff747474)),
+                icon: const Icon(Icons.share_outlined, color: HurColors.muted),
                 onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('공유 기능은 준비 중입니다.')),
                 ),
@@ -225,11 +226,11 @@ class _DetailHomePage extends State<DetailHomePage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.lock_outline, size: 64, color: Colors.black26),
+                          const Icon(Icons.lock_outline, size: 64, color: HurColors.border),
                           const SizedBox(height: 16),
                           const Text(
                             '팔로우한 사람만 볼 수 있는 게시물이에요.',
-                            style: TextStyle(color: Colors.black54, fontSize: 15),
+                            style: TextStyle(color: HurColors.muted, fontSize: 15),
                           ),
                           if (_userId == null) ...[
                             const SizedBox(height: 16),
@@ -240,7 +241,7 @@ class _DetailHomePage extends State<DetailHomePage> {
                               ),
                               child: const Text(
                                 '로그인하기',
-                                style: TextStyle(color: Color(0xFF6B1F8A), fontWeight: FontWeight.bold),
+                                style: TextStyle(color: HurColors.accent, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],
@@ -277,7 +278,7 @@ class _DetailHomePage extends State<DetailHomePage> {
                           Text(
                             widget.title,
                             style: const TextStyle(
-                              color: Colors.black,
+                              color: HurColors.text,
                               fontSize: 21,
                               fontWeight: FontWeight.bold,
                             ),
@@ -293,7 +294,7 @@ class _DetailHomePage extends State<DetailHomePage> {
                               Text(
                                 _post!['post_content'],
                                 style: const TextStyle(
-                                    color: Colors.black, fontSize: 14, height: 1.4),
+                                    color: HurColors.text, fontSize: 14, height: 1.4),
                               ),
                             ],
                             if (categories.isNotEmpty) ...[

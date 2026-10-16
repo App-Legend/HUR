@@ -10,6 +10,7 @@ import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/app/auth_utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hur_app/app/theme.dart';
 
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({super.key});
@@ -177,16 +178,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: selected ? const Color(0xFF6B1F8A) : Colors.white,
+                  color: selected ? HurColors.accent : HurColors.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: selected ? const Color(0xFF6B1F8A) : Colors.black26,
+                    color: selected ? HurColors.accent : HurColors.border,
                   ),
                 ),
                 child: Text(
                   tag,
                   style: TextStyle(
-                    color: selected ? Colors.white : Colors.black87,
+                    color: selected ? HurColors.onAccent : HurColors.text,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
@@ -219,14 +220,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: selected ? const Color(0xFF6B1F8A) : Colors.white,
+                  color: selected ? HurColors.accent : HurColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: selected ? const Color(0xFF6B1F8A) : Colors.black26),
+                  border: Border.all(color: selected ? HurColors.accent : HurColors.border),
                 ),
                 child: Text(
                   opt,
                   style: TextStyle(
-                    color: selected ? Colors.white : Colors.black87,
+                    color: selected ? HurColors.onAccent : HurColors.text,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
@@ -259,14 +260,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: selected ? const Color(0xFF6B1F8A) : Colors.white,
+                  color: selected ? HurColors.accent : HurColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: selected ? const Color(0xFF6B1F8A) : Colors.black26),
+                  border: Border.all(color: selected ? HurColors.accent : HurColors.border),
                 ),
                 child: Text(
                   opt,
                   style: TextStyle(
-                    color: selected ? Colors.white : Colors.black87,
+                    color: selected ? HurColors.onAccent : HurColors.text,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
@@ -299,7 +300,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               onSaved(controller.text.trim());
               Navigator.pop(context);
             },
-            child: const Text('확인', style: TextStyle(color: Color(0xFF6B1F8A))),
+            child: const Text('확인', style: TextStyle(color: HurColors.accent)),
           ),
         ],
       ),
@@ -309,18 +310,18 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2),
+      backgroundColor: HurColors.surfaceStrong,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: HurColors.bg,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          icon: const Icon(Icons.arrow_back_ios, color: HurColors.text, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           '프로필 편집',
-          style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w600),
+          style: TextStyle(color: HurColors.text, fontSize: 17, fontWeight: FontWeight.w600),
         ),
         actions: [
           _isSaving
@@ -332,7 +333,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   onPressed: _save,
                   child: const Text(
                     '변경',
-                    style: TextStyle(color: Color(0xFF6B1F8A), fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(color: HurColors.accent, fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
         ],
@@ -432,7 +433,7 @@ class _ProfileImageSection extends StatelessWidget {
             width: double.infinity,
             height: 120,
             decoration: BoxDecoration(
-              color: const Color(0xFFB0B0B0),
+              color: HurColors.surfaceStrong,
               borderRadius: BorderRadius.circular(14),
               image: backgroundImageUrl != null
                   ? DecorationImage(
@@ -459,7 +460,7 @@ class _ProfileImageSection extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
-                        child: const Icon(Icons.edit, color: Colors.white, size: 14),
+                        child: const Icon(Icons.edit, color: HurColors.text, size: 14),
                       ),
                     ),
                   ),
@@ -477,9 +478,9 @@ class _ProfileImageSection extends StatelessWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF9E9E9E),
+                    color: HurColors.surfaceStrong,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 3),
+                    border: Border.all(color: HurColors.border, width: 3),
                     image: profileImageUrl != null
                         ? DecorationImage(
                             image: NetworkImage(ApiConstants.imageUrl(profileImageUrl)),
@@ -488,7 +489,7 @@ class _ProfileImageSection extends StatelessWidget {
                         : null,
                   ),
                   child: profileImageUrl == null
-                      ? const Icon(Icons.person, color: Colors.white, size: 36)
+                      ? const Icon(Icons.person, color: HurColors.text, size: 36)
                       : null,
                 ),
                 Positioned(
@@ -497,8 +498,8 @@ class _ProfileImageSection extends StatelessWidget {
                   child: Container(
                     width: 24,
                     height: 24,
-                    decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                    child: const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 13),
+                    decoration: const BoxDecoration(color: HurColors.bg, shape: BoxShape.circle),
+                    child: const Icon(Icons.camera_alt_outlined, color: HurColors.text, size: 13),
                   ),
                 ),
               ],
@@ -517,14 +518,14 @@ class _EditCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(color: HurColors.panel, borderRadius: BorderRadius.circular(14)),
       child: Column(
         children: List.generate(items.length, (i) {
           return Column(
             children: [
               items[i],
               if (i < items.length - 1)
-                const Divider(height: 1, thickness: 1, indent: 20, endIndent: 20, color: Color(0xFFF0F0F0)),
+                const Divider(height: 1, thickness: 1, indent: 20, endIndent: 20, color: HurColors.line),
             ],
           );
         }),
@@ -560,7 +561,7 @@ class _EditRow extends StatelessWidget {
           children: [
             SizedBox(
               width: 80,
-              child: Text(label, style: const TextStyle(color: Colors.black54, fontSize: 15)),
+              child: Text(label, style: const TextStyle(color: HurColors.muted, fontSize: 15)),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -570,14 +571,14 @@ class _EditRow extends StatelessWidget {
                       Text(
                         value ?? '',
                         style: TextStyle(
-                          color: editable ? Colors.black87 : Colors.black45,
+                          color: editable ? HurColors.text : HurColors.muted,
                           fontSize: 15,
                           fontWeight: editable ? FontWeight.w500 : FontWeight.normal,
                         ),
                       ),
             ),
             if (editable)
-              const Icon(Icons.chevron_right, color: Colors.black26, size: 20),
+              const Icon(Icons.chevron_right, color: HurColors.border, size: 20),
           ],
         ),
       ),

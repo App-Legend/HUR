@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../app/constants.dart';
 import '../main_page.dart';
 import 'signup/signup_page.dart';
+import 'package:hur_app/app/theme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -107,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -130,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
               const Text(
                 '로그인',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: HurColors.text,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                 ),
@@ -141,12 +142,12 @@ class _LoginPageState extends State<LoginPage> {
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(color: Colors.black87, fontSize: 15),
+                style: const TextStyle(color: HurColors.text, fontSize: 15),
                 decoration: _inputDecoration(
                   hint: 'example@gmail.com',
                   prefix: const Icon(
                     Icons.email_outlined,
-                    color: Colors.black38,
+                    color: HurColors.muted,
                     size: 20,
                   ),
                 ),
@@ -157,12 +158,12 @@ class _LoginPageState extends State<LoginPage> {
               TextField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
-                style: const TextStyle(color: Colors.black87, fontSize: 15),
+                style: const TextStyle(color: HurColors.text, fontSize: 15),
                 decoration: _inputDecoration(
                   hint: '••••••••',
                   prefix: const Icon(
                     Icons.lock_outline,
-                    color: Colors.black38,
+                    color: HurColors.muted,
                     size: 20,
                   ),
                   suffix: IconButton(
@@ -170,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                       _obscurePassword
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
-                      color: Colors.black38,
+                      color: HurColors.muted,
                       size: 20,
                     ),
                     onPressed:
@@ -190,12 +191,14 @@ class _LoginPageState extends State<LoginPage> {
                         child: Checkbox(
                           value: _keepLoggedIn,
                           onChanged: (v) => setState(() => _keepLoggedIn = v ?? false),
-                          activeColor: const Color(0xFF6B1F8A),
+                          activeColor: HurColors.accent,
+                          checkColor: HurColors.onAccent,
+                          side: const BorderSide(color: HurColors.border, width: 1.5),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text('로그인 유지', style: TextStyle(color: Colors.black54, fontSize: 13)),
+                      const Text('로그인 유지', style: TextStyle(color: HurColors.muted, fontSize: 13)),
                     ],
                   ),
                   TextButton(
@@ -207,7 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: const Text(
                       '비밀번호를 잊으셨나요?',
-                      style: TextStyle(color: Colors.black54, fontSize: 13),
+                      style: TextStyle(color: HurColors.muted, fontSize: 13),
                     ),
                   ),
                 ],
@@ -219,10 +222,10 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6B1F8A),
+                    backgroundColor: HurColors.accent,
                     disabledBackgroundColor:
-                        const Color(0xFF6B1F8A).withValues(alpha: 0.4),
-                    foregroundColor: Colors.white,
+                        HurColors.accent.withValues(alpha: 0.4),
+                    foregroundColor: HurColors.onAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -233,7 +236,7 @@ class _LoginPageState extends State<LoginPage> {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color: HurColors.onAccent,
                             strokeWidth: 2,
                           ),
                         )
@@ -247,15 +250,15 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 28),
               Row(
                 children: const [
-                  Expanded(child: Divider(color: Colors.black26, thickness: 1)),
+                  Expanded(child: Divider(color: HurColors.border, thickness: 1)),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       '또는',
-                      style: TextStyle(color: Colors.black45, fontSize: 13),
+                      style: TextStyle(color: HurColors.muted, fontSize: 13),
                     ),
                   ),
-                  Expanded(child: Divider(color: Colors.black26, thickness: 1)),
+                  Expanded(child: Divider(color: HurColors.border, thickness: 1)),
                 ],
               ),
               const SizedBox(height: 20),
@@ -263,7 +266,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Text(
                   'login with',
                   style: TextStyle(
-                    color: Colors.black87,
+                    color: HurColors.text,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
@@ -278,28 +281,16 @@ class _LoginPageState extends State<LoginPage> {
                     child: const Icon(
                       Icons.apple,
                       size: 28,
-                      color: Colors.black,
+                      color: HurColors.text,
                     ),
                   ),
                   const SizedBox(width: 24),
                   _SocialButton(
                     onTap: () {},
-                    child: ShaderMask(
-                      shaderCallback:
-                          (bounds) => const LinearGradient(
-                            colors: [
-                              Color(0xFFF9ED32),
-                              Color(0xFFEE2A7B),
-                              Color(0xFF002AFF),
-                            ],
-                            begin: Alignment.bottomLeft,
-                            end: Alignment.topRight,
-                          ).createShader(bounds),
-                      child: const Icon(
-                        Icons.camera_alt_outlined,
-                        size: 26,
-                        color: Colors.white,
-                      ),
+                    child: const Icon(
+                      Icons.camera_alt_outlined,
+                      size: 26,
+                      color: HurColors.text,
                     ),
                   ),
                   const SizedBox(width: 24),
@@ -310,7 +301,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF4285F4),
+                        color: HurColors.text,
                       ),
                     ),
                   ),
@@ -322,7 +313,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   const Text(
                     '아직 계정이 없나요?  ',
-                    style: TextStyle(color: Colors.black54, fontSize: 14),
+                    style: TextStyle(color: HurColors.muted, fontSize: 14),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -334,7 +325,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: const Text(
                       '회원가입',
                       style: TextStyle(
-                        color: Color(0xFF6B1F8A),
+                        color: HurColors.accent,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
@@ -351,10 +342,10 @@ class _LoginPageState extends State<LoginPage> {
                   child: const Text(
                     '비회원으로 시작하기',
                     style: TextStyle(
-                      color: Colors.black38,
+                      color: HurColors.muted,
                       fontSize: 13,
                       decoration: TextDecoration.underline,
-                      decorationColor: Colors.black38,
+                      decorationColor: HurColors.muted,
                     ),
                   ),
                 ),
@@ -374,19 +365,23 @@ class _LoginPageState extends State<LoginPage> {
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Colors.black38, fontSize: 15),
+      hintStyle: const TextStyle(color: HurColors.muted, fontSize: 15),
       prefixIcon: prefix,
       suffixIcon: suffix,
       filled: true,
-      fillColor: const Color(0xFFF0F0F0),
+      fillColor: HurColors.surface,
       contentPadding: const EdgeInsets.symmetric(vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
+        borderSide: const BorderSide(color: HurColors.border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: HurColors.border),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Color(0xFF6B1F8A), width: 1.5),
+        borderSide: const BorderSide(color: HurColors.accent, width: 1.5),
       ),
     );
   }
@@ -400,7 +395,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(color: Colors.black54, fontSize: 13),
+      style: const TextStyle(color: HurColors.muted, fontSize: 13),
     );
   }
 }
@@ -420,8 +415,8 @@ class _SocialButton extends StatelessWidget {
         height: 60,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.black12, width: 1.5),
-          color: Colors.white,
+          border: Border.all(color: HurColors.line, width: 1.5),
+          color: HurColors.surface,
         ),
         child: Center(child: child),
       ),

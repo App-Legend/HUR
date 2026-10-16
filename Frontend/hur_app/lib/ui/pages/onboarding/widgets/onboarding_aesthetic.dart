@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
-
-const _purple = Color(0xFF7B2D8B);
+import 'package:hur_app/app/theme.dart';
+import 'package:hur_app/ui/pages/onboarding/widgets/step_dots.dart';
 
 class OnboardingAesthetic extends StatefulWidget {
   final ValueChanged<List<String>> onFinish;
@@ -57,14 +57,16 @@ class _OnboardingAestheticState extends State<OnboardingAesthetic> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 48),
+            const SizedBox(height: 28),
+            const StepDots(current: 3),
+            const SizedBox(height: 34),
             const Text(
               '자신의 추구미와\n맞는 분위기를 골라주세요',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1A1A1A),
+                fontWeight: FontWeight.w500,
+                color: HurColors.text,
                 height: 1.5,
               ),
             ),
@@ -72,7 +74,7 @@ class _OnboardingAestheticState extends State<OnboardingAesthetic> {
             const Text(
               'Please select a mood that matches your\naesthetic aspirations',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: Colors.grey, height: 1.5),
+              style: TextStyle(fontSize: 13, color: HurColors.muted, height: 1.5),
             ),
             const SizedBox(height: 24),
             Padding(
@@ -98,18 +100,24 @@ class _OnboardingAestheticState extends State<OnboardingAesthetic> {
                         fit: StackFit.expand,
                         children: [
                           if (_loadingImages || i >= _images.length)
-                            Container(color: const Color(0xFFEEEEEE))
+                            Container(color: HurColors.surfaceStrong)
                           else
                             Image.network(_images[i], fit: BoxFit.cover),
                           if (isSelected) ...[
-                            Container(color: _purple.withValues(alpha: 0.3)),
+                            Container(color: HurColors.bg.withValues(alpha: 0.3)),
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: HurColors.accent, width: 2),
+                              ),
+                            ),
                             const Positioned(
                               top: 8,
                               right: 8,
                               child: CircleAvatar(
-                                radius: 12,
-                                backgroundColor: _purple,
-                                child: Icon(Icons.check, color: Colors.white, size: 14),
+                                radius: 13,
+                                backgroundColor: HurColors.accent,
+                                child: Icon(Icons.check, color: HurColors.onAccent, size: 15),
                               ),
                             ),
                           ],
@@ -128,14 +136,14 @@ class _OnboardingAestheticState extends State<OnboardingAesthetic> {
                   width: double.infinity,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: _purple,
+                    color: HurColors.accent,
                     borderRadius: BorderRadius.circular(26),
                   ),
                   child: const Center(
                     child: Text(
                       '시작하기',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: HurColors.onAccent,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/pages/home/detail/detail_home_page.dart';
+import 'package:hur_app/app/theme.dart';
 
 class SearchResultFeedTab extends StatefulWidget {
   final String query;
@@ -78,13 +79,13 @@ class _SearchResultFeedTabState extends State<SearchResultFeedTab> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
+        child: CircularProgressIndicator(color: HurColors.text, strokeWidth: 2),
       );
     }
 
     if (_error != null) {
       return Center(
-        child: Text(_error!, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+        child: Text(_error!, style: const TextStyle(color: HurColors.muted, fontSize: 14)),
       );
     }
 
@@ -93,11 +94,11 @@ class _SearchResultFeedTabState extends State<SearchResultFeedTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.search_off, size: 48, color: Color(0xffbdbdbd)),
+            const Icon(Icons.search_off, size: 48, color: HurColors.muted),
             const SizedBox(height: 12),
             Text(
               "'${widget.query}' 관련 게시물이 없어요",
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: const TextStyle(fontSize: 14, color: HurColors.muted),
             ),
           ],
         ),
@@ -164,12 +165,12 @@ class _SearchResultFeedTabState extends State<SearchResultFeedTab> {
                   if (progress == null) return child;
                   return const AspectRatio(
                     aspectRatio: 3 / 4,
-                    child: ColoredBox(color: Color(0xFFEEEEEE)),
+                    child: ColoredBox(color: HurColors.surfaceStrong),
                   );
                 },
                 errorBuilder: (context, error, stackTrace) => const AspectRatio(
                   aspectRatio: 3 / 4,
-                  child: ColoredBox(color: Color(0xFFEEEEEE)),
+                  child: ColoredBox(color: HurColors.surfaceStrong),
                 ),
               ),
             ),
@@ -180,7 +181,7 @@ class _SearchResultFeedTabState extends State<SearchResultFeedTab> {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black,
+                  color: HurColors.text,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),

@@ -9,6 +9,7 @@ import 'package:hur_app/app/constants.dart';
 import 'search_result_accounts_tab.dart';
 import 'search_result_cosmetics_tab.dart';
 import 'search_result_feed_tab.dart';
+import 'package:hur_app/app/theme.dart';
 
 class SearchPage extends StatefulWidget {
   final FocusNode? focusNode;
@@ -200,7 +201,7 @@ class SearchPageState extends State<SearchPage>
         }
       },
       child: Container(
-        color: Colors.white,
+        color: HurColors.panel,
         child: SafeArea(
           child: Column(
             children: [
@@ -208,7 +209,7 @@ class SearchPageState extends State<SearchPage>
               Container(
                 padding: const EdgeInsets.fromLTRB(28, 12, 28, 14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: HurColors.panel,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.08),
@@ -220,7 +221,7 @@ class SearchPageState extends State<SearchPage>
                 child: Container(
                   height: 38,
                   decoration: BoxDecoration(
-                    color: const Color(0xfff4f4f4),
+                    color: HurColors.surfaceStrong,
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: TextField(
@@ -229,16 +230,16 @@ class SearchPageState extends State<SearchPage>
                     textAlignVertical: TextAlignVertical.center,
                     textInputAction: TextInputAction.search,
                     onSubmitted: _onSubmitted,
-                    style: const TextStyle(color: Colors.black),
+                    style: const TextStyle(color: HurColors.text),
                     decoration: InputDecoration(
                       hintText: '검색어를 입력하세요',
                       prefixIcon: const Icon(
                         Icons.search,
                         size: 20,
-                        color: Colors.grey,
+                        color: HurColors.muted,
                       ),
                       filled: true,
-                      fillColor: const Color(0xfff4f4f4),
+                      fillColor: HurColors.surfaceStrong,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(22),
                         borderSide: BorderSide.none,
@@ -256,16 +257,16 @@ class SearchPageState extends State<SearchPage>
                     children: [
                       TabBar(
                         controller: _tabController,
-                        labelColor: const Color(0xFF6B1F8A),
-                        unselectedLabelColor: const Color(0xff9b9b9b),
+                        labelColor: HurColors.accent,
+                        unselectedLabelColor: HurColors.muted,
                         labelStyle: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                         unselectedLabelStyle: const TextStyle(fontSize: 14),
-                        indicatorColor: const Color(0xFF6B1F8A),
+                        indicatorColor: HurColors.accent,
                         indicatorSize: TabBarIndicatorSize.tab,
-                        dividerColor: const Color(0xffe5e5e5),
+                        dividerColor: HurColors.surfaceStrong,
                         tabs: const [
                           Tab(text: '화장품'),
                           Tab(text: '계정'),
@@ -319,7 +320,7 @@ class SearchPageState extends State<SearchPage>
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                  color: HurColors.text,
                                 ),
                               ),
                               GestureDetector(
@@ -328,7 +329,7 @@ class SearchPageState extends State<SearchPage>
                                   '전체 삭제',
                                   style: TextStyle(
                                     fontSize: 10,
-                                    color: Color(0xffc4c4c4),
+                                    color: HurColors.muted,
                                   ),
                                 ),
                               ),
@@ -356,14 +357,14 @@ class SearchPageState extends State<SearchPage>
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: HurColors.text,
                               ),
                             ),
                             Text(
                               '$_trendingUpdatedAt 기준',
                               style: const TextStyle(
                                 fontSize: 10,
-                                color: Color(0xffc4c4c4),
+                                color: HurColors.muted,
                               ),
                             ),
                           ],
@@ -429,15 +430,15 @@ class _SearchHistoryItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Row(
           children: [
-            const Icon(Icons.search, size: 18, color: Color(0xffbdbdbd)),
+            const Icon(Icons.search, size: 18, color: HurColors.muted),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 text,
-                style: const TextStyle(fontSize: 13, color: Colors.black),
+                style: const TextStyle(fontSize: 13, color: HurColors.text),
               ),
             ),
-            const Icon(Icons.call_made, size: 16, color: Color(0xffbdbdbd)),
+            const Icon(Icons.call_made, size: 16, color: HurColors.muted),
           ],
         ),
       ),
@@ -462,8 +463,8 @@ class _RecentKeywordChip extends StatelessWidget {
       height: 24,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xffe5e5e5)),
+        color: HurColors.panel,
+        border: Border.all(color: HurColors.line),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -473,7 +474,7 @@ class _RecentKeywordChip extends StatelessWidget {
             onTap: onTap,
             child: Text(
               text,
-              style: const TextStyle(fontSize: 10, color: Color(0xff9b9b9b)),
+              style: const TextStyle(fontSize: 10, color: HurColors.muted),
             ),
           ),
           const SizedBox(width: 3),
@@ -482,7 +483,7 @@ class _RecentKeywordChip extends StatelessWidget {
             child: const Icon(
               Symbols.close,
               size: 12,
-              color: Color(0xffbdbdbd),
+              color: HurColors.muted,
               weight: 400,
             ),
           ),
@@ -513,14 +514,14 @@ class _TrendingKeywordItem extends StatelessWidget {
             width: 18,
             child: Text(
               rank,
-              style: const TextStyle(fontSize: 11, color: Colors.black),
+              style: const TextStyle(fontSize: 11, color: HurColors.text),
             ),
           ),
           Expanded(
             child: Text(
               keyword,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 11, color: Colors.black),
+              style: const TextStyle(fontSize: 11, color: HurColors.text),
             ),
           ),
           _StatusIcon(status: status),
@@ -541,7 +542,7 @@ class _StatusIcon extends StatelessWidget {
       return const Icon(
         Symbols.arrow_drop_up,
         size: 18,
-        color: Colors.red,
+        color: HurColors.peach,
         weight: 700,
       );
     }
@@ -557,7 +558,7 @@ class _StatusIcon extends StatelessWidget {
 
     return const Text(
       '-',
-      style: TextStyle(fontSize: 11, color: Color(0xffbdbdbd)),
+      style: TextStyle(fontSize: 11, color: HurColors.muted),
     );
   }
 }

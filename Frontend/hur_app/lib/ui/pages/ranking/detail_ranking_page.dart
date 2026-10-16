@@ -11,6 +11,7 @@ import 'package:hur_app/ui/common/widget/category_chip.dart';
 import 'package:hur_app/ui/pages/home/detail/detail_home_page.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/purchase_popup.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:hur_app/app/theme.dart';
 
 const _kDetailCategories = ['전체', '봄 웜톤', '가을 웜톤', '여름쿨톤', '겨울 쿨톤'];
 
@@ -51,7 +52,7 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: Column(
           children: [
@@ -89,7 +90,7 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
               ],
             ),
 
-            Container(height: 1, color: const Color(0xffeeeeee)),
+            Container(height: 1, color: HurColors.surfaceStrong),
 
             const SizedBox(height: 12),
 
@@ -232,7 +233,7 @@ class _PhotoTabState extends State<_PhotoTab> {
 
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: HurColors.panel,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.08),
@@ -257,8 +258,8 @@ class _PhotoTabState extends State<_PhotoTab> {
                           errorBuilder: (_, _, _) => Container(
                             width: 84,
                             height: 84,
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                            color: HurColors.placeholder,
+                            child: const Icon(Icons.image_not_supported, color: HurColors.muted),
                           ),
                         )
                       : Image.asset(widget.imagePath, width: 84, height: 84, fit: BoxFit.cover),
@@ -275,7 +276,7 @@ class _PhotoTabState extends State<_PhotoTab> {
                         widget.rank,
                         style: const TextStyle(
                           fontSize: 17,
-                          color: Colors.black,
+                          color: HurColors.text,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -291,20 +292,20 @@ class _PhotoTabState extends State<_PhotoTab> {
                               ? '★ ${_rating!.toStringAsFixed(1)}'
                                   '${_reviewCount != null ? ' (${_withComma(_reviewCount!)})' : ''}'
                               : '오늘 조회 3206',
-                          style: const TextStyle(fontSize: 16, color: Colors.black),
+                          style: const TextStyle(fontSize: 16, color: HurColors.text),
                         ),
                         if (_price != null)
                           Text(
                             '${_withComma(_price!)}원',
                             style: const TextStyle(
                               fontSize: 14,
-                              color: Colors.black,
+                              color: HurColors.text,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         Text(
                           '총 ${_posts.length}회 사용',
-                          style: const TextStyle(fontSize: 13, color: Colors.grey),
+                          style: const TextStyle(fontSize: 13, color: HurColors.muted),
                         ),
                       ],
                     ),
@@ -316,7 +317,7 @@ class _PhotoTabState extends State<_PhotoTab> {
                       child: const Icon(
                         Symbols.open_in_new,
                         weight: 400,
-                        color: Color(0xffbfbfbf),
+                        color: HurColors.muted,
                       ),
                     ),
                   ],
@@ -335,7 +336,7 @@ class _PhotoTabState extends State<_PhotoTab> {
                         widget.selectedCategory == '전체'
                             ? '이 제품이 태그된 게시물이 없어요'
                             : '${widget.selectedCategory} 게시물이 없어요',
-                        style: const TextStyle(color: Colors.black38, fontSize: 14),
+                        style: const TextStyle(color: HurColors.muted, fontSize: 14),
                       ),
                     )
                   : GridView.builder(
@@ -368,8 +369,8 @@ class _PhotoTabState extends State<_PhotoTab> {
                               imageUrl,
                               fit: BoxFit.cover,
                               errorBuilder: (_, _, _) => Container(
-                                color: Colors.grey[200],
-                                child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                                color: HurColors.placeholder,
+                                child: const Icon(Icons.image_not_supported, color: HurColors.muted),
                               ),
                             ),
                           ),
@@ -412,14 +413,14 @@ class _TabText extends StatelessWidget {
           text,
           style: TextStyle(
             fontSize: 13,
-            color: selected ? Colors.purple : Colors.grey,
+            color: selected ? HurColors.accent : HurColors.muted,
             fontWeight: selected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           height: 2,
-          color: selected ? Colors.purple : Colors.transparent,
+          color: selected ? HurColors.accent : Colors.transparent,
         ),
       ],
     );
@@ -438,7 +439,7 @@ class _ReviewItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xfff7f7f7),
+        color: HurColors.surfaceStrong,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -449,13 +450,13 @@ class _ReviewItem extends StatelessWidget {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: HurColors.text,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             review,
-            style: const TextStyle(fontSize: 13, color: Colors.black87),
+            style: const TextStyle(fontSize: 13, color: HurColors.text),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 class MainHeader extends StatelessWidget {
   const MainHeader({
@@ -52,7 +53,7 @@ class MainHeader extends StatelessWidget {
                             subtitle!,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: Colors.grey,
+                              color: HurColors.muted,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -62,7 +63,7 @@ class MainHeader extends StatelessWidget {
                           style: TextStyle(
                             fontSize: titleFontSize,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: HurColors.text,
                           ),
                         ),
                         if (subtitle != null && !subtitleAbove) ...[
@@ -71,7 +72,7 @@ class MainHeader extends StatelessWidget {
                             subtitle!,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: Colors.grey,
+                              color: HurColors.muted,
                             ),
                           ),
                         ],

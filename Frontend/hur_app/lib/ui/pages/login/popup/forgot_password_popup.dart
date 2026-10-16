@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 class ForgotPasswordPopup extends StatefulWidget {
   const ForgotPasswordPopup({super.key});
@@ -10,7 +11,7 @@ class ForgotPasswordPopup extends StatefulWidget {
 class _ForgotPasswordPopupState extends State<ForgotPasswordPopup> {
   final _emailController = TextEditingController();
 
-  static const _purple = Color(0xFF6B1F8A);
+  static const _purple = HurColors.accent;
 
   @override
   void dispose() {
@@ -22,7 +23,7 @@ class _ForgotPasswordPopupState extends State<ForgotPasswordPopup> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: HurColors.panel,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -46,7 +47,7 @@ class _ForgotPasswordPopupState extends State<ForgotPasswordPopup> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: HurColors.text,
                     ),
                   ),
                 ),
@@ -57,10 +58,10 @@ class _ForgotPasswordPopupState extends State<ForgotPasswordPopup> {
                     height: 32,
                     margin: const EdgeInsets.only(right: 8),
                     decoration: const BoxDecoration(
-                      color: Color(0xFFEEEEEE),
+                      color: HurColors.surfaceStrong,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.close, size: 18, color: Colors.black54),
+                    child: const Icon(Icons.close, size: 18, color: HurColors.muted),
                   ),
                 ),
               ],
@@ -79,7 +80,7 @@ class _ForgotPasswordPopupState extends State<ForgotPasswordPopup> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: HurColors.text,
                   ),
                 ),
 
@@ -89,7 +90,7 @@ class _ForgotPasswordPopupState extends State<ForgotPasswordPopup> {
                   '비밀번호를 재설정하려는 계정(이메일)을 입력해주세요.',
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.black54,
+                    color: HurColors.muted,
                     height: 1.5,
                   ),
                 ),
@@ -98,7 +99,7 @@ class _ForgotPasswordPopupState extends State<ForgotPasswordPopup> {
 
                 const Text(
                   '이메일 주소',
-                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                  style: TextStyle(fontSize: 13, color: HurColors.muted),
                 ),
 
                 const SizedBox(height: 8),
@@ -106,17 +107,17 @@ class _ForgotPasswordPopupState extends State<ForgotPasswordPopup> {
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(fontSize: 15, color: Colors.black87),
+                  style: const TextStyle(fontSize: 15, color: HurColors.text),
                   decoration: InputDecoration(
                     hintText: 'tanyamyroniuk@gmail.com',
-                    hintStyle: const TextStyle(fontSize: 14, color: Colors.black38),
-                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.black38, size: 20),
+                    hintStyle: const TextStyle(fontSize: 14, color: HurColors.muted),
+                    prefixIcon: const Icon(Icons.email_outlined, color: HurColors.muted, size: 20),
                     filled: true,
-                    fillColor: const Color(0xFFF0F0F0),
+                    fillColor: HurColors.surface,
                     contentPadding: const EdgeInsets.symmetric(vertical: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(color: HurColors.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -136,7 +137,7 @@ class _ForgotPasswordPopupState extends State<ForgotPasswordPopup> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _purple,
-                      foregroundColor: Colors.white,
+                      foregroundColor: HurColors.onAccent,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),

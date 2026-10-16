@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/pages/main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hur_app/app/theme.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -24,7 +25,7 @@ class SettingsPage extends StatelessWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('로그아웃', style: TextStyle(color: Color(0xFFE53935))),
+            child: const Text('로그아웃', style: TextStyle(color: HurColors.peach)),
           ),
         ],
       ),
@@ -55,26 +56,26 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: HurColors.bg,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          icon: const Icon(Icons.arrow_back_ios, color: HurColors.text, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           '설정',
           style: TextStyle(
-            color: Colors.black,
+            color: HurColors.text,
             fontSize: 17,
             fontWeight: FontWeight.w600,
           ),
         ),
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, thickness: 1, color: Color(0xFFE0E0E0)),
+          child: Divider(height: 1, thickness: 1, color: HurColors.line),
         ),
       ),
       body: ListView(
@@ -96,19 +97,19 @@ class SettingsPage extends StatelessWidget {
           const SizedBox(height: 40),
           _SettingsItem(
             label: '로그아웃',
-            labelColor: const Color(0xFFE53935),
+            labelColor: HurColors.peach,
             onTap: () => _logout(context),
           ),
           _SettingsItem(
             label: '회원탈퇴',
-            labelColor: const Color(0xFFE53935),
+            labelColor: HurColors.peach,
             onTap: () {},
             isLast: true,
           ),
           const SizedBox(height: 20),
           const Text(
             '버전: 0.0.1',
-            style: TextStyle(color: Colors.black38, fontSize: 13),
+            style: TextStyle(color: HurColors.muted, fontSize: 13),
           ),
           const SizedBox(height: 40),
         ],
@@ -128,7 +129,7 @@ class _SectionHeader extends StatelessWidget {
       style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: Colors.black,
+        color: HurColors.text,
       ),
     );
   }
@@ -161,7 +162,7 @@ class _SettingsItem extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 15,
-                  color: labelColor ?? Colors.black87,
+                  color: labelColor ?? HurColors.text,
                 ),
               ),
             ),
@@ -170,7 +171,7 @@ class _SettingsItem extends StatelessWidget {
         Divider(
           height: 1,
           thickness: 1,
-          color: isLast ? const Color(0xFFD0D0D0) : const Color(0xFFEEEEEE),
+          color: HurColors.line,
         ),
       ],
     );

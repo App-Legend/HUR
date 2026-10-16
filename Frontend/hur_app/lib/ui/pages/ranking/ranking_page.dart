@@ -10,9 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'detail_ranking_page.dart';
 
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/app/theme.dart';
 
 // 상품 데이터가 준비된 카테고리. 나머지는 '준비중'으로 보여준다.
-const _readyCategories = {'틴트', '피부'};
+const _readyCategories = {'틴트', '피부', '볼터치', '섀도우'};
 
 // ─────────────────────────────────────────────
 // 랭킹 상품 데이터 모델
@@ -131,7 +132,7 @@ class _RankingPageState extends State<RankingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -166,7 +167,7 @@ class _RankingPageState extends State<RankingPage> {
                         height: 280,
                         child: Center(
                           child: CircularProgressIndicator(
-                            color: Colors.black,
+                            color: HurColors.text,
                             strokeWidth: 2,
                           ),
                         ),
@@ -182,7 +183,7 @@ class _RankingPageState extends State<RankingPage> {
                               Text(
                                 _error!,
                                 style: const TextStyle(
-                                    color: Colors.grey, fontSize: 14),
+                                    color: HurColors.muted, fontSize: 14),
                               ),
                               const SizedBox(height: 12),
                               GestureDetector(
@@ -190,7 +191,7 @@ class _RankingPageState extends State<RankingPage> {
                                 child: const Text(
                                   '다시 시도',
                                   style: TextStyle(
-                                    color: Colors.black,
+                                    color: HurColors.text,
                                     fontWeight: FontWeight.bold,
                                     decoration: TextDecoration.underline,
                                   ),
@@ -255,7 +256,7 @@ class _RankingHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: HurColors.panel,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -384,7 +385,7 @@ class _Top3SectionState extends State<_Top3Section> {
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 6),
                         decoration: BoxDecoration(
-                          color: const Color(0xffeeeeee),
+                          color: HurColors.surfaceStrong,
                           image: DecorationImage(
                             image: _imageProvider(product.imagePath),
                             fit: BoxFit.cover,
@@ -406,7 +407,7 @@ class _Top3SectionState extends State<_Top3Section> {
                           child: Text(
                             '# ${product.rank}',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: HurColors.text,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
@@ -434,7 +435,7 @@ class _Top3SectionState extends State<_Top3Section> {
               width: isActive ? 18 : 6,
               height: 6,
               decoration: BoxDecoration(
-                color: isActive ? Colors.black : Colors.black26,
+                color: isActive ? HurColors.text : HurColors.border,
                 borderRadius: BorderRadius.circular(3),
               ),
             );
@@ -471,7 +472,7 @@ class _SectionTitle extends StatelessWidget {
         style: const TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.bold,
-          color: Colors.black,
+          color: HurColors.text,
         ),
       ),
     );
@@ -542,13 +543,13 @@ class _ComingSoonSection extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: const Color(0xfff5f5f5),
+                color: HurColors.surfaceStrong,
                 borderRadius: BorderRadius.circular(40),
               ),
               child: const Icon(
                 Icons.access_time_rounded,
                 size: 40,
-                color: Color(0xffbdbdbd),
+                color: HurColors.muted,
               ),
             ),
             const SizedBox(height: 20),
@@ -557,7 +558,7 @@ class _ComingSoonSection extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: HurColors.text,
               ),
             ),
             const SizedBox(height: 8),
@@ -565,7 +566,7 @@ class _ComingSoonSection extends StatelessWidget {
               '곧 만나볼 수 있어요 :)',
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.grey,
+                color: HurColors.muted,
               ),
             ),
           ],

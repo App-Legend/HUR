@@ -10,6 +10,7 @@ import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 
 import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/pages/home/detail/detail_home_page.dart';
+import 'package:hur_app/app/theme.dart';
 
 class UserFeedPage extends StatefulWidget {
   final int userId;
@@ -95,7 +96,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -145,7 +146,7 @@ class _UserProfileHeader extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFB0B0B0),
+        color: HurColors.surfaceStrong,
         image: backgroundImage != null
             ? DecorationImage(
                 image: NetworkImage(ApiConstants.imageUrl(backgroundImage)),
@@ -161,12 +162,12 @@ class _UserProfileHeader extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 22),
+                child: const Icon(Icons.arrow_back_ios, color: HurColors.text, size: 22),
               ),
               const Spacer(),
               GestureDetector(
                 onTap: () => showPostMoreOptions(context),
-                child: const Icon(Icons.more_horiz, color: Colors.white, size: 26),
+                child: const Icon(Icons.more_horiz, color: HurColors.text, size: 26),
               ),
             ],
           ),
@@ -176,10 +177,10 @@ class _UserProfileHeader extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 40,
-                backgroundColor: const Color(0xFF9E9E9E),
+                backgroundColor: HurColors.muted,
                 backgroundImage: profileImage != null ? NetworkImage(ApiConstants.imageUrl(profileImage)) : null,
                 child: profileImage == null
-                    ? const Icon(Icons.person, color: Colors.white, size: 36)
+                    ? const Icon(Icons.person, color: HurColors.text, size: 36)
                     : null,
               ),
               const SizedBox(width: 20),
@@ -188,7 +189,7 @@ class _UserProfileHeader extends StatelessWidget {
                 children: [
                   Text(
                     nickname,
-                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: HurColors.text, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -197,9 +198,9 @@ class _UserProfileHeader extends StatelessWidget {
           const SizedBox(height: 20),
           Row(
             children: [
-              Text('$followerCount 팔로워', style: const TextStyle(color: Colors.white, fontSize: 14)),
+              Text('$followerCount 팔로워', style: const TextStyle(color: HurColors.text, fontSize: 14)),
               const SizedBox(width: 20),
-              Text('$followingCount 팔로잉', style: const TextStyle(color: Colors.white, fontSize: 14)),
+              Text('$followingCount 팔로잉', style: const TextStyle(color: HurColors.text, fontSize: 14)),
             ],
           ),
           const SizedBox(height: 12),
@@ -219,12 +220,12 @@ class _UserProfileHeader extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isFollowing ? Colors.white38 : const Color(0xFF6B1F8A),
+                    color: isFollowing ? HurColors.surfaceStrong : HurColors.accent,
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Text(
                     isFollowing ? '팔로잉' : '팔로우',
-                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                    style: TextStyle(color: isFollowing ? HurColors.text : HurColors.onAccent, fontSize: 14, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -253,9 +254,9 @@ class _TagChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: Colors.white),
+          Icon(icon, size: 13, color: HurColors.text),
           const SizedBox(width: 5),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Text(label, style: const TextStyle(color: HurColors.text, fontSize: 12)),
         ],
       ),
     );
@@ -281,12 +282,12 @@ class _FeedTabBar extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: active ? const Color(0xFF6B1F8A) : Colors.transparent,
+                  color: active ? HurColors.accent : Colors.transparent,
                   width: 2.5,
                 ),
               ),
             ),
-            child: Icon(icons[i], size: 24, color: active ? const Color(0xFF6B1F8A) : Colors.black38),
+            child: Icon(icons[i], size: 24, color: active ? HurColors.accent : HurColors.muted),
           ),
         );
       }),
@@ -332,11 +333,11 @@ class _PostsGridState extends State<_PostsGrid> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: Colors.purple));
+      return const Center(child: CircularProgressIndicator(color: HurColors.accent));
     }
     if (_posts.isEmpty) {
       return const Center(
-        child: Text('게시물 없음', style: TextStyle(fontSize: 15, color: Colors.grey)),
+        child: Text('게시물 없음', style: TextStyle(fontSize: 15, color: HurColors.muted)),
       );
     }
     return GridView.builder(
@@ -368,7 +369,7 @@ class _PostsGridState extends State<_PostsGrid> {
             child: Image.network(
               imageUrl,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(color: const Color(0xFFD9D9D9)),
+              errorBuilder: (_, _, _) => Container(color: HurColors.surfaceStrong),
             ),
           ),
         );
@@ -383,6 +384,6 @@ class _EmptyTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Icon(icon, size: 48, color: Colors.black12));
+    return Center(child: Icon(icon, size: 48, color: HurColors.line));
   }
 }

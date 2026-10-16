@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/navigation/bottom_nav.dart';
 import 'home/home_page.dart';
+import 'package:hur_app/app/theme.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -54,7 +55,7 @@ class _MainPageState extends State<MainPage> {
         : _pages[_currentIndex];
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
 
       body: MediaQuery.removePadding(
         context: context,

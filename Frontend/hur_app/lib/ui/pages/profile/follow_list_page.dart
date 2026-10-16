@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'feed/user_feed_page.dart';
 
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/app/theme.dart';
 
 class FollowListPage extends StatefulWidget {
   final int userId;
@@ -56,22 +57,22 @@ class _FollowListPageState extends State<FollowListPage> {
     final title = widget.isFollowers ? '팔로워' : '팔로잉';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: HurColors.bg,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          icon: const Icon(Icons.arrow_back_ios, color: HurColors.text, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           title,
-          style: const TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w600),
+          style: const TextStyle(color: HurColors.text, fontSize: 17, fontWeight: FontWeight.w600),
         ),
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, thickness: 1, color: Color(0xFFE0E0E0)),
+          child: Divider(height: 1, thickness: 1, color: HurColors.line),
         ),
       ),
       body: _isLoading
@@ -80,7 +81,7 @@ class _FollowListPageState extends State<FollowListPage> {
               ? Center(
                   child: Text(
                     widget.isFollowers ? '팔로워가 없어요' : '팔로잉한 계정이 없어요',
-                    style: const TextStyle(color: Colors.black38, fontSize: 14),
+                    style: const TextStyle(color: HurColors.muted, fontSize: 14),
                   ),
                 )
               : ListView.builder(
@@ -119,10 +120,10 @@ class _UserItem extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 26,
-            backgroundColor: const Color(0xFFE0E0E0),
+            backgroundColor: HurColors.surfaceStrong,
             backgroundImage: profileImage != null ? NetworkImage(ApiConstants.imageUrl(profileImage)) : null,
             child: profileImage == null
-                ? const Icon(Icons.person, color: Colors.white, size: 26)
+                ? const Icon(Icons.person, color: HurColors.text, size: 26)
                 : null,
           ),
           const SizedBox(width: 14),
@@ -132,7 +133,7 @@ class _UserItem extends StatelessWidget {
               children: [
                 Text(
                   user['nickname'] ?? '',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: HurColors.text),
                 ),
               ],
             ),

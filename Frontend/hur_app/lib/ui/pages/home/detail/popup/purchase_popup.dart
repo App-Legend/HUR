@@ -3,6 +3,7 @@
 //  ————————————————————————————————
 
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 class PurchasePopup extends StatelessWidget {
   const PurchasePopup({super.key});
@@ -12,7 +13,7 @@ class PurchasePopup extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: HurColors.panel,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
@@ -26,7 +27,7 @@ class PurchasePopup extends StatelessWidget {
                 const Text(
                   '구매하기',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: HurColors.text,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -37,7 +38,7 @@ class PurchasePopup extends StatelessWidget {
                 const Text(
                   '파워링크',
                   style: TextStyle(
-                    color: Color(0xff7b61ff),
+                    color: HurColors.muted,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
@@ -49,7 +50,7 @@ class PurchasePopup extends StatelessWidget {
                   onTap: () => Navigator.pop(context),
                   child: const Icon(
                     Icons.close,
-                    color: Colors.black54,
+                    color: HurColors.muted,
                     size: 26,
                   ),
                 ),
@@ -66,14 +67,15 @@ class PurchasePopup extends StatelessWidget {
                     child: Container(
                       height: 58,
                       decoration: BoxDecoration(
-                        color: const Color(0xffc8ffd0),
-                        borderRadius: BorderRadius.circular(8),
+                        color: HurColors.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: HurColors.border),
                       ),
                       child: const Center(
                         child: Text(
                           '네이버',
                           style: TextStyle(
-                            color: Colors.black,
+                            color: HurColors.text,
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
                           ),
@@ -91,14 +93,15 @@ class PurchasePopup extends StatelessWidget {
                     child: Container(
                       height: 58,
                       decoration: BoxDecoration(
-                        color: const Color(0xffffcf70),
-                        borderRadius: BorderRadius.circular(8),
+                        color: HurColors.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: HurColors.border),
                       ),
                       child: const Center(
                         child: Text(
                           '쿠팡',
                           style: TextStyle(
-                            color: Colors.black,
+                            color: HurColors.text,
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
                           ),

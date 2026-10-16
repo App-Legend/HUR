@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hur_app/app/theme.dart';
 
 class CommentPopup extends StatefulWidget {
   final int postId;
@@ -124,7 +125,7 @@ class _CommentPopupState extends State<CommentPopup> {
         builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: HurColors.panel,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(28),
               topRight: Radius.circular(28),
@@ -137,7 +138,7 @@ class _CommentPopupState extends State<CommentPopup> {
                 width: 42,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xffd9d9d9),
+                  color: HurColors.surfaceStrong,
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
@@ -149,7 +150,7 @@ class _CommentPopupState extends State<CommentPopup> {
                     Text(
                       '댓글 ${_comments.length}개',
                       style: const TextStyle(
-                        color: Colors.black,
+                        color: HurColors.text,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -157,20 +158,20 @@ class _CommentPopupState extends State<CommentPopup> {
                     const Spacer(),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: Colors.black),
+                      icon: const Icon(Icons.close, color: HurColors.text),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 6),
-              const Divider(height: 1, color: Color(0xffeeeeee)),
+              const Divider(height: 1, color: HurColors.line),
               Expanded(
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _comments.isEmpty
                         ? const Center(
                             child: Text('첫 댓글을 남겨보세요!',
-                                style: TextStyle(color: Colors.black38)),
+                                style: TextStyle(color: HurColors.muted)),
                           )
                         : ListView.separated(
                             controller: scrollController,
@@ -204,7 +205,7 @@ class _CommentPopupState extends State<CommentPopup> {
                                                 },
                                                 child: const Text('삭제',
                                                     style: TextStyle(
-                                                        color: Colors.red)),
+                                                        color: HurColors.peach)),
                                               ),
                                             ],
                                           ),
@@ -215,7 +216,7 @@ class _CommentPopupState extends State<CommentPopup> {
                             },
                           ),
               ),
-              const Divider(height: 1, color: Color(0xffeeeeee)),
+              const Divider(height: 1, color: HurColors.line),
               Padding(
                 padding: EdgeInsets.only(
                   left: 16,
@@ -230,15 +231,15 @@ class _CommentPopupState extends State<CommentPopup> {
                       child: TextField(
                         controller: _controller,
                         focusNode: _focusNode,
-                        style: const TextStyle(fontSize: 14, color: Colors.black),
+                        style: const TextStyle(fontSize: 14, color: HurColors.text),
                         decoration: InputDecoration(
                           hintText: widget.userId == null
                               ? '로그인 후 댓글을 남길 수 있어요'
                               : '댓글을 입력하세요...',
                           hintStyle: const TextStyle(
-                              fontSize: 14, color: Color(0xffaaaaaa)),
+                              fontSize: 14, color: HurColors.muted),
                           filled: true,
-                          fillColor: const Color(0xfff5f5f5),
+                          fillColor: HurColors.surfaceStrong,
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 14, vertical: 10),
                           border: OutlineInputBorder(
@@ -258,10 +259,10 @@ class _CommentPopupState extends State<CommentPopup> {
                               height: 26,
                               child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Color(0xff690673)),
+                                  color: HurColors.accent),
                             )
                           : const Icon(Icons.send_rounded,
-                              color: Color(0xff690673), size: 26),
+                              color: HurColors.accent, size: 26),
                     ),
                   ],
                 ),
@@ -287,11 +288,11 @@ class _CommentItem extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 21,
-          backgroundColor: const Color(0xffdddddd),
+          backgroundColor: HurColors.surfaceStrong,
           backgroundImage:
               profileImage != null ? NetworkImage(profileImage) : null,
           child: profileImage == null
-              ? const Icon(Icons.person, color: Colors.white, size: 20)
+              ? const Icon(Icons.person, color: HurColors.text, size: 20)
               : null,
         ),
         const SizedBox(width: 12),
@@ -302,7 +303,7 @@ class _CommentItem extends StatelessWidget {
               Text(
                 comment['nickname'] ?? '',
                 style: const TextStyle(
-                    color: Color(0xff888888),
+                    color: HurColors.muted,
                     fontSize: 11,
                     fontWeight: FontWeight.w600),
               ),
@@ -310,7 +311,7 @@ class _CommentItem extends StatelessWidget {
               Text(
                 comment['content'] ?? '',
                 style: const TextStyle(
-                    color: Colors.black,
+                    color: HurColors.text,
                     fontSize: 13,
                     fontWeight: FontWeight.w500),
               ),

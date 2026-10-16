@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/app/theme.dart';
 
 class ProductItem {
   final int id;
@@ -95,7 +96,7 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: HurColors.panel,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -105,7 +106,7 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: const Color(0xffdddddd),
+              color: HurColors.surfaceStrong,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -115,7 +116,7 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: HurColors.text,
             ),
           ),
           const SizedBox(height: 16),
@@ -123,14 +124,14 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
               controller: _searchController,
-              style: const TextStyle(color: Colors.black),
+              style: const TextStyle(color: HurColors.text),
               onChanged: _search,
               decoration: InputDecoration(
                 hintText: '브랜드명 또는 제품명 검색',
-                hintStyle: const TextStyle(fontSize: 13, color: Color(0xffaaaaaa)),
-                prefixIcon: const Icon(Icons.search, color: Color(0xffaaaaaa), size: 20),
+                hintStyle: const TextStyle(fontSize: 13, color: HurColors.muted),
+                prefixIcon: const Icon(Icons.search, color: HurColors.muted, size: 20),
                 filled: true,
-                fillColor: const Color(0xfff5f5f5),
+                fillColor: HurColors.surfaceStrong,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -147,14 +148,14 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
                     ? Center(
                         child: Text(
                           _query.isEmpty ? '제품을 불러오는 중...' : '검색 결과가 없어요',
-                          style: const TextStyle(fontSize: 14, color: Color(0xffaaaaaa)),
+                          style: const TextStyle(fontSize: 14, color: HurColors.muted),
                         ),
                       )
                     : ListView.separated(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         itemCount: _products.length,
                         separatorBuilder: (_, __) =>
-                            const Divider(height: 1, color: Color(0xfff0f0f0)),
+                            const Divider(height: 1, color: HurColors.line),
                         itemBuilder: (context, index) {
                           final product = _products[index];
                           final imageUrl = product.imagePath;
@@ -165,7 +166,7 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: const Color(0xfff5f5f5),
+                                color: HurColors.surfaceStrong,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: imageUrl != null
@@ -176,14 +177,14 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
                                         fit: BoxFit.cover,
                                         errorBuilder: (_, __, ___) => const Icon(
                                           Icons.face_retouching_natural,
-                                          color: Color(0xffcccccc),
+                                          color: HurColors.muted,
                                           size: 24,
                                         ),
                                       ),
                                     )
                                   : const Icon(
                                       Icons.face_retouching_natural,
-                                      color: Color(0xffcccccc),
+                                      color: HurColors.muted,
                                       size: 24,
                                     ),
                             ),
@@ -192,22 +193,22 @@ class _ProductSearchSheetState extends State<ProductSearchSheet> {
                               style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.black),
+                                  color: HurColors.text),
                             ),
                             subtitle: Text(
                               product.brand,
                               style: const TextStyle(
-                                  fontSize: 12, color: Color(0xff888888)),
+                                  fontSize: 12, color: HurColors.muted),
                             ),
                             trailing: Container(
                               width: 30,
                               height: 30,
                               decoration: const BoxDecoration(
-                                color: Color(0xff9c27b0),
+                                color: HurColors.accent,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.add,
-                                  color: Colors.white, size: 18),
+                                  color: HurColors.onAccent, size: 18),
                             ),
                             onTap: () => Navigator.pop(context, product),
                           );

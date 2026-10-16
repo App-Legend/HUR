@@ -5,6 +5,7 @@ import 'widgets/onboarding_welcome.dart';
 import 'widgets/onboarding_color.dart';
 import 'widgets/onboarding_skin_tone.dart';
 import 'widgets/onboarding_aesthetic.dart';
+import 'package:hur_app/app/theme.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -38,7 +39,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: PageView(
         controller: _controller,
         physics: const NeverScrollableScrollPhysics(),

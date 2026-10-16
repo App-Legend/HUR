@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:hur_app/app/theme.dart';
 
 /// imagePath가 'http'로 시작하면 NetworkImage, 아니면 AssetImage 사용
 Widget _productImage(String imagePath, {double? width, double? height}) {
@@ -8,8 +9,8 @@ Widget _productImage(String imagePath, {double? width, double? height}) {
     return Container(
       width: width,
       height: height,
-      color: Colors.grey[200],
-      child: const Icon(Icons.face_retouching_natural, color: Colors.grey, size: 20),
+      color: HurColors.placeholder,
+      child: const Icon(Icons.face_retouching_natural, color: HurColors.muted, size: 20),
     );
   }
   if (imagePath.startsWith('http')) {
@@ -21,8 +22,8 @@ Widget _productImage(String imagePath, {double? width, double? height}) {
       errorBuilder: (_, _, _) => Container(
         width: width,
         height: height,
-        color: Colors.grey[200],
-        child: const Icon(Icons.image_not_supported, color: Colors.grey, size: 20),
+        color: HurColors.placeholder,
+        child: const Icon(Icons.image_not_supported, color: HurColors.muted, size: 20),
       ),
     );
   }
@@ -59,15 +60,9 @@ class ProductItemContainer extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: HurColors.surface,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withValues(alpha: 0.09),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: HurColors.line),
       ),
       child: Row(
         children: [
@@ -76,7 +71,7 @@ class ProductItemContainer extends StatelessWidget {
               rank!,
               style: const TextStyle(
                 fontSize: 16,
-                color: Colors.black,
+                color: HurColors.text,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -99,7 +94,7 @@ class ProductItemContainer extends StatelessWidget {
               children: [
                 Text(
                   brandName,
-                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  style: const TextStyle(fontSize: 10, color: HurColors.muted),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -107,7 +102,7 @@ class ProductItemContainer extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.black,
+                    color: HurColors.text,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -125,7 +120,7 @@ class ProductItemContainer extends StatelessWidget {
                 child: Icon(
                   Symbols.more_horiz,
                   size: 24,
-                  color: Colors.black,
+                  color: HurColors.text,
                   weight: 400,
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 class FollowButton extends StatelessWidget {
   final bool isFollowing;
@@ -24,9 +25,11 @@ class FollowButton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: onDark
-              ? (isFollowing ? Colors.white38 : const Color(0xFF6B1F8A))
-              : (isFollowing ? const Color(0xFF6B1F8A) : Colors.white),
-          border: onDark ? null : Border.all(color: const Color(0xFF6B1F8A)),
+              ? (isFollowing ? HurColors.surfaceStrong : HurColors.accent)
+              : (isFollowing ? HurColors.accent : Colors.transparent),
+          border: onDark
+              ? (isFollowing ? Border.all(color: HurColors.border) : null)
+              : Border.all(color: isFollowing ? HurColors.accent : HurColors.border),
           borderRadius: BorderRadius.circular(onDark ? 24 : 20),
         ),
         child: Text(
@@ -35,8 +38,8 @@ class FollowButton extends StatelessWidget {
             fontSize: onDark ? 14 : 12,
             fontWeight: FontWeight.w600,
             color: onDark
-                ? Colors.white
-                : (isFollowing ? Colors.white : const Color(0xFF6B1F8A)),
+                ? (isFollowing ? HurColors.text : HurColors.onAccent)
+                : (isFollowing ? HurColors.onAccent : HurColors.text),
           ),
         ),
       ),

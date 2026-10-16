@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
 
 import '../login_page.dart';
+import 'package:hur_app/app/theme.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -26,8 +27,7 @@ class _SignupPageState extends State<SignupPage> {
   String? _selectedGender;
   DateTime? _birthDate;
 
-  static const _purple = Color(0xFF6B1F8A);
-  static const _lightGray = Color(0xFFF0F0F0);
+  static const _purple = HurColors.accent;
 
   @override
   void dispose() {
@@ -133,7 +133,7 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -157,7 +157,7 @@ class _SignupPageState extends State<SignupPage> {
               const Text(
                 '회원가입',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: HurColors.text,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                 ),
@@ -168,7 +168,7 @@ class _SignupPageState extends State<SignupPage> {
               _buildTextField(
                 controller: _nameController,
                 hint: '홍길동',
-                prefix: const Icon(Icons.person_outline, color: Colors.black38, size: 20),
+                prefix: const Icon(Icons.person_outline, color: HurColors.muted, size: 20),
               ),
               const SizedBox(height: 16),
               const _FieldLabel('닉네임'),
@@ -176,7 +176,7 @@ class _SignupPageState extends State<SignupPage> {
               _buildTextField(
                 controller: _nicknameController,
                 hint: '홍길동',
-                prefix: const Icon(Icons.person_outline, color: Colors.black38, size: 20),
+                prefix: const Icon(Icons.person_outline, color: HurColors.muted, size: 20),
               ),
               const SizedBox(height: 16),
               Row(
@@ -212,7 +212,7 @@ class _SignupPageState extends State<SignupPage> {
                 controller: _emailController,
                 hint: 'tanyamyroniuk@gmail.com',
                 keyboardType: TextInputType.emailAddress,
-                prefix: const Icon(Icons.email_outlined, color: Colors.black38, size: 20),
+                prefix: const Icon(Icons.email_outlined, color: HurColors.muted, size: 20),
               ),
               const SizedBox(height: 16),
               const _FieldLabel('비밀번호'),
@@ -221,11 +221,11 @@ class _SignupPageState extends State<SignupPage> {
                 controller: _passwordController,
                 hint: '••••••••',
                 obscure: _obscurePassword,
-                prefix: const Icon(Icons.lock_outline, color: Colors.black38, size: 20),
+                prefix: const Icon(Icons.lock_outline, color: HurColors.muted, size: 20),
                 suffix: IconButton(
                   icon: Icon(
                     _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    color: Colors.black38,
+                    color: HurColors.muted,
                     size: 20,
                   ),
                   onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
@@ -238,11 +238,11 @@ class _SignupPageState extends State<SignupPage> {
                 controller: _passwordConfirmController,
                 hint: '••••••••',
                 obscure: _obscureConfirm,
-                prefix: const Icon(Icons.lock_outline, color: Colors.black38, size: 20),
+                prefix: const Icon(Icons.lock_outline, color: HurColors.muted, size: 20),
                 suffix: IconButton(
                   icon: Icon(
                     _obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    color: Colors.black38,
+                    color: HurColors.muted,
                     size: 20,
                   ),
                   onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
@@ -258,14 +258,15 @@ class _SignupPageState extends State<SignupPage> {
                       value: _acceptedPolicy,
                       onChanged: (v) => setState(() => _acceptedPolicy = v ?? false),
                       activeColor: _purple,
+                      checkColor: HurColors.onAccent,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                      side: const BorderSide(color: Colors.black38),
+                      side: const BorderSide(color: HurColors.muted),
                     ),
                   ),
                   const SizedBox(width: 10),
                   const Text(
                     '개인정보 수집 및 이용 동의',
-                    style: TextStyle(color: Colors.black54, fontSize: 13),
+                    style: TextStyle(color: HurColors.muted, fontSize: 13),
                   ),
                 ],
               ),
@@ -278,7 +279,7 @@ class _SignupPageState extends State<SignupPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _purple,
                     disabledBackgroundColor: _purple.withValues(alpha: 0.4),
-                    foregroundColor: Colors.white,
+                    foregroundColor: HurColors.onAccent,
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
@@ -287,7 +288,7 @@ class _SignupPageState extends State<SignupPage> {
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color: HurColors.onAccent,
                             strokeWidth: 2,
                           ),
                         )
@@ -303,7 +304,7 @@ class _SignupPageState extends State<SignupPage> {
                 children: [
                   const Text(
                     '이미 계정이 있으신가요?  ',
-                    style: TextStyle(color: Colors.black54, fontSize: 14),
+                    style: TextStyle(color: HurColors.muted, fontSize: 14),
                   ),
                   GestureDetector(
                     onTap: () => Navigator.pushReplacement(
@@ -341,18 +342,17 @@ class _SignupPageState extends State<SignupPage> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: selected ? _purple : HurColors.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: selected ? _purple : Colors.black26,
-                  width: selected ? 1.5 : 1,
+                  color: selected ? _purple : HurColors.border,
                 ),
               ),
               child: Text(
                 g,
                 style: TextStyle(
                   fontSize: 13,
-                  color: selected ? _purple : Colors.black54,
+                  color: selected ? HurColors.onAccent : HurColors.muted,
                   fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
@@ -373,7 +373,7 @@ class _SignupPageState extends State<SignupPage> {
           lastDate: DateTime.now(),
           builder: (context, child) => Theme(
             data: Theme.of(context).copyWith(
-              colorScheme: const ColorScheme.light(primary: _purple),
+              colorScheme: const ColorScheme.dark(primary: _purple, onPrimary: HurColors.onAccent),
             ),
             child: child!,
           ),
@@ -384,12 +384,13 @@ class _SignupPageState extends State<SignupPage> {
         height: 50,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: _lightGray,
+          color: HurColors.surface,
           borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: HurColors.border),
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today_outlined, size: 17, color: Colors.black38),
+            const Icon(Icons.calendar_today_outlined, size: 17, color: HurColors.muted),
             const SizedBox(width: 8),
             Text(
               _birthDate != null
@@ -397,7 +398,7 @@ class _SignupPageState extends State<SignupPage> {
                   : '1999.01.01',
               style: TextStyle(
                 fontSize: 13,
-                color: _birthDate != null ? Colors.black87 : Colors.black38,
+                color: _birthDate != null ? HurColors.text : HurColors.muted,
               ),
             ),
           ],
@@ -418,18 +419,22 @@ class _SignupPageState extends State<SignupPage> {
       controller: controller,
       obscureText: obscure,
       keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.black87, fontSize: 15),
+      style: const TextStyle(color: HurColors.text, fontSize: 15),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.black38, fontSize: 15),
+        hintStyle: const TextStyle(color: HurColors.muted, fontSize: 15),
         prefixIcon: prefix,
         suffixIcon: suffix,
         filled: true,
-        fillColor: _lightGray,
+        fillColor: HurColors.surface,
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: HurColors.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: HurColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -448,7 +453,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(color: Colors.black54, fontSize: 13),
+      style: const TextStyle(color: HurColors.muted, fontSize: 13),
     );
   }
 }

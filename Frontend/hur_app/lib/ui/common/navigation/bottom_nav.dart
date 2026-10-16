@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 class BottomNav extends StatelessWidget {
   final int currentIndex;
@@ -19,11 +20,11 @@ class BottomNav extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        color: Colors.white,
+        color: HurColors.panel,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(height: 0.5, color: const Color(0xFFDDDDDD)),
+            Container(height: 1, color: HurColors.line),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Row(
@@ -40,7 +41,7 @@ class BottomNav extends StatelessWidget {
                         child: Icon(
                           isSelected ? activeIcon : inactiveIcon,
                           size: size,
-                          color: isSelected ? Colors.black : Colors.grey,
+                          color: isSelected ? HurColors.text : HurColors.muted,
                         ),
                       ),
                     ),

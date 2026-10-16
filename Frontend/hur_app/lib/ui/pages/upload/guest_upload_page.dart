@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/pages/login/login_page.dart';
+import 'package:hur_app/app/theme.dart';
 
 class UploadLoginGate extends StatelessWidget {
   const UploadLoginGate({super.key});
@@ -8,13 +9,13 @@ class UploadLoginGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: HurColors.panel,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.08),
@@ -37,7 +38,7 @@ class UploadLoginGate extends StatelessWidget {
                     const Icon(
                       Icons.edit_outlined,
                       size: 72,
-                      color: Color(0xFFBDBDBD),
+                      color: HurColors.muted,
                     ),
                     const SizedBox(height: 20),
                     const Text(
@@ -45,7 +46,7 @@ class UploadLoginGate extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: HurColors.text,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -54,7 +55,7 @@ class UploadLoginGate extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.black45,
+                        color: HurColors.muted,
                         height: 1.6,
                       ),
                     ),
@@ -72,8 +73,8 @@ class UploadLoginGate extends StatelessWidget {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6B1F8A),
-                          foregroundColor: Colors.white,
+                          backgroundColor: HurColors.accent,
+                          foregroundColor: HurColors.onAccent,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),

@@ -3,6 +3,7 @@
 //  ————————————————————————————————
 
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 class UploadInputBox extends StatelessWidget {
   final TextEditingController controller;
@@ -23,7 +24,7 @@ class UploadInputBox extends StatelessWidget {
       child: TextField(
         controller: controller,
         maxLines: maxLines,
-        style: const TextStyle(color: Colors.black, fontSize: 14),
+        style: const TextStyle(color: HurColors.text, fontSize: 14),
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,
@@ -31,15 +32,15 @@ class UploadInputBox extends StatelessWidget {
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Color(0xffcccccc)),
+            borderSide: const BorderSide(color: HurColors.border),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Color(0xffcccccc)),
+            borderSide: const BorderSide(color: HurColors.border),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Color(0xff999999)),
+            borderSide: const BorderSide(color: HurColors.border),
           ),
         ),
       ),

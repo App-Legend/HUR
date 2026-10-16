@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hur_app/app/theme.dart';
 
 class SideDrawer extends StatelessWidget {
   const SideDrawer({super.key});
@@ -6,7 +7,7 @@ class SideDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFFF2F2F2),
+      backgroundColor: HurColors.panel,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,8 +73,9 @@ class _DrawerGroup extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: HurColors.surface,
           borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: HurColors.line),
         ),
         child: Column(
           children: List.generate(items.length, (i) {
@@ -86,7 +88,7 @@ class _DrawerGroup extends StatelessWidget {
                     thickness: 1,
                     indent: 16,
                     endIndent: 16,
-                    color: Color(0xFFF0F0F0),
+                    color: HurColors.line,
                   ),
               ],
             );
@@ -111,10 +113,10 @@ class _DrawerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: Colors.black54, size: 22),
+      leading: Icon(icon, color: HurColors.muted, size: 22),
       title: Text(
         label,
-        style: const TextStyle(fontSize: 15, color: Colors.black87),
+        style: const TextStyle(fontSize: 15, color: HurColors.text),
       ),
       onTap: () {
         Navigator.pop(context);
@@ -145,15 +147,15 @@ class _DrawerIconButton extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: const BoxDecoration(
-              color: Color(0xFFE0E0E0),
+              color: HurColors.surfaceStrong,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: Colors.black54, size: 24),
+            child: Icon(icon, color: HurColors.muted, size: 24),
           ),
           const SizedBox(height: 6),
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: Colors.black54),
+            style: const TextStyle(fontSize: 12, color: HurColors.muted),
           ),
         ],
       ),

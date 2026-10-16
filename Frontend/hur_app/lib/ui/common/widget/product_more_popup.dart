@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:hur_app/app/theme.dart';
 
 class ProductMorePopup extends StatelessWidget {
   final String imagePath;
@@ -19,7 +20,7 @@ class ProductMorePopup extends StatelessWidget {
       height: 350,
       padding: const EdgeInsets.fromLTRB(22, 14, 22, 22),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: HurColors.panel,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Stack(
@@ -41,8 +42,8 @@ class ProductMorePopup extends StatelessWidget {
                         errorBuilder: (_, _, _) => Container(
                           width: 86,
                           height: 86,
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                          color: HurColors.placeholder,
+                          child: const Icon(Icons.image_not_supported, color: HurColors.muted),
                         ),
                       )
                     : Image.asset(imagePath, width: 86, height: 86, fit: BoxFit.cover),
@@ -59,7 +60,7 @@ class ProductMorePopup extends StatelessWidget {
               child: const SizedBox(
                 width: 44,
                 height: 44,
-                child: Icon(Icons.close, size: 28, color: Colors.black54),
+                child: Icon(Icons.close, size: 28, color: HurColors.muted),
               ),
             ),
           ),
@@ -73,7 +74,7 @@ class ProductMorePopup extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 16,
-                    color: Colors.black,
+                    color: HurColors.text,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -83,7 +84,7 @@ class ProductMorePopup extends StatelessWidget {
                 Text(
                   brand,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  style: const TextStyle(fontSize: 13, color: HurColors.muted),
                 ),
 
                 const SizedBox(height: 28),
@@ -137,13 +138,13 @@ class _MoreMenuItem extends StatelessWidget {
         height: 34,
         child: Row(
           children: [
-            Icon(icon, size: 20, color: Colors.black87),
+            Icon(icon, size: 20, color: HurColors.text),
             const SizedBox(width: 14),
             Text(
               text,
               style: const TextStyle(
                 fontSize: 14,
-                color: Colors.black87,
+                color: HurColors.text,
                 fontWeight: FontWeight.w600,
               ),
             ),

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:hur_app/app/theme.dart';
 
 class StickerTag {
   double xRatio;
@@ -84,12 +85,12 @@ class _ProductTagPageState extends State<ProductTagPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: Column(
           children: [
             _buildHeader(context),
-            Container(height: 1, color: const Color(0xffdddddd)),
+            Container(height: 1, color: HurColors.surfaceStrong),
             _buildImageArea(),
             _buildAddTagButton(),
             Expanded(child: _buildProductList()),
@@ -111,7 +112,7 @@ class _ProductTagPageState extends State<ProductTagPage> {
               child: const Icon(
                 Icons.chevron_left,
                 size: 34,
-                color: Colors.black,
+                color: HurColors.text,
               ),
             ),
             const Spacer(),
@@ -120,7 +121,7 @@ class _ProductTagPageState extends State<ProductTagPage> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: HurColors.text,
               ),
             ),
             const Spacer(),
@@ -132,7 +133,7 @@ class _ProductTagPageState extends State<ProductTagPage> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xff9c27b0),
+                  color: HurColors.accent,
                 ),
               ),
             ),
@@ -151,7 +152,7 @@ class _ProductTagPageState extends State<ProductTagPage> {
             key: _imageKey,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: const Color(0xffd9d9d9),
+              color: HurColors.surfaceStrong,
               borderRadius: BorderRadius.circular(6),
             ),
             child: widget.selectedImage == null
@@ -189,7 +190,7 @@ class _ProductTagPageState extends State<ProductTagPage> {
           ),
           child: Icon(
             Icons.delete_outline,
-            color: Colors.white,
+            color: HurColors.text,
             size: _overTrash ? 28 : 22,
           ),
         ),
@@ -223,8 +224,8 @@ class _ProductTagPageState extends State<ProductTagPage> {
               height: pinSize,
               decoration: BoxDecoration(
                 color: isDragging && _overTrash
-                    ? Colors.red
-                    : const Color(0xff9c27b0),
+                    ? HurColors.peach
+                    : HurColors.accent,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -234,7 +235,7 @@ class _ProductTagPageState extends State<ProductTagPage> {
                   ),
                 ],
               ),
-              child: const Icon(Icons.add, color: Colors.white, size: 18),
+              child: const Icon(Icons.add, color: HurColors.onAccent, size: 18),
             ),
           ),
         ),
@@ -254,8 +255,8 @@ class _ProductTagPageState extends State<ProductTagPage> {
           icon: const Icon(Icons.push_pin_outlined, size: 16),
           label: const Text('태그 추가', style: TextStyle(fontSize: 13)),
           style: OutlinedButton.styleFrom(
-            foregroundColor: const Color(0xff9c27b0),
-            side: const BorderSide(color: Color(0xff9c27b0)),
+            foregroundColor: HurColors.text,
+            side: const BorderSide(color: HurColors.border),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -278,15 +279,15 @@ class _ProductTagPageState extends State<ProductTagPage> {
               onPressed: _openAddProductPage,
               style: ElevatedButton.styleFrom(
                 elevation: 0,
-                backgroundColor: const Color(0xffd9d9d9),
-                foregroundColor: Colors.black,
+                backgroundColor: HurColors.surfaceStrong,
+                foregroundColor: HurColors.text,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: const Text(
                 '화장품 추가',
-                style: TextStyle(fontSize: 11, color: Colors.black),
+                style: TextStyle(fontSize: 11, color: HurColors.text),
               ),
             ),
           ),
@@ -297,7 +298,7 @@ class _ProductTagPageState extends State<ProductTagPage> {
             '등록된 화장품',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.black,
+              color: HurColors.text,
               fontWeight: FontWeight.bold,
             ),
           ),

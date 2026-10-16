@@ -14,6 +14,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'guest_upload_page.dart';
+import 'package:hur_app/app/theme.dart';
 
 class _StickerData {
   double xRatio;
@@ -244,7 +245,7 @@ class _UploadPageState extends State<UploadPage> {
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Text(
               '제품 태그하기로 제품을 추가해보세요',
-              style: TextStyle(fontSize: 13, color: Color(0xffaaaaaa)),
+              style: TextStyle(fontSize: 13, color: HurColors.muted),
             ),
           ),
         ),
@@ -256,7 +257,7 @@ class _UploadPageState extends State<UploadPage> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: HurColors.panel,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -272,7 +273,7 @@ class _UploadPageState extends State<UploadPage> {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: const Color(0xfff5f5f5),
+                color: HurColors.surfaceStrong,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: s.imagePath != null
@@ -282,12 +283,12 @@ class _UploadPageState extends State<UploadPage> {
                           ? Image.network(s.imagePath!, fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => const Icon(
                                 Icons.face_retouching_natural,
-                                color: Color(0xffcccccc), size: 26))
+                                color: HurColors.muted, size: 26))
                           : Image.asset(s.imagePath!, fit: BoxFit.cover),
                     )
                   : const Icon(
                       Icons.face_retouching_natural,
-                      color: Color(0xffcccccc),
+                      color: HurColors.muted,
                       size: 26,
                     ),
             ),
@@ -300,7 +301,7 @@ class _UploadPageState extends State<UploadPage> {
                     s.brandName,
                     style: const TextStyle(
                       fontSize: 10,
-                      color: Colors.grey,
+                      color: HurColors.muted,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -309,7 +310,7 @@ class _UploadPageState extends State<UploadPage> {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 12,
-                      color: Colors.black,
+                      color: HurColors.text,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -351,8 +352,8 @@ class _UploadPageState extends State<UploadPage> {
               height: pinSize,
               decoration: BoxDecoration(
                 color: isDragging && _overTrash
-                    ? Colors.red
-                    : const Color(0xff9c27b0),
+                    ? HurColors.peach
+                    : HurColors.accent,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -362,7 +363,7 @@ class _UploadPageState extends State<UploadPage> {
                   ),
                 ],
               ),
-              child: const Icon(Icons.add, color: Colors.white, size: 18),
+              child: const Icon(Icons.add, color: HurColors.onAccent, size: 18),
             ),
           ),
         ),
@@ -395,7 +396,7 @@ class _UploadPageState extends State<UploadPage> {
         child: Container(
           width: cardWidth,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: HurColors.panel,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
@@ -412,7 +413,7 @@ class _UploadPageState extends State<UploadPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xfff5f5f5),
+                  color: HurColors.surfaceStrong,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: s.imagePath != null
@@ -422,7 +423,7 @@ class _UploadPageState extends State<UploadPage> {
                       )
                     : const Icon(
                         Icons.face_retouching_natural,
-                        color: Color(0xffcccccc),
+                        color: HurColors.muted,
                         size: 24,
                       ),
               ),
@@ -436,7 +437,7 @@ class _UploadPageState extends State<UploadPage> {
                       s.brandName,
                       style: const TextStyle(
                         fontSize: 11,
-                        color: Color(0xff888888),
+                        color: HurColors.muted,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -447,7 +448,7 @@ class _UploadPageState extends State<UploadPage> {
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: HurColors.text,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -461,7 +462,7 @@ class _UploadPageState extends State<UploadPage> {
                 child: const Icon(
                   Icons.close,
                   size: 16,
-                  color: Color(0xffaaaaaa),
+                  color: HurColors.muted,
                 ),
               ),
             ],
@@ -488,7 +489,7 @@ class _UploadPageState extends State<UploadPage> {
           ),
           child: Icon(
             Icons.delete_outline,
-            color: Colors.white,
+            color: HurColors.text,
             size: _overTrash ? 28 : 22,
           ),
         ),
@@ -498,20 +499,20 @@ class _UploadPageState extends State<UploadPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoggedIn == null) return const Scaffold(backgroundColor: Colors.white);
+    if (_isLoggedIn == null) return const Scaffold(backgroundColor: HurColors.bg);
     if (_isLoggedIn == false) return const UploadLoginGate();
 
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
+      backgroundColor: HurColors.bg,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: HurColors.panel,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.08),
@@ -534,7 +535,7 @@ class _UploadPageState extends State<UploadPage> {
                   children: [
                     const Text(
                       '사진',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: HurColors.text),
                     ),
                     const SizedBox(height: 10),
 
@@ -570,8 +571,8 @@ class _UploadPageState extends State<UploadPage> {
                             style: TextStyle(fontSize: 13),
                           ),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xff9c27b0),
-                            side: const BorderSide(color: Color(0xff9c27b0)),
+                            foregroundColor: HurColors.text,
+                            side: const BorderSide(color: HurColors.border),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -584,7 +585,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     const Text(
                       '제목',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: HurColors.text),
                     ),
                     const SizedBox(height: 6),
                     UploadInputBox(controller: _titleController),
@@ -593,7 +594,7 @@ class _UploadPageState extends State<UploadPage> {
 
                     const Text(
                       '설명',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: HurColors.text),
                     ),
                     const SizedBox(height: 6),
                     UploadInputBox(
@@ -618,7 +619,7 @@ class _UploadPageState extends State<UploadPage> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: HurColors.text,
                       ),
                     ),
 
@@ -634,8 +635,8 @@ class _UploadPageState extends State<UploadPage> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _submitPost,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xff9c27b0),
-                          foregroundColor: Colors.white,
+                          backgroundColor: HurColors.accent,
+                          foregroundColor: HurColors.onAccent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -645,7 +646,7 @@ class _UploadPageState extends State<UploadPage> {
                                 width: 20,
                                 height: 20,
                                 child: CircularProgressIndicator(
-                                  color: Colors.white,
+                                  color: HurColors.onAccent,
                                   strokeWidth: 2,
                                 ),
                               )

@@ -10,6 +10,7 @@ import 'package:hur_app/ui/common/widget/product_more_popup.dart';
 import 'package:hur_app/ui/pages/ranking/detail_ranking_page.dart';
 
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/app/theme.dart';
 
 class SearchResultCosmeticsTab extends StatefulWidget {
   final String query;
@@ -84,14 +85,14 @@ class _SearchResultCosmeticsTabState extends State<SearchResultCosmeticsTab> {
     // 로딩 중
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
+        child: CircularProgressIndicator(color: HurColors.text, strokeWidth: 2),
       );
     }
 
     // 에러
     if (_error != null) {
       return Center(
-        child: Text(_error!, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+        child: Text(_error!, style: const TextStyle(color: HurColors.muted, fontSize: 14)),
       );
     }
 
@@ -101,11 +102,11 @@ class _SearchResultCosmeticsTabState extends State<SearchResultCosmeticsTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.search_off, size: 48, color: Color(0xffbdbdbd)),
+            const Icon(Icons.search_off, size: 48, color: HurColors.muted),
             const SizedBox(height: 12),
             Text(
               "'${widget.query}' 검색 결과가 없어요",
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: const TextStyle(fontSize: 14, color: HurColors.muted),
             ),
           ],
         ),

@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:hur_app/app/theme.dart';
 
 class UsedProductList extends StatelessWidget {
   final VoidCallback onOpenTap;
@@ -23,7 +24,7 @@ class UsedProductList extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 12),
         child: Text(
           '사용한 제품이 없습니다',
-          style: TextStyle(color: Colors.grey, fontSize: 13),
+          style: TextStyle(color: HurColors.muted, fontSize: 13),
         ),
       );
     }
