@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS products (
   discount_rate  INT          NULL,  -- 할인율(%)
   rating         NUMERIC(2,1) NULL,  -- 평점(0.0~5.0)
   review_count   INT          NULL,  -- 리뷰 수
+  category       VARCHAR(30)  NULL,  -- 상품 카테고리 (틴트, 피부 등)
   PRIMARY KEY (id)
 );
 
@@ -216,3 +217,5 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS original_price INT;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS discount_rate  INT;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS rating         NUMERIC(2,1);
 ALTER TABLE products ADD COLUMN IF NOT EXISTS review_count   INT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS category       VARCHAR(30);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products (category);

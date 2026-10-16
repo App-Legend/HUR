@@ -2,22 +2,24 @@ const pool = require('../db');
 
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
-// 랭킹: 리뷰 수가 많은 순 (리뷰 수가 없는 상품은 맨 뒤). 모든 유저에게 같은 순서로 보여준다.
+// 랭킹: 카테고리별로 리뷰 수가 많은 순 (리뷰 수가 없는 상품은 맨 뒤). 모든 유저에게 같은 순서로 보여준다.
+// category를 안 보내면 전체 상품을 대상으로 한다.
 const getRanking = async (req, res) => {
     try {
-        const { limit = 20 } = req.query;
+        const { limit = 20, category } = req.query;
         const limitInt = parseInt(limit) || 20;
 
         const { rows } = await pool.query(
-            `SELECT p.id, p.brand, p.name, p.image, p.source,
+            `SELECT p.id, p.brand, p.name, p.image, p.source, p.category,
                     p.price, p.original_price, p.discount_rate, p.rating, p.review_count,
                     COUNT(ps.id) AS tag_count
              FROM products p
              LEFT JOIN post_sticker ps ON p.id = ps.product_id
+             WHERE ($2::text IS NULL OR p.category = $2)
              GROUP BY p.id
              ORDER BY p.review_count DESC NULLS LAST, tag_count DESC, p.id ASC
              LIMIT $1`,
-            [limitInt]
+            [limitInt, category || null]
         );
 
         res.json(rows);
@@ -36,7 +38,7 @@ const searchProducts = async (req, res) => {
         }
 
         const { rows } = await pool.query(
-            `SELECT id, brand, name, image, source
+            `SELECT id, brand, name, image, source, category
              FROM products
              WHERE name ILIKE $1 OR brand ILIKE $1
              ORDER BY id ASC
@@ -56,7 +58,7 @@ const getProduct = async (req, res) => {
         const { id } = req.params;
 
         const { rows } = await pool.query(
-            `SELECT id, brand, name, image, source,
+            `SELECT id, brand, name, image, source, category,
                     price, original_price, discount_rate, rating, review_count
              FROM products WHERE id = $1`,
             [parseInt(id)]

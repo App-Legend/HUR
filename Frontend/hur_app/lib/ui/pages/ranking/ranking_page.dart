@@ -11,6 +11,9 @@ import 'detail_ranking_page.dart';
 
 import 'package:hur_app/app/constants.dart';
 
+// 상품 데이터가 준비된 카테고리. 나머지는 '준비중'으로 보여준다.
+const _readyCategories = {'틴트', '피부'};
+
 // ─────────────────────────────────────────────
 // 랭킹 상품 데이터 모델
 // ─────────────────────────────────────────────
@@ -148,14 +151,14 @@ class _RankingPageState extends State<RankingPage> {
                       selectedCategory: _selectedCategory,
                       onCategorySelected: (category) {
                         setState(() => _selectedCategory = category);
-                        if (category == '틴트') _fetchRanking(category);
+                        if (_readyCategories.contains(category)) _fetchRanking(category);
                       },
                     ),
 
                     const SizedBox(height: 15),
 
                     // 틴트 외 카테고리 → 준비중
-                    if (_selectedCategory != '틴트')
+                    if (!_readyCategories.contains(_selectedCategory))
                       const _ComingSoonSection()
                     // 로딩 중
                     else if (_isLoading)
@@ -204,7 +207,7 @@ class _RankingPageState extends State<RankingPage> {
                         onProductTap: (item) => _goToDetail(context, item),
                       ),
 
-                    if (_selectedCategory == '틴트' && !_isLoading && _error == null)
+                    if (_readyCategories.contains(_selectedCategory) && !_isLoading && _error == null)
                       const _Top20Title(),
                   ],
                 ),
@@ -212,7 +215,7 @@ class _RankingPageState extends State<RankingPage> {
             ),
 
             // ── TOP20 리스트
-            if (_selectedCategory == '틴트' && !_isLoading && _error == null && _listProducts.isNotEmpty)
+            if (_readyCategories.contains(_selectedCategory) && !_isLoading && _error == null && _listProducts.isNotEmpty)
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
                 sliver: _RankingListSection(
@@ -284,7 +287,7 @@ class _CategorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const categories = ['틴트', '렌즈', '볼터치', '섀도우'];
+    const categories = ['틴트', '피부', '렌즈', '볼터치', '섀도우'];
     return SizedBox(
       height: 36,
       child: ListView.separated(

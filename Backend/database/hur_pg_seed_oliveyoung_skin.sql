@@ -1,11 +1,14 @@
--- 올리브영 상품 데이터 (졸업작품 전시용 샘플). 출시 전에는 아래 한 줄로 전부 제거:
---   DELETE FROM products WHERE source = 'oliveyoung';
+-- 올리브영 '피부' 카테고리(세럼/앰플) 샘플 데이터 (졸업작품 전시용). 출시 전에는 아래 한 줄로 제거:
+--   DELETE FROM products WHERE source = 'oliveyoung' AND category = '피부';
 -- hur_pg.sql 적용 후 실행. 이미 들어가 있으면 중복 삽입하지 않음.
 -- 이미지는 S3로 복사하지 않고 원본 주소를 그대로 연결한다.
 
+-- category 컬럼이 생기기 전에 들어간 기존 올리브영 상품은 전부 '피부'로 분류
+UPDATE products SET category = '피부' WHERE source = 'oliveyoung' AND category IS NULL;
+
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM products WHERE source = 'oliveyoung') THEN
+  IF NOT EXISTS (SELECT 1 FROM products WHERE source = 'oliveyoung' AND category = '피부') THEN
     INSERT INTO products (brand, name, image, source, price, original_price, discount_rate, rating, review_count) VALUES
     ('메디힐', '메디힐 마데카소사이드 더마 세럼 50+50ml 서울 에디션', 'https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0026/A00000026774819ko.png?l=ko&SF=webp', 'oliveyoung', 24500, 43000, 43, 4.9, 4665),
     ('셀리맥스', '셀리맥스 더 비타 A 레티날 샷 타이트닝 부스터 15ml 기획(+3ml)', 'https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0025/A00000025019931ko.png?l=ko&SF=webp', 'oliveyoung', 23100, 30000, 23, 4.8, 5606),
@@ -109,3 +112,6 @@ BEGIN
     ('디오디너리', '디오디너리 매트릭실 10% + HA', 'https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0014/A00000014133304ko.jpg?l=ko&SF=webp', 'oliveyoung', 16600, NULL, NULL, 4.7, 1540);
   END IF;
 END $$;
+
+-- 방금 새로 들어간 행에 카테고리 지정
+UPDATE products SET category = '피부' WHERE source = 'oliveyoung' AND category IS NULL;
