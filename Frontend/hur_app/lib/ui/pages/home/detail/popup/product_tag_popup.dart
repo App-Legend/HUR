@@ -8,11 +8,13 @@ import 'package:hur_app/app/theme.dart';
 class ProductTagPopup extends StatelessWidget {
   final String brandName;
   final String productName;
+  final String imageUrl;
 
   const ProductTagPopup({
     super.key,
     required this.brandName,
     required this.productName,
+    this.imageUrl = '',
   });
 
   @override
@@ -27,15 +29,26 @@ class ProductTagPopup extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              width: 36,
+              height: 36,
               color: Colors.white24,
-              borderRadius: BorderRadius.circular(10),
+              child: imageUrl.startsWith('http')
+                  ? Image.network(
+                      imageUrl,
+                      width: 36,
+                      height: 36,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const Icon(
+                          Icons.face_retouching_natural,
+                          color: Colors.white70,
+                          size: 20),
+                    )
+                  : const Icon(Icons.face_retouching_natural,
+                      color: Colors.white70, size: 20),
             ),
-            child: const Icon(Icons.face_retouching_natural,
-                color: Colors.white70, size: 20),
           ),
           const SizedBox(width: 8),
           Expanded(

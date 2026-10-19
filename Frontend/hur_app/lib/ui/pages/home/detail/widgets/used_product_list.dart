@@ -37,7 +37,7 @@ class UsedProductList extends StatelessWidget {
       itemBuilder: (context, index) {
         final s = stickers[index];
         return ProductItemContainer(
-          imagePath: '',
+          imagePath: s['image'] as String? ?? '',
           brandName: s['brand_name'] ?? '',
           productName: s['product_name'] ?? '',
           price: '',

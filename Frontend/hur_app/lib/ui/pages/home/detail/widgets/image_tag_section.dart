@@ -114,6 +114,7 @@ class _ImageTagSectionState extends State<ImageTagSection> {
                     child: ProductTagPopup(
                       brandName: s['brand_name'] ?? '',
                       productName: s['product_name'] ?? '',
+                      imageUrl: s['image'] as String? ?? '',
                     ),
                   ),
               ];
