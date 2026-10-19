@@ -11,6 +11,7 @@ class OnboardingWelcome extends StatelessWidget {
     return Container(
       color: HurColors.bg,
       child: Stack(
+        fit: StackFit.expand,
         children: [
           // 은은하게 번지는 빛
           Positioned(
