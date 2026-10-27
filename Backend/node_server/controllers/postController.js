@@ -172,7 +172,7 @@ const getFeed = async (req, res) => {
         WHERE (p.visibility IS NULL OR p.visibility = '모든 사람' OR (p.visibility = '팔로워만' AND EXISTS (
                 SELECT 1 FROM follow WHERE follower_id = $1 AND following_id = p.user_id
               )))
-          AND p.created_at > NOW() - INTERVAL '7 days'
+          AND p.created_at > NOW() - INTERVAL '365 days'
         ORDER BY
           CASE WHEN anchor.vec IS NOT NULL AND p.embedding IS NOT NULL
                THEN p.embedding <=> anchor.vec END ASC NULLS LAST,
@@ -225,7 +225,7 @@ const getFeed = async (req, res) => {
         FROM posts p
         JOIN users u ON p.user_id = u.user_id
         WHERE (p.visibility IS NULL OR p.visibility = '모든 사람')
-          AND p.created_at > NOW() - INTERVAL '7 days'
+          AND p.created_at > NOW() - INTERVAL '365 days'
         ORDER BY relevance_score DESC, p.created_at DESC
         LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
         params
@@ -271,7 +271,7 @@ const getFeed = async (req, res) => {
         FROM posts p
         JOIN users u ON p.user_id = u.user_id
         WHERE (p.visibility IS NULL OR p.visibility = '모든 사람')
-          AND p.created_at > NOW() - INTERVAL '7 days'
+          AND p.created_at > NOW() - INTERVAL '365 days'
         ORDER BY p.created_at DESC
         LIMIT $1 OFFSET $2`,
         [limit, offset]
