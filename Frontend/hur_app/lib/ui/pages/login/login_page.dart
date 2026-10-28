@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../app/constants.dart';
 import '../main_page.dart';
+import 'popup/forgot_password_popup.dart';
 import 'signup/signup_page.dart';
 import 'package:hur_app/app/theme.dart';
 
@@ -202,7 +203,12 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => const ForgotPasswordPopup(),
+                    ),
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
                       minimumSize: Size.zero,
@@ -246,66 +252,6 @@ class _LoginPageState extends State<LoginPage> {
                               fontSize: 17, fontWeight: FontWeight.bold),
                         ),
                 ),
-              ),
-              const SizedBox(height: 28),
-              Row(
-                children: const [
-                  Expanded(child: Divider(color: HurColors.border, thickness: 1)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      '또는',
-                      style: TextStyle(color: HurColors.muted, fontSize: 13),
-                    ),
-                  ),
-                  Expanded(child: Divider(color: HurColors.border, thickness: 1)),
-                ],
-              ),
-              const SizedBox(height: 20),
-              const Center(
-                child: Text(
-                  'login with',
-                  style: TextStyle(
-                    color: HurColors.text,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _SocialButton(
-                    onTap: () {},
-                    child: const Icon(
-                      Icons.apple,
-                      size: 28,
-                      color: HurColors.text,
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  _SocialButton(
-                    onTap: () {},
-                    child: const Icon(
-                      Icons.camera_alt_outlined,
-                      size: 26,
-                      color: HurColors.text,
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  _SocialButton(
-                    onTap: () {},
-                    child: const Text(
-                      'G',
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: HurColors.text,
-                      ),
-                    ),
-                  ),
-                ],
               ),
               const SizedBox(height: 48),
               Row(
@@ -400,26 +346,3 @@ class _FieldLabel extends StatelessWidget {
   }
 }
 
-class _SocialButton extends StatelessWidget {
-  final VoidCallback onTap;
-  final Widget child;
-
-  const _SocialButton({required this.onTap, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: HurColors.line, width: 1.5),
-          color: HurColors.surface,
-        ),
-        child: Center(child: child),
-      ),
-    );
-  }
-}

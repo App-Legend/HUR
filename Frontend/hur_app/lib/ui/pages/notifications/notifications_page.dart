@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/auth_utils.dart';
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/app/notification_prefs.dart';
 import 'package:hur_app/app/theme.dart';
 import 'package:hur_app/ui/pages/home/detail/detail_home_page.dart';
 import 'package:hur_app/ui/pages/profile/feed/user_feed_page.dart';
@@ -34,9 +35,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('auth_token');
+    final types = await enabledNotificationTypes();
     try {
       final res = await http.get(
-        Uri.parse('${ApiConstants.baseUrl}/notifications'),
+        Uri.parse('${ApiConstants.baseUrl}/notifications').replace(queryParameters: {'types': types}),
         headers: {'Authorization': 'Bearer $_token'},
       );
       if (!mounted) return;

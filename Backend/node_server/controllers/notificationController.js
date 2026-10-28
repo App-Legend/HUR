@@ -40,10 +40,20 @@ const removeNotification = async ({ userId, actorId, type, postId = null }) => {
   }
 };
 
+const ALL_TYPES = ['like', 'comment', 'follow'];
+
+// ?types=like,comment 처럼 보고 싶은 종류만 받는다. (설정에서 끈 알림 종류를 앱이 빼고 요청)
+// 파라미터가 아예 없으면 전부, 빈 값이면 아무것도 보여주지 않는다.
+const parseTypes = (req) => {
+  if (req.query.types === undefined) return ALL_TYPES;
+  return String(req.query.types).split(',').map((t) => t.trim()).filter((t) => ALL_TYPES.includes(t));
+};
+
 // 내 알림 목록 (최근 50개) + 안 읽은 개수
 const getNotifications = async (req, res) => {
   try {
     const userId = req.user.id;
+    const types = parseTypes(req);
     const { rows } = await pool.query(
       `SELECT n.notification_id, n.type, n.post_id, n.is_read, n.created_at,
               a.user_id AS actor_id, a.nickname AS actor_nickname, a.profile_image AS actor_image,
@@ -52,10 +62,10 @@ const getNotifications = async (req, res) => {
        JOIN users a ON n.actor_id = a.user_id
        JOIN users me ON n.user_id = me.user_id
        LEFT JOIN posts p ON n.post_id = p.post_id
-       WHERE n.user_id = $1
+       WHERE n.user_id = $1 AND n.type = ANY($2::text[])
        ORDER BY n.created_at DESC
        LIMIT 50`,
-      [userId]
+      [userId, types]
     );
     const unread = rows.filter((r) => !r.is_read).length;
     res.json({ notifications: rows, unread });
@@ -68,8 +78,8 @@ const getNotifications = async (req, res) => {
 const getUnreadCount = async (req, res) => {
   try {
     const { rows: [{ count }] } = await pool.query(
-      'SELECT COUNT(*) AS count FROM notifications WHERE user_id = $1 AND is_read = FALSE',
-      [req.user.id]
+      'SELECT COUNT(*) AS count FROM notifications WHERE user_id = $1 AND is_read = FALSE AND type = ANY($2::text[])',
+      [req.user.id, parseTypes(req)]
     );
     res.json({ count: parseInt(count) });
   } catch (err) {

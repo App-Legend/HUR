@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/auth_utils.dart';
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/app/notification_prefs.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 import 'package:hur_app/ui/common/widget/side_drawer.dart';
@@ -72,9 +73,11 @@ class _HomePageState extends State<HomePage> {
   // 안 읽은 알림이 있을 때만 벨에 빨간 점을 보여준다.
   Future<void> _loadUnread() async {
     if (_userId == null || _token == null) return;
+    final types = await enabledNotificationTypes();
     try {
       final res = await http.get(
-        Uri.parse('${ApiConstants.baseUrl}/notifications/unread-count'),
+        Uri.parse('${ApiConstants.baseUrl}/notifications/unread-count')
+            .replace(queryParameters: {'types': types}),
         headers: {'Authorization': 'Bearer $_token'},
       );
       if (res.statusCode == 200 && mounted) {
