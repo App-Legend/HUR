@@ -46,6 +46,19 @@ CATEGORY_PROMPTS = {
 }
 
 
+# CLIP 원점수는 라벨마다 평균 점수가 달라서 '청순'이 거의 항상 1위가 된다 (사진 37장 평가에서 24장).
+# 평가용 사진 37장에서 구한 라벨별 평균 점수를 빼서 쏠림을 줄인다 (무드 정확도 32% -> 43%).
+# 표본이 작으므로 게시물이 충분히 쌓이면 DB의 posts.embedding으로 다시 구해서 갱신할 것.
+# 퍼스널컬러는 같은 보정으로도 정확도가 오르지 않아(약 27%) 적용하지 않는다.
+MOOD_SCORE_OFFSETS = {
+    "청순": 0.2744,
+    "시크": 0.2514,
+    "큐티": 0.2710,
+    "섹시": 0.2657,
+    "차분": 0.2516,
+}
+
+
 def _encode_texts(prompts: list[str]) -> torch.Tensor:
     tokens = tokenizer(prompts)
     with torch.no_grad():
@@ -126,14 +139,16 @@ def embed(req: EmbedRequest):
 def classify(req: EmbedRequest):
     image_features = _image_features(req.image)
 
-    def best_label(category_type: str) -> list[tuple[str, float]]:
+    def best_label(category_type: str, offsets: dict[str, float] | None = None) -> list[tuple[str, float]]:
         labels = _CATEGORY_TEXT_EMBEDDINGS[category_type]["labels"]
         text_embeddings = _CATEGORY_TEXT_EMBEDDINGS[category_type]["embeddings"]
         scores = (image_features @ text_embeddings.T)[0].tolist()
+        if offsets:
+            scores = [score - offsets.get(label, 0.0) for label, score in zip(labels, scores)]
         return sorted(zip(labels, scores), key=lambda x: x[1], reverse=True)
 
     personal_color_ranked = best_label("personal_color")
-    mood_ranked = best_label("mood")
+    mood_ranked = best_label("mood", MOOD_SCORE_OFFSETS)
 
     # personal_color는 단일 선택, mood는 1위와 근소한 차이(0.03 이내)면 2위까지 같이 포함
     personal_color = personal_color_ranked[0][0]
