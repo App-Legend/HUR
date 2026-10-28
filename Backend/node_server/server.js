@@ -20,6 +20,7 @@ app.use('/user/:id/follow', require('./routes/follow'));
 app.use('/upload', require('./routes/upload'));
 app.use('/products', require('./routes/product'));
 app.use('/search', require('./routes/search'));
+app.use('/notifications', require('./routes/notification'));
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

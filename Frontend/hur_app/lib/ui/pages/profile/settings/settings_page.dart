@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
+import 'package:hur_app/ui/pages/info/info_pages.dart';
 import 'package:hur_app/ui/pages/main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hur_app/app/theme.dart';
@@ -91,9 +92,29 @@ class SettingsPage extends StatelessWidget {
           const SizedBox(height: 32),
           _SectionHeader('정보'),
           const SizedBox(height: 12),
-          _SettingsItem(label: '이용약관', onTap: () {}),
-          _SettingsItem(label: '개인정보처리방침', onTap: () {}),
-          _SettingsItem(label: '오픈소스 라이선스', onTap: () {}, isLast: true),
+          _SettingsItem(
+            label: '이용약관',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TermsPage()),
+            ),
+          ),
+          _SettingsItem(
+            label: '개인정보처리방침',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PrivacyPolicyPage()),
+            ),
+          ),
+          _SettingsItem(
+            label: '오픈소스 라이선스',
+            onTap: () => showLicensePage(
+              context: context,
+              applicationName: 'HUR',
+              applicationVersion: '0.0.1',
+            ),
+            isLast: true,
+          ),
           const SizedBox(height: 40),
           _SettingsItem(
             label: '로그아웃',

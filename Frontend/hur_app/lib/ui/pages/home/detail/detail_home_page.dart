@@ -17,6 +17,7 @@ import 'package:hur_app/ui/pages/home/detail/widgets/image_tag_section.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/used_product_header.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/used_product_list.dart';
 import 'package:hur_app/ui/pages/login/login_page.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hur_app/app/theme.dart';
 
@@ -65,6 +66,15 @@ class _DetailHomePage extends State<DetailHomePage> {
   }
 
   bool get _isMyPost => _userId != null && _post?['user_id'] == _userId;
+
+  // 웹 주소가 없어서 게시물 소개 문구를 공유한다.
+  Future<void> _sharePost() async {
+    final nickname = widget.nickname.isNotEmpty ? widget.nickname : (_post?['nickname'] ?? '');
+    final title = widget.title.isNotEmpty ? widget.title : (_post?['title'] ?? '');
+    await SharePlus.instance.share(
+      ShareParams(text: 'HUR에서 $nickname님의 게시물 "$title"을(를) 확인해보세요!'),
+    );
+  }
 
   Future<void> _loadBookmarkStatus() async {
     try {
@@ -323,9 +333,7 @@ class _DetailHomePage extends State<DetailHomePage> {
                     ),
                   IconButton(
                     icon: const Icon(Icons.share_outlined, color: HurColors.muted),
-                    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('공유 기능은 준비 중입니다.')),
-                    ),
+                    onPressed: _sharePost,
                   ),
                 ],
               ),

@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { s3Storage } = require('../s3');
-const { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts, getPostsByProduct, deletePost, toggleBookmark, getBookmarkStatus, getBookmarkedPosts } = require('../controllers/postController');
+const { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts, getPostsByProduct, getFollowingFeed, deletePost, toggleBookmark, getBookmarkStatus, getBookmarkedPosts } = require('../controllers/postController');
 
 const upload = multer({
   storage: s3Storage('posts'),
@@ -16,6 +16,7 @@ const upload = multer({
 });
 
 router.get('/feed', getFeed);
+router.get('/feed/following', verifyToken, getFollowingFeed);
 router.get('/search', searchPosts);
 router.get('/by-product/:productId', getPostsByProduct);
 router.get('/user/:userId', getUserPosts);

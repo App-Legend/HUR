@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/app/theme.dart';
+import 'package:hur_app/ui/pages/info/info_pages.dart';
+import 'package:hur_app/ui/pages/profile/settings/settings_page.dart';
 
 class SideDrawer extends StatelessWidget {
   const SideDrawer({super.key});
@@ -18,7 +20,10 @@ class SideDrawer extends StatelessWidget {
                 _DrawerItem(
                   icon: Icons.eco_outlined,
                   label: '커뮤니티 가이드라인',
-                  onTap: () {},
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CommunityGuidelinesPage()),
+                  ),
                 ),
               ],
             ),
@@ -45,13 +50,21 @@ class SideDrawer extends StatelessWidget {
                   _DrawerIconButton(
                     icon: Icons.headset_mic_outlined,
                     label: '고객센터',
-                    onTap: () {},
+                    onTap: () {
+                      final navigator = Navigator.of(context);
+                      navigator.pop();
+                      navigator.push(MaterialPageRoute(builder: (_) => const SupportPage()));
+                    },
                   ),
                   const SizedBox(width: 24),
                   _DrawerIconButton(
                     icon: Icons.settings_outlined,
                     label: '설정',
-                    onTap: () {},
+                    onTap: () {
+                      final navigator = Navigator.of(context);
+                      navigator.pop();
+                      navigator.push(MaterialPageRoute(builder: (_) => const SettingsPage()));
+                    },
                   ),
                 ],
               ),

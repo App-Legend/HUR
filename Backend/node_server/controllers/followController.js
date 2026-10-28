@@ -1,4 +1,5 @@
 const pool = require('../db');
+const { createNotification, removeNotification } = require('./notificationController');
 
 // 팔로우 API
 const followUser = async (req, res) => {
@@ -14,6 +15,7 @@ const followUser = async (req, res) => {
             "INSERT INTO follow (follower_id, following_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
             [follower_id, id]
         );
+        await createNotification({ userId: Number(id), actorId: follower_id, type: 'follow', dedupe: true });
 
         res.json({ message: "팔로우 성공" });
     } catch (err) {
@@ -31,6 +33,7 @@ const unfollowUser = async (req, res) => {
             "DELETE FROM follow WHERE follower_id=$1 AND following_id=$2",
             [follower_id, id]
         );
+        await removeNotification({ userId: Number(id), actorId: follower_id, type: 'follow' });
 
         res.json({ message: "언팔로우 성공" });
     } catch (err) {

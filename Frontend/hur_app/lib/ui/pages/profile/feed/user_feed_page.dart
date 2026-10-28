@@ -21,7 +21,6 @@ class UserFeedPage extends StatefulWidget {
 }
 
 class _UserFeedPageState extends State<UserFeedPage> {
-  int _selectedTab = 0;
   bool _isFollowing = false;
   Map<String, dynamic>? _user;
   bool _isLoading = true;
@@ -107,14 +106,9 @@ class _UserFeedPageState extends State<UserFeedPage> {
                     isFollowing: _isFollowing,
                     onFollowTap: _toggleFollow,
                   ),
-                  _FeedTabBar(
-                    selected: _selectedTab,
-                    onTap: (i) => setState(() => _selectedTab = i),
-                  ),
+                  const Divider(height: 1, thickness: 1, color: HurColors.line),
                   Expanded(
-                    child: _selectedTab == 0
-                        ? _PostsGrid(userId: widget.userId, viewerId: _myId)
-                        : const _EmptyTab(icon: Icons.location_on_outlined),
+                    child: _PostsGrid(userId: widget.userId, viewerId: _myId),
                   ),
                 ],
               ),
@@ -263,38 +257,6 @@ class _TagChip extends StatelessWidget {
   }
 }
 
-class _FeedTabBar extends StatelessWidget {
-  final int selected;
-  final ValueChanged<int> onTap;
-  const _FeedTabBar({required this.selected, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final icons = [Icons.grid_on, Icons.location_on_outlined];
-    return Row(
-      children: List.generate(icons.length, (i) {
-        final active = selected == i;
-        return GestureDetector(
-          onTap: () => onTap(i),
-          child: Container(
-            width: 64,
-            height: 50,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: active ? HurColors.accent : Colors.transparent,
-                  width: 2.5,
-                ),
-              ),
-            ),
-            child: Icon(icons[i], size: 24, color: active ? HurColors.accent : HurColors.muted),
-          ),
-        );
-      }),
-    );
-  }
-}
-
 class _PostsGrid extends StatefulWidget {
   final int userId;
   final int? viewerId;
@@ -375,15 +337,5 @@ class _PostsGridState extends State<_PostsGrid> {
         );
       },
     );
-  }
-}
-
-class _EmptyTab extends StatelessWidget {
-  final IconData icon;
-  const _EmptyTab({required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Icon(icon, size: 48, color: HurColors.line));
   }
 }

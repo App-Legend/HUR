@@ -53,6 +53,7 @@ dependencies:
 
   #점선
   dotted_border: ^2.1.0
+  share_plus: ^13.3.1
 
 dev_dependencies:
   flutter_test:

@@ -89,8 +89,6 @@ class _MyPageState extends State<MyPage> {
   Widget _tabBody(int index) {
     switch (index) {
       case 1:
-        return const _EmptyTab(icon: Icons.location_on_outlined);
-      case 2:
         return const _PostsGrid(bookmarked: true);
       default:
         return _PostsGrid(onPostsLoaded: (count) => setState(() => _postCount = count));
@@ -323,7 +321,6 @@ class _TabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final icons = [
       Icons.grid_on,
-      Icons.location_on_outlined,
       Icons.bookmark_border,
     ];
 
@@ -452,15 +449,5 @@ class _PostsGridState extends State<_PostsGrid> {
         );
       },
     );
-  }
-}
-
-class _EmptyTab extends StatelessWidget {
-  final IconData icon;
-  const _EmptyTab({required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Icon(icon, size: 48, color: HurColors.line));
   }
 }

@@ -131,6 +131,22 @@ CREATE TABLE IF NOT EXISTS post_likes (
   CONSTRAINT fk_post_likes_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
+-- 알림 테이블 (user_id = 받는 사람, actor_id = 좋아요/댓글/팔로우를 한 사람)
+CREATE TABLE IF NOT EXISTS notifications (
+  notification_id SERIAL      NOT NULL,
+  user_id         INT         NOT NULL,
+  actor_id        INT         NOT NULL,
+  type            VARCHAR(20) NOT NULL,
+  post_id         INT,
+  is_read         BOOLEAN     NOT NULL DEFAULT FALSE,
+  created_at      TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (notification_id),
+  CONSTRAINT fk_notifications_user  FOREIGN KEY (user_id)  REFERENCES users (user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_notifications_actor FOREIGN KEY (actor_id) REFERENCES users (user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_notifications_post  FOREIGN KEY (post_id)  REFERENCES posts (post_id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications (user_id, created_at DESC);
+
 -- 북마크(저장) 테이블
 CREATE TABLE IF NOT EXISTS post_bookmarks (
   bookmark_id SERIAL    NOT NULL,

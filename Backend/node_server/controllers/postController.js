@@ -1,6 +1,13 @@
 const pool = require('../db');
+const { createNotification, removeNotification } = require('./notificationController');
 
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+
+// 알림을 받을 사람 = 게시물 작성자
+const getPostOwnerId = async (postId) => {
+  const { rows: [post] } = await pool.query('SELECT user_id FROM posts WHERE post_id = $1', [parseInt(postId)]);
+  return post?.user_id ?? null;
+};
 
 // personal_color/mood를 사용자가 고르지 않았을 때, 업로드된 사진으로 CLIP 자동 분류한다.
 // skin_tone(파운데이션 호수)은 사진으로 유추할 수 있는 정보가 아니라 자동 분류 대상에서 제외.
@@ -347,6 +354,8 @@ const toggleLike = async (req, res) => {
                     [user_id, category_type, category_value]
                 );
             }
+            const ownerId = await getPostOwnerId(postId);
+            await removeNotification({ userId: ownerId, actorId: user_id, type: 'like', postId: parseInt(postId) });
             return res.json({ liked: false });
         } else {
             await pool.query('INSERT INTO post_likes (post_id, user_id) VALUES ($1, $2)', [postId, user_id]);
@@ -363,8 +372,32 @@ const toggleLike = async (req, res) => {
                     [user_id, category_type, category_value]
                 );
             }
+            const ownerId = await getPostOwnerId(postId);
+            await createNotification({ userId: ownerId, actorId: user_id, type: 'like', postId: parseInt(postId), dedupe: true });
             return res.json({ liked: true });
         }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// 팔로우한 사람들의 게시물 피드 (최신순). 팔로워만 공개 게시물도 팔로워에게는 보인다.
+const getFollowingFeed = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const page = parseInt(req.query.page) || 0;
+        const limit = 20;
+
+        const { rows } = await pool.query(
+            `SELECT p.post_id, p.title, p.post_image, p.created_at, u.nickname, u.profile_image
+             FROM posts p
+             JOIN users u ON p.user_id = u.user_id
+             JOIN follow f ON f.following_id = p.user_id AND f.follower_id = $1
+             ORDER BY p.created_at DESC
+             LIMIT $2 OFFSET $3`,
+            [userId, limit, page * limit]
+        );
+        res.json({ posts: rows });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -619,6 +652,9 @@ const addComment = async (req, res) => {
             [comment_id]
         );
 
+        const ownerId = await getPostOwnerId(postId);
+        await createNotification({ userId: ownerId, actorId: user_id, type: 'comment', postId: parseInt(postId) });
+
         res.status(201).json(comment);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -703,4 +739,4 @@ const getPostsByProduct = async (req, res) => {
     }
 };
 
-module.exports = { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts, getPostsByProduct, deletePost, toggleBookmark, getBookmarkStatus, getBookmarkedPosts };
+module.exports = { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts, getPostsByProduct, getFollowingFeed, deletePost, toggleBookmark, getBookmarkStatus, getBookmarkedPosts };
