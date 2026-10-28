@@ -68,6 +68,95 @@ async function classify(imageBase64) {
 
 const pct = (n, d) => (d ? `${((n / d) * 100).toFixed(1)}%` : "-");
 
+// ml_server CATEGORY_PROMPTS 의 키와 같아야 한다 (바뀌면 여기도 맞출 것)
+const COLOR_LABELS = ["봄 웜톤", "가을 웜톤", "겨울 쿨톤", "여름쿨톤"];
+const MOOD_LABELS = ["청순", "시크", "큐티", "섹시", "차분"];
+
+// /preference_embedding 에 라벨 하나만 보내면 그 라벨의 텍스트 벡터(정규화됨)를 돌려준다
+async function labelEmbedding(kind, label) {
+    const body = kind === "color" ? { personal_color: label } : { moods: [label] };
+    const res = await fetch(`${ML_SERVICE_URL}/preference_embedding`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`ml_server preference_embedding 실패: ${await res.text()}`);
+    return (await res.json()).embedding;
+}
+
+const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+const argmax = (arr) => arr.reduce((best, v, i) => (v > arr[best] ? i : best), 0);
+
+// 쏠림 보정 방식을 같은 사진으로 비교한다. 사진 한 장씩 빼고(leave-one-out) 계산해서
+// 평가 대상 사진 자신이 보정값에 섞이지 않게 한다. 평균/표준편차 보정은 정답 라벨을 쓰지 않는다.
+async function compareCalibration(records) {
+    console.log("\n==================== 쏠림 보정 비교 ====================");
+    const tasks = [
+        { title: "퍼스널컬러", kind: "color", labels: COLOR_LABELS, key: "trueColor" },
+        { title: "무드(1순위)", kind: "mood", labels: MOOD_LABELS, key: "trueMood" },
+    ];
+
+    for (const task of tasks) {
+        const text = [];
+        for (const label of task.labels) text.push(await labelEmbedding(task.kind, label));
+
+        const rows = records
+            .map((r) => ({ emb: r.emb, t: task.labels.findIndex((l) => norm(l) === norm(r[task.key])) }))
+            .filter((r) => r.t >= 0);
+        const n = rows.length;
+        const K = task.labels.length;
+        const S = rows.map((r) => text.map((v) => dot(r.emb, v)));
+
+        const sum = Array(K).fill(0);
+        const sq = Array(K).fill(0);
+        for (const s of S) s.forEach((v, k) => ((sum[k] += v), (sq[k] += v * v)));
+
+        const truthCount = Array(K).fill(0);
+        rows.forEach((r) => (truthCount[r.t] += 1));
+
+        const methods = {
+            "원래 방식(보정 없음)": (i) => argmax(S[i]),
+            "평균 빼기": (i) => argmax(S[i].map((v, k) => v - (sum[k] - v) / (n - 1))),
+            "평균 빼고 표준편차로 나누기": (i) =>
+                argmax(
+                    S[i].map((v, k) => {
+                        const mean = (sum[k] - v) / (n - 1);
+                        const variance = (sq[k] - v * v) / (n - 1) - mean * mean;
+                        return (v - mean) / Math.sqrt(Math.max(variance, 1e-12));
+                    })
+                ),
+            // 정답을 써서 클래스 평균 벡터와 비교 — 이미지 벡터에 신호가 있는지 보는 참고용
+            "참고: 정답 평균벡터와 가까운 쪽": (i) => {
+                const scores = Array(K).fill(-Infinity);
+                for (let c = 0; c < K; c++) {
+                    const members = rows.filter((r, j) => j !== i && r.t === c);
+                    if (!members.length) continue;
+                    const cen = members[0].emb.map((_, d) => members.reduce((s, m) => s + m.emb[d], 0));
+                    const len = Math.sqrt(dot(cen, cen));
+                    scores[c] = dot(rows[i].emb, cen) / len;
+                }
+                return argmax(scores);
+            },
+        };
+
+        console.log(`\n[${task.title}] ${n}장, 최빈값 찍기 ${pct(Math.max(...truthCount), n)}, 랜덤 ${pct(1, K)}`);
+        for (const [name, predict] of Object.entries(methods)) {
+            const counts = Array(K).fill(0);
+            let hit = 0;
+            for (let i = 0; i < n; i++) {
+                const p = predict(i);
+                counts[p] += 1;
+                hit += p === rows[i].t;
+            }
+            const dist = task.labels.map((l, k) => `${l} ${counts[k]}`).join(" / ");
+            console.log(`  ${name.padEnd(28)} ${pct(hit, n).padStart(6)}  예측 분포: ${dist}`);
+        }
+
+        const meanScores = task.labels.map((l, k) => `${l} ${(sum[k] / n).toFixed(4)}`).join(" / ");
+        console.log(`  라벨별 평균 점수(보정값 후보): ${meanScores}`);
+    }
+}
+
 // 정답 라벨별 맞춘 개수(재현율) 출력
 function printPerLabel(title, stats) {
     console.log(`\n[${title}] 라벨별 (정답 기준)`);
@@ -109,6 +198,7 @@ async function run() {
     const colorMatrix = {};
     const moodMatrix = {};
     const truthColorCount = {};
+    const records = [];
 
     for (const r of items) {
         const file = r[iFile];
@@ -117,6 +207,7 @@ async function run() {
         try {
             const imageBase64 = (await readBytes(file)).toString("base64");
             const result = await classify(imageBase64);
+            records.push({ trueColor, trueMood, emb: result.embedding });
 
             const predColor = result.personal_color;
             const predMoods = result.moods || [];
@@ -169,6 +260,8 @@ async function run() {
     printConfusion("퍼스널컬러", colorMatrix);
     printPerLabel("무드(1순위)", moodStats);
     printConfusion("무드(1순위)", moodMatrix);
+
+    await compareCalibration(records);
 }
 
 run().catch((err) => {
