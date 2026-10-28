@@ -88,10 +88,15 @@ class _MyPageState extends State<MyPage> {
 
   Widget _tabBody(int index) {
     switch (index) {
+      // 두 탭이 같은 위젯 종류라서 key가 없으면 Flutter가 이전 탭의 상태(목록)를 그대로 재사용한다.
+      // key를 달아 탭을 바꿀 때마다 새로 만들고 목록을 다시 불러오게 한다.
       case 1:
-        return const _PostsGrid(bookmarked: true);
+        return const _PostsGrid(key: ValueKey('bookmarks'), bookmarked: true);
       default:
-        return _PostsGrid(onPostsLoaded: (count) => setState(() => _postCount = count));
+        return _PostsGrid(
+          key: const ValueKey('posts'),
+          onPostsLoaded: (count) => setState(() => _postCount = count),
+        );
     }
   }
 }
@@ -356,7 +361,7 @@ class _PostsGrid extends StatefulWidget {
   final void Function(int count)? onPostsLoaded;
   // true면 내가 쓴 글 대신 내가 북마크한 게시물을 보여준다.
   final bool bookmarked;
-  const _PostsGrid({this.onPostsLoaded, this.bookmarked = false});
+  const _PostsGrid({super.key, this.onPostsLoaded, this.bookmarked = false});
 
   @override
   State<_PostsGrid> createState() => _PostsGridState();
