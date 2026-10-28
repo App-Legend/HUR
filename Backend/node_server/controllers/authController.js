@@ -23,7 +23,7 @@ const login = async (req, res) => {
         const token = jwt.sign(
             { id: user.user_id, email: user.email },
             JWT_SECRET,
-            { expiresIn: keep_logged_in ? '30d' : '1h' }
+            { expiresIn: keep_logged_in ? '30d' : '7d' }
         );
 
         res.json({
@@ -77,7 +77,7 @@ const signup = async (req, res) => {
         const token = jwt.sign(
             { id: newUser.id, email: newUser.email },
             JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '7d' }
         );
 
         const initScores = [
