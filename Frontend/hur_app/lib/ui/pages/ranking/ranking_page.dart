@@ -220,6 +220,8 @@ class _RankingPageState extends State<RankingPage> {
                 sliver: _RankingListSection(
                   products: _listProducts,
                   onProductTap: (item) => _goToDetail(context, item),
+                  // '덜 보기' 등으로 내 목록이 바뀌면 랭킹을 다시 불러온다.
+                  onProductChanged: () => _fetchRanking(_selectedCategory),
                 ),
               ),
           ],
@@ -476,10 +478,12 @@ class _SectionTitle extends StatelessWidget {
 class _RankingListSection extends StatelessWidget {
   final List<RankingProduct> products;
   final ValueChanged<RankingProduct> onProductTap;
+  final VoidCallback? onProductChanged;
 
   const _RankingListSection({
     required this.products,
     required this.onProductTap,
+    this.onProductChanged,
   });
 
   @override
@@ -495,8 +499,8 @@ class _RankingListSection extends StatelessWidget {
             productName: item.name,
             price: '',
             onTap: () => onProductTap(item),
-            onOpenTap: () {
-              showModalBottomSheet(
+            onOpenTap: () async {
+              final changed = await showModalBottomSheet<bool>(
                 context: context,
                 backgroundColor: Colors.transparent,
                 barrierColor: Colors.black.withValues(alpha: 0.25),
@@ -505,8 +509,10 @@ class _RankingListSection extends StatelessWidget {
                   imagePath: item.imagePath,
                   brand: item.brand,
                   name: item.name,
+                  productId: item.id,
                 ),
               );
+              if (changed == true) onProductChanged?.call();
             },
           );
         },

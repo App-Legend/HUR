@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/pages/home/detail/detail_home_page.dart';
 import 'package:hur_app/app/theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchResultFeedTab extends StatefulWidget {
   final String query;
@@ -43,11 +44,14 @@ class _SearchResultFeedTabState extends State<SearchResultFeedTab> {
       _error = null;
     });
     try {
+      // 로그인했다면 내가 차단한 계정의 게시물은 검색 결과에서 뺀다.
+      final myId = (await SharedPreferences.getInstance()).getInt('user_id');
       final response = await http
           .get(
             Uri.parse(
               '${ApiConstants.baseUrl}/post/search'
-              '?q=${Uri.encodeComponent(query)}',
+              '?q=${Uri.encodeComponent(query)}'
+              '${myId != null ? '&me=$myId' : ''}',
             ),
           )
           .timeout(const Duration(seconds: 10));

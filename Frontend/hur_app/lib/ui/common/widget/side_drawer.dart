@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hur_app/app/theme.dart';
 import 'package:hur_app/ui/pages/info/info_pages.dart';
+import 'package:hur_app/ui/pages/library/blocked_page.dart';
+import 'package:hur_app/ui/pages/library/history_page.dart';
+import 'package:hur_app/ui/pages/library/product_list_page.dart';
 import 'package:hur_app/ui/pages/profile/settings/settings_page.dart';
 
 class SideDrawer extends StatelessWidget {
@@ -31,14 +34,55 @@ class SideDrawer extends StatelessWidget {
             _DrawerGroup(
               items: [
                 _DrawerItem(
+                  icon: Icons.inventory_2_outlined,
+                  label: '내 화장품',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProductListPage(
+                        title: '내 화장품',
+                        path: '/products/marks/me?kind=own',
+                        emptyText: '아직 담은 화장품이 없어요.\n화장품 옆 ... 메뉴에서 담아보세요.',
+                        requiresLogin: true,
+                      ),
+                    ),
+                  ),
+                ),
+                _DrawerItem(
+                  icon: Icons.star_border,
+                  label: '찜한 화장품',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProductListPage(
+                        title: '찜한 화장품',
+                        path: '/products/marks/me?kind=wish',
+                        emptyText: '아직 찜한 화장품이 없어요.\n화장품 옆 ... 메뉴에서 찜해보세요.',
+                        requiresLogin: true,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            _DrawerGroup(
+              items: [
+                _DrawerItem(
                   icon: Icons.history,
                   label: '조회 기록',
-                  onTap: () {},
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HistoryPage()),
+                  ),
                 ),
                 _DrawerItem(
                   icon: Icons.block_outlined,
                   label: '차단됨',
-                  onTap: () {},
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BlockedPage()),
+                  ),
                 ),
               ],
             ),

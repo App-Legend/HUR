@@ -248,7 +248,8 @@ class _HomePageState extends State<HomePage> {
                                               onTap: () => _openDetail(post, imageUrl),
                                               child: _ImageCard(
                                                 imageUrl: imageUrl,
-                                                label: post['nickname'],
+                                                post: post,
+                                                onChanged: _refresh,
                                               ),
                                             );
                                           }).toList(),
@@ -266,7 +267,8 @@ class _HomePageState extends State<HomePage> {
                                               onTap: () => _openDetail(post, imageUrl),
                                               child: _ImageCard(
                                                 imageUrl: imageUrl,
-                                                label: post['nickname'],
+                                                post: post,
+                                                onChanged: _refresh,
                                               ),
                                             );
                                           }).toList(),
@@ -391,7 +393,7 @@ class _FollowingFeedState extends State<_FollowingFeed> {
           final imageUrl = ApiConstants.imageUrl(post['post_image']);
           return GestureDetector(
             onTap: () => _openDetail(post, imageUrl),
-            child: _ImageCard(imageUrl: imageUrl, label: post['nickname']),
+            child: _ImageCard(imageUrl: imageUrl, post: post, onChanged: _refresh),
           );
         }).toList(),
       ),
@@ -618,9 +620,13 @@ class _HeaderTab extends StatelessWidget {
 
 class _ImageCard extends StatelessWidget {
   final String imageUrl;
-  final String? label;
+  final Map<String, dynamic> post;
+  // 제한/차단 후 목록을 다시 불러오는 콜백
+  final VoidCallback? onChanged;
 
-  const _ImageCard({required this.imageUrl, this.label});
+  const _ImageCard({required this.imageUrl, required this.post, this.onChanged});
+
+  String? get label => post['nickname'] as String?;
 
   @override
   Widget build(BuildContext context) {
@@ -667,7 +673,14 @@ class _ImageCard extends StatelessWidget {
                 ),
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () => showPostMoreOptions(context),
+                  onTap: () => showPostMoreOptions(
+                    context,
+                    postId: post['post_id'] as int,
+                    authorId: post['user_id'] as int?,
+                    nickname: post['nickname'] ?? '',
+                    title: post['title'] ?? '',
+                    onChanged: onChanged,
+                  ),
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4),
                     child: Icon(

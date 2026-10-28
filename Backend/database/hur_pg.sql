@@ -131,6 +131,54 @@ CREATE TABLE IF NOT EXISTS post_likes (
   CONSTRAINT fk_post_likes_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
+-- 차단/제한 (kind: 'block' = 차단, 'mute' = 제한(내 발견 피드에서만 숨김))
+CREATE TABLE IF NOT EXISTS user_blocks (
+  block_id   SERIAL      NOT NULL,
+  blocker_id INT         NOT NULL,
+  blocked_id INT         NOT NULL,
+  kind       VARCHAR(10) NOT NULL DEFAULT 'block',
+  created_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (block_id),
+  CONSTRAINT uq_user_blocks UNIQUE (blocker_id, blocked_id),
+  CONSTRAINT fk_user_blocks_blocker FOREIGN KEY (blocker_id) REFERENCES users (user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_user_blocks_blocked FOREIGN KEY (blocked_id) REFERENCES users (user_id) ON DELETE CASCADE
+);
+
+-- 게시물 신고
+CREATE TABLE IF NOT EXISTS post_reports (
+  report_id   SERIAL       NOT NULL,
+  post_id     INT          NOT NULL,
+  reporter_id INT          NOT NULL,
+  reason      VARCHAR(50)  NOT NULL,
+  created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (report_id),
+  CONSTRAINT uq_post_reports UNIQUE (post_id, reporter_id),
+  CONSTRAINT fk_post_reports_post     FOREIGN KEY (post_id)     REFERENCES posts (post_id) ON DELETE CASCADE,
+  CONSTRAINT fk_post_reports_reporter FOREIGN KEY (reporter_id) REFERENCES users (user_id) ON DELETE CASCADE
+);
+
+-- 조회 기록 (사용자별 게시물당 마지막으로 본 시각)
+CREATE TABLE IF NOT EXISTS post_views (
+  user_id   INT       NOT NULL,
+  post_id   INT       NOT NULL,
+  viewed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, post_id),
+  CONSTRAINT fk_post_views_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_post_views_post FOREIGN KEY (post_id) REFERENCES posts (post_id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_post_views_user ON post_views (user_id, viewed_at DESC);
+
+-- 제품 표시 (kind: 'wish' = 찜, 'own' = 내 화장품, 'hide' = 덜 보기)
+CREATE TABLE IF NOT EXISTS user_products (
+  user_id    INT         NOT NULL,
+  product_id INT         NOT NULL,
+  kind       VARCHAR(10) NOT NULL,
+  created_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, product_id, kind),
+  CONSTRAINT fk_user_products_user    FOREIGN KEY (user_id)    REFERENCES users (user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_user_products_product FOREIGN KEY (product_id) REFERENCES products (id)   ON DELETE CASCADE
+);
+
 -- 알림 테이블 (user_id = 받는 사람, actor_id = 좋아요/댓글/팔로우를 한 사람)
 CREATE TABLE IF NOT EXISTS notifications (
   notification_id SERIAL      NOT NULL,

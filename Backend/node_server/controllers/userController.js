@@ -18,6 +18,12 @@ const searchUsers = async (req, res) => {
              FROM users u
              WHERE u.nickname ILIKE $2
                AND u.user_id != $3
+               AND NOT EXISTS (
+                 SELECT 1 FROM user_blocks ub
+                 WHERE ub.kind = 'block'
+                   AND ((ub.blocker_id = $3 AND ub.blocked_id = u.user_id)
+                     OR (ub.blocker_id = u.user_id AND ub.blocked_id = $3))
+               )
              LIMIT 20`,
             [me ?? 0, `%${q}%`, me ?? 0]
         );

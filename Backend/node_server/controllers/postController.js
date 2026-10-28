@@ -152,6 +152,7 @@ const getFeed = async (req, res) => {
         )
         SELECT
           p.post_id,
+          p.user_id,
           p.title,
           p.post_image,
           p.created_at,
@@ -180,6 +181,11 @@ const getFeed = async (req, res) => {
                 SELECT 1 FROM follow WHERE follower_id = $1 AND following_id = p.user_id
               )))
           AND p.created_at > NOW() - INTERVAL '365 days'
+          AND NOT EXISTS (
+            SELECT 1 FROM user_blocks ub
+            WHERE (ub.blocker_id = $1 AND ub.blocked_id = p.user_id)
+               OR (ub.kind = 'block' AND ub.blocker_id = p.user_id AND ub.blocked_id = $1)
+          )
         ORDER BY
           CASE WHEN anchor.vec IS NOT NULL AND p.embedding IS NOT NULL
                THEN p.embedding <=> anchor.vec END ASC NULLS LAST,
@@ -213,6 +219,7 @@ const getFeed = async (req, res) => {
       ({ rows } = await pool.query(
         `SELECT
           p.post_id,
+          p.user_id,
           p.title,
           p.post_image,
           p.created_at,
@@ -241,6 +248,7 @@ const getFeed = async (req, res) => {
       ({ rows } = await pool.query(
         `SELECT
           p.post_id,
+          p.user_id,
           p.title,
           p.post_image,
           p.created_at,
@@ -264,6 +272,7 @@ const getFeed = async (req, res) => {
       ({ rows } = await pool.query(
         `SELECT
           p.post_id,
+          p.user_id,
           p.title,
           p.post_image,
           p.created_at,
@@ -381,6 +390,45 @@ const toggleLike = async (req, res) => {
     }
 };
 
+// 내가 본 게시물 기록 (최근에 본 순, 최대 100개). 지금은 볼 수 없는 게시물/차단한 계정의 게시물은 제외.
+const getViewHistory = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { rows } = await pool.query(
+            `SELECT p.post_id, p.post_image, p.title, p.created_at, u.nickname
+             FROM post_views v
+             JOIN posts p ON v.post_id = p.post_id
+             JOIN users u ON p.user_id = u.user_id
+             WHERE v.user_id = $1
+               AND (p.user_id = $1 OR p.visibility IS NULL OR p.visibility = '모든 사람' OR (p.visibility = '팔로워만' AND EXISTS (
+                 SELECT 1 FROM follow WHERE follower_id = $1 AND following_id = p.user_id
+               )))
+               AND NOT EXISTS (
+                 SELECT 1 FROM user_blocks ub
+                 WHERE ub.kind = 'block'
+                   AND ((ub.blocker_id = $1 AND ub.blocked_id = p.user_id)
+                     OR (ub.blocker_id = p.user_id AND ub.blocked_id = $1))
+               )
+             ORDER BY v.viewed_at DESC
+             LIMIT 100`,
+            [userId]
+        );
+        res.json({ posts: rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// 내 조회 기록 전체 삭제
+const clearViewHistory = async (req, res) => {
+    try {
+        await pool.query('DELETE FROM post_views WHERE user_id = $1', [req.user.id]);
+        res.json({ cleared: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 // 팔로우한 사람들의 게시물 피드 (최신순). 팔로워만 공개 게시물도 팔로워에게는 보인다.
 const getFollowingFeed = async (req, res) => {
     try {
@@ -389,10 +437,16 @@ const getFollowingFeed = async (req, res) => {
         const limit = 20;
 
         const { rows } = await pool.query(
-            `SELECT p.post_id, p.title, p.post_image, p.created_at, u.nickname, u.profile_image
+            `SELECT p.post_id, p.user_id, p.title, p.post_image, p.created_at, u.nickname, u.profile_image
              FROM posts p
              JOIN users u ON p.user_id = u.user_id
              JOIN follow f ON f.following_id = p.user_id AND f.follower_id = $1
+             WHERE NOT EXISTS (
+               SELECT 1 FROM user_blocks ub
+               WHERE ub.kind = 'block'
+                 AND ((ub.blocker_id = $1 AND ub.blocked_id = p.user_id)
+                   OR (ub.blocker_id = p.user_id AND ub.blocked_id = $1))
+             )
              ORDER BY p.created_at DESC
              LIMIT $2 OFFSET $3`,
             [userId, limit, page * limit]
@@ -523,6 +577,19 @@ const updateScore = async (req, res) => {
         }
 
         const delta = action === 'like' ? 2 : 1;
+
+        // 조회 기록 (사이드 메뉴 '조회 기록'). 같은 게시물을 다시 보면 시각만 갱신한다.
+        if (action === 'view') {
+            try {
+                await pool.query(
+                    `INSERT INTO post_views (user_id, post_id) VALUES ($1, $2)
+                     ON CONFLICT (user_id, post_id) DO UPDATE SET viewed_at = CURRENT_TIMESTAMP`,
+                    [user_id, parseInt(postId)]
+                );
+            } catch (viewErr) {
+                console.error('[post_views]', viewErr.message);
+            }
+        }
 
         const { rows: categories } = await pool.query(
             'SELECT category_type, category_value FROM post_category WHERE post_id = $1',
@@ -690,6 +757,8 @@ const searchPosts = async (req, res) => {
     if (!q || q.trim() === '') {
       return res.json({ posts: [] });
     }
+    // me(내 user_id)를 보내면 내가 차단한 계정/나를 차단한 계정의 게시물은 검색에서 뺀다.
+    const me = parseInt(req.query.me) || 0;
 
     const { rows } = await pool.query(
       `SELECT DISTINCT p.post_id, p.title, p.post_image, p.created_at, u.nickname, u.profile_image
@@ -697,14 +766,20 @@ const searchPosts = async (req, res) => {
        JOIN users u ON p.user_id = u.user_id
        LEFT JOIN post_sticker ps ON ps.post_id = p.post_id
        LEFT JOIN products pr ON ps.product_id = pr.id
-       WHERE p.title ILIKE $1
+       WHERE (p.title ILIKE $1
           OR p.post_content ILIKE $1
           OR u.nickname ILIKE $1
           OR pr.name ILIKE $1
-          OR pr.brand ILIKE $1
+          OR pr.brand ILIKE $1)
+         AND NOT EXISTS (
+           SELECT 1 FROM user_blocks ub
+           WHERE ub.kind = 'block'
+             AND ((ub.blocker_id = $2 AND ub.blocked_id = p.user_id)
+               OR (ub.blocker_id = p.user_id AND ub.blocked_id = $2))
+         )
        ORDER BY p.created_at DESC
        LIMIT 40`,
-      [`%${q.trim()}%`]
+      [`%${q.trim()}%`, me]
     );
 
     res.json({ posts: rows });
@@ -739,4 +814,4 @@ const getPostsByProduct = async (req, res) => {
     }
 };
 
-module.exports = { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts, getPostsByProduct, getFollowingFeed, deletePost, toggleBookmark, getBookmarkStatus, getBookmarkedPosts };
+module.exports = { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts, getPostsByProduct, getFollowingFeed, getViewHistory, clearViewHistory, deletePost, toggleBookmark, getBookmarkStatus, getBookmarkedPosts };

@@ -9,6 +9,7 @@ import 'package:hur_app/app/auth_utils.dart';
 import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
+import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/comment_popup.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/purchase_popup.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/detail_icon_action_bar.dart';
@@ -334,6 +335,20 @@ class _DetailHomePage extends State<DetailHomePage> {
                   IconButton(
                     icon: const Icon(Icons.share_outlined, color: HurColors.muted),
                     onPressed: _sharePost,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.more_horiz, color: HurColors.muted),
+                    onPressed: () => showPostMoreOptions(
+                      context,
+                      postId: widget.postId,
+                      authorId: _post?['user_id'] as int?,
+                      nickname: widget.nickname,
+                      title: widget.title,
+                      // 제한/차단하면 이 게시물은 더 볼 수 없으니 피드로 돌아가 목록을 새로고침한다.
+                      onChanged: () {
+                        if (mounted) Navigator.pop(context, true);
+                      },
+                    ),
                   ),
                 ],
               ),

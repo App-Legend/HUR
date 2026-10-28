@@ -151,6 +151,7 @@ class _SearchResultCosmeticsTabState extends State<SearchResultCosmeticsTab> {
               imagePath: imagePath,
               brand: brand,
               name: name,
+              productId: p['id'] as int?,
             ),
           ),
         );

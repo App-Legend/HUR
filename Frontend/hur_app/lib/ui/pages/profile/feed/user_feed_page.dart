@@ -160,7 +160,17 @@ class _UserProfileHeader extends StatelessWidget {
               ),
               const Spacer(),
               GestureDetector(
-                onTap: () => showPostMoreOptions(context),
+                onTap: () => showPostMoreOptions(
+                  context,
+                  postId: null,
+                  authorId: user?['id'] as int?,
+                  nickname: nickname,
+                  title: null,
+                  // 차단하면 그 사람의 프로필에 더 머무를 필요가 없으니 이전 화면으로 돌아간다.
+                  onChanged: () {
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                ),
                 child: const Icon(Icons.more_horiz, color: HurColors.text, size: 26),
               ),
             ],

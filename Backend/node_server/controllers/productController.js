@@ -46,6 +46,10 @@ const getRanking = async (req, res) => {
              LEFT JOIN scores s ON s.product_id = p.id
              LEFT JOIN post_sticker ps ON ps.product_id = p.id
              WHERE ($2::text IS NULL OR p.category = $2)
+               AND NOT EXISTS (
+                 SELECT 1 FROM user_products up
+                 WHERE up.user_id = $3::int AND up.product_id = p.id AND up.kind = 'hide'
+               )
              GROUP BY p.id, s.match_score
              ORDER BY COALESCE(s.match_score, 0) DESC, p.review_count DESC NULLS LAST, tag_count DESC, p.id ASC
              LIMIT $1`,
@@ -145,4 +149,98 @@ const recommendByImage = async (req, res) => {
     }
 };
 
-module.exports = { getRanking, searchProducts, getProduct, recommendByImage };
+// ───── 제품 표시: 찜(wish) / 내 화장품(own) / 덜 보기(hide) ─────
+const MARK_KINDS = ['wish', 'own', 'hide'];
+const PRODUCT_FIELDS = `p.id, p.brand, p.name, p.image, p.source, p.category,
+                        p.price, p.original_price, p.discount_rate, p.rating, p.review_count`;
+
+// 이 제품에 내가 표시한 종류들 { wish, own, hide }
+const getMyMarks = async (req, res) => {
+    try {
+        const { rows } = await pool.query(
+            'SELECT kind FROM user_products WHERE user_id = $1 AND product_id = $2',
+            [req.user.id, parseInt(req.params.id)]
+        );
+        const kinds = rows.map((r) => r.kind);
+        res.json({ wish: kinds.includes('wish'), own: kinds.includes('own'), hide: kinds.includes('hide') });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// 표시 켜기/끄기: { kind, on }
+const setMark = async (req, res) => {
+    try {
+        const productId = parseInt(req.params.id);
+        const { kind, on } = req.body;
+        if (Number.isNaN(productId) || !MARK_KINDS.includes(kind)) {
+            return res.status(400).json({ message: '잘못된 요청이에요.' });
+        }
+
+        if (on) {
+            const { rows: [product] } = await pool.query('SELECT 1 FROM products WHERE id = $1', [productId]);
+            if (!product) return res.status(404).json({ message: "상품을 찾을 수 없습니다" });
+            await pool.query(
+                'INSERT INTO user_products (user_id, product_id, kind) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
+                [req.user.id, productId, kind]
+            );
+        } else {
+            await pool.query(
+                'DELETE FROM user_products WHERE user_id = $1 AND product_id = $2 AND kind = $3',
+                [req.user.id, productId, kind]
+            );
+        }
+        res.json({ kind, on: !!on });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// 내가 표시한 제품 목록 (?kind=wish|own|hide, 최근 표시한 순)
+const listMarkedProducts = async (req, res) => {
+    try {
+        const kind = req.query.kind;
+        if (!MARK_KINDS.includes(kind)) return res.status(400).json({ message: '잘못된 요청이에요.' });
+
+        const { rows } = await pool.query(
+            `SELECT ${PRODUCT_FIELDS}
+             FROM user_products up
+             JOIN products p ON up.product_id = p.id
+             WHERE up.user_id = $1 AND up.kind = $2
+             ORDER BY up.created_at DESC`,
+            [req.user.id, kind]
+        );
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// 임베딩이 가까운 제품 20개. 로그인했다면 내가 '덜 보기'한 제품은 뺀다.
+const getSimilarProducts = async (req, res) => {
+    try {
+        const productId = parseInt(req.params.id);
+        const userId = req.user ? req.user.id : null;
+
+        const { rows } = await pool.query(
+            `SELECT ${PRODUCT_FIELDS}
+             FROM products p, (SELECT embedding FROM products WHERE id = $1) base
+             WHERE p.id <> $1
+               AND p.embedding IS NOT NULL
+               AND base.embedding IS NOT NULL
+               AND NOT EXISTS (
+                 SELECT 1 FROM user_products up
+                 WHERE up.user_id = $2::int AND up.product_id = p.id AND up.kind = 'hide'
+               )
+             ORDER BY p.embedding <=> base.embedding
+             LIMIT 20`,
+            [productId, userId]
+        );
+        res.json(rows);
+    } catch (err) {
+        console.error("products/similar error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+module.exports = { getRanking, searchProducts, getProduct, recommendByImage, getMyMarks, setMark, listMarkedProducts, getSimilarProducts };
