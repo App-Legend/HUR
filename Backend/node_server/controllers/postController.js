@@ -370,6 +370,92 @@ const toggleLike = async (req, res) => {
     }
 };
 
+// 게시물 삭제 (작성자 본인만). 카테고리/스티커/좋아요/댓글/북마크는 FK CASCADE로 함께 지워진다.
+// S3에 올라간 사진 파일은 지우지 않는다.
+const deletePost = async (req, res) => {
+    try {
+        const postId = parseInt(req.params.id);
+        if (Number.isNaN(postId)) return res.status(400).json({ message: '잘못된 게시물이에요.' });
+
+        const { rows: [post] } = await pool.query('SELECT user_id FROM posts WHERE post_id = $1', [postId]);
+        if (!post) return res.status(404).json({ message: '게시물이 없습니다' });
+        if (post.user_id !== req.user.id) {
+            return res.status(403).json({ message: '내 게시물만 삭제할 수 있어요.' });
+        }
+
+        await pool.query('DELETE FROM posts WHERE post_id = $1', [postId]);
+        res.json({ deleted: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// 북마크 토글
+const toggleBookmark = async (req, res) => {
+    try {
+        const postId = parseInt(req.params.id);
+        if (Number.isNaN(postId)) return res.status(400).json({ message: '잘못된 게시물이에요.' });
+        const userId = req.user.id;
+
+        const { rows: [post] } = await pool.query('SELECT 1 FROM posts WHERE post_id = $1', [postId]);
+        if (!post) return res.status(404).json({ message: '게시물이 없습니다' });
+
+        const { rowCount } = await pool.query(
+            'DELETE FROM post_bookmarks WHERE post_id = $1 AND user_id = $2', [postId, userId]
+        );
+        if (rowCount > 0) return res.json({ bookmarked: false });
+
+        await pool.query(
+            'INSERT INTO post_bookmarks (post_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [postId, userId]
+        );
+        res.json({ bookmarked: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// 북마크 여부 + 개수 (비로그인이면 개수만)
+const getBookmarkStatus = async (req, res) => {
+    try {
+        const postId = parseInt(req.params.id);
+        if (Number.isNaN(postId)) return res.status(400).json({ message: '잘못된 게시물이에요.' });
+
+        const { rows: [{ count }] } = await pool.query(
+            'SELECT COUNT(*) AS count FROM post_bookmarks WHERE post_id = $1', [postId]
+        );
+        if (!req.user) return res.json({ bookmarked: false, count: parseInt(count) });
+
+        const { rows: existing } = await pool.query(
+            'SELECT 1 FROM post_bookmarks WHERE post_id = $1 AND user_id = $2', [postId, req.user.id]
+        );
+        res.json({ bookmarked: existing.length > 0, count: parseInt(count) });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// 내가 북마크한 게시물 목록 (최근 저장순). 지금은 볼 수 없는 게시물(팔로워만 + 언팔)은 제외.
+const getBookmarkedPosts = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { rows } = await pool.query(
+            `SELECT p.post_id, p.post_image, p.title, p.created_at, u.nickname
+             FROM post_bookmarks b
+             JOIN posts p ON b.post_id = p.post_id
+             JOIN users u ON p.user_id = u.user_id
+             WHERE b.user_id = $1
+               AND (p.user_id = $1 OR p.visibility IS NULL OR p.visibility = '모든 사람' OR (p.visibility = '팔로워만' AND EXISTS (
+                 SELECT 1 FROM follow WHERE follower_id = $1 AND following_id = p.user_id
+               )))
+             ORDER BY b.created_at DESC`,
+            [userId]
+        );
+        res.json({ posts: rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 // 좋아요 여부 확인
 const getLikeStatus = async (req, res) => {
     try {
@@ -617,4 +703,4 @@ const getPostsByProduct = async (req, res) => {
     }
 };
 
-module.exports = { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts, getPostsByProduct };
+module.exports = { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts, getPostsByProduct, deletePost, toggleBookmark, getBookmarkStatus, getBookmarkedPosts };

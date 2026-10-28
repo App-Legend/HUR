@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const multer = require('multer');
 const path = require('path');
-const { verifyToken } = require('../middleware/auth');
+const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { s3Storage } = require('../s3');
-const { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts, getPostsByProduct } = require('../controllers/postController');
+const { createPost, getFeed, getUserPosts, getPostDetail, updateScore, toggleLike, getLikeStatus, getComments, addComment, deleteComment, searchPosts, getPostsByProduct, deletePost, toggleBookmark, getBookmarkStatus, getBookmarkedPosts } = require('../controllers/postController');
 
 const upload = multer({
   storage: s3Storage('posts'),
@@ -19,8 +19,12 @@ router.get('/feed', getFeed);
 router.get('/search', searchPosts);
 router.get('/by-product/:productId', getPostsByProduct);
 router.get('/user/:userId', getUserPosts);
+router.get('/bookmarks/me', verifyToken, getBookmarkedPosts);
 router.get('/:id', getPostDetail);
+router.delete('/:id', verifyToken, deletePost);
 router.post('/', verifyToken, upload.single('image'), createPost);
+router.post('/:id/bookmark', verifyToken, toggleBookmark);
+router.get('/:id/bookmark', optionalAuth, getBookmarkStatus);
 router.post('/:id/score', verifyToken, updateScore);
 router.post('/:id/like', verifyToken, toggleLike);
 router.get('/:id/like', getLikeStatus);

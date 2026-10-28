@@ -131,6 +131,19 @@ CREATE TABLE IF NOT EXISTS post_likes (
   CONSTRAINT fk_post_likes_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
+-- 북마크(저장) 테이블
+CREATE TABLE IF NOT EXISTS post_bookmarks (
+  bookmark_id SERIAL    NOT NULL,
+  post_id     INT       NOT NULL,
+  user_id     INT       NOT NULL,
+  created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (bookmark_id),
+  CONSTRAINT uq_post_bookmarks      UNIQUE (post_id, user_id),
+  CONSTRAINT fk_post_bookmarks_post FOREIGN KEY (post_id) REFERENCES posts (post_id) ON DELETE CASCADE,
+  CONSTRAINT fk_post_bookmarks_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_post_bookmarks_user ON post_bookmarks (user_id, created_at DESC);
+
 -- 댓글 테이블
 CREATE TABLE IF NOT EXISTS post_comments (
   comment_id SERIAL    NOT NULL,

@@ -5,6 +5,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:hur_app/app/auth_utils.dart';
 import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
@@ -40,6 +41,7 @@ class DetailHomePage extends StatefulWidget {
 class _DetailHomePage extends State<DetailHomePage> {
   bool isLiked = false;
   bool isBookmark = false;
+  int bookmarkCount = 0;
   int likeCount = 0;
   int _commentCount = 0;
   int? _userId;
@@ -59,7 +61,103 @@ class _DetailHomePage extends State<DetailHomePage> {
     final prefs = await SharedPreferences.getInstance();
     _userId = prefs.getInt('user_id');
     _token = prefs.getString('auth_token');
-    await Future.wait([_loadPostDetail(), _loadLikeStatus(), _recordView()]);
+    await Future.wait([_loadPostDetail(), _loadLikeStatus(), _loadBookmarkStatus(), _recordView()]);
+  }
+
+  bool get _isMyPost => _userId != null && _post?['user_id'] == _userId;
+
+  Future<void> _loadBookmarkStatus() async {
+    try {
+      final res = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/post/${widget.postId}/bookmark'),
+        headers: _token != null ? {'Authorization': 'Bearer $_token'} : null,
+      );
+      if (res.statusCode == 200 && mounted) {
+        final data = jsonDecode(res.body);
+        setState(() {
+          isBookmark = data['bookmarked'] ?? false;
+          bookmarkCount = data['count'] ?? 0;
+        });
+      }
+    } catch (_) {}
+  }
+
+  void _toggleBookmark() async {
+    if (_userId == null) {
+      _showLoginRequired();
+      return;
+    }
+    setState(() {
+      isBookmark = !isBookmark;
+      bookmarkCount += isBookmark ? 1 : -1;
+    });
+    try {
+      final res = await http.post(
+        Uri.parse('${ApiConstants.baseUrl}/post/${widget.postId}/bookmark'),
+        headers: {'Authorization': 'Bearer $_token'},
+      );
+      if (res.statusCode == 401) {
+        if (mounted) await handleUnauthorized(context);
+        return;
+      }
+      if (res.statusCode != 200) throw Exception('bookmark ${res.statusCode}');
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          isBookmark = !isBookmark;
+          bookmarkCount += isBookmark ? 1 : -1;
+        });
+      }
+    }
+  }
+
+  Future<void> _confirmDelete() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: HurColors.bg,
+        title: const Text('게시물을 삭제할까요?', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: HurColors.text)),
+        content: const Text('삭제하면 되돌릴 수 없어요.', style: TextStyle(color: HurColors.muted)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소', style: TextStyle(color: HurColors.muted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('삭제', style: TextStyle(color: HurColors.peach, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) await _deletePost();
+  }
+
+  Future<void> _deletePost() async {
+    try {
+      final res = await http.delete(
+        Uri.parse('${ApiConstants.baseUrl}/post/${widget.postId}'),
+        headers: {'Authorization': 'Bearer $_token'},
+      );
+      if (!mounted) return;
+      if (res.statusCode == 200) {
+        Navigator.pop(context, true);
+        return;
+      }
+      if (res.statusCode == 401) {
+        await handleUnauthorized(context);
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('삭제하지 못했어요. 잠시 후 다시 시도해주세요.')),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('삭제하지 못했어요. 인터넷 연결을 확인해주세요.')),
+        );
+      }
+    }
   }
 
   Future<void> _loadPostDetail() async {
@@ -194,9 +292,12 @@ class _DetailHomePage extends State<DetailHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = (_post?['categories'] as List?)
-            ?.cast<Map<String, dynamic>>() ??
-        [];
+    // 퍼스널컬러 AI 분류는 정확도가 낮아(약 30%) 화면에는 보여주지 않는다. DB에는 그대로 저장된다.
+    final categories = ((_post?['categories'] as List?)
+                ?.cast<Map<String, dynamic>>() ??
+            [])
+        .where((cat) => cat['category_type'] != 'personal_color')
+        .toList();
     final stickers = (_post?['stickers'] as List?)
             ?.cast<Map<String, dynamic>>() ??
         [];
@@ -211,11 +312,22 @@ class _DetailHomePage extends State<DetailHomePage> {
                 icon: const Icon(Icons.arrow_back_ios, color: HurColors.text),
                 onPressed: () => Navigator.pop(context),
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.share_outlined, color: HurColors.muted),
-                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('공유 기능은 준비 중입니다.')),
-                ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_isMyPost)
+                    IconButton(
+                      tooltip: '게시물 삭제',
+                      icon: const Icon(Icons.delete_outline, color: HurColors.muted),
+                      onPressed: _confirmDelete,
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.share_outlined, color: HurColors.muted),
+                    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('공유 기능은 준비 중입니다.')),
+                    ),
+                  ),
+                ],
               ),
               showDivider: false,
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
@@ -265,10 +377,10 @@ class _DetailHomePage extends State<DetailHomePage> {
                       isBookmark: isBookmark,
                       likeCount: likeCount,
                       commentCount: _commentCount,
-                      bookmarkCount: 0,
+                      bookmarkCount: bookmarkCount,
                       onLikeTap: _toggleLike,
                       onCommentTap: _showCommentPopup,
-                      onBookmarkTap: () {},
+                      onBookmarkTap: _toggleBookmark,
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16),

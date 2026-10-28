@@ -91,7 +91,7 @@ class _MyPageState extends State<MyPage> {
       case 1:
         return const _EmptyTab(icon: Icons.location_on_outlined);
       case 2:
-        return const _EmptyTab(icon: Icons.bookmark_border);
+        return const _PostsGrid(bookmarked: true);
       default:
         return _PostsGrid(onPostsLoaded: (count) => setState(() => _postCount = count));
     }
@@ -356,8 +356,10 @@ class _TabBar extends StatelessWidget {
 }
 
 class _PostsGrid extends StatefulWidget {
-  final void Function(int count) onPostsLoaded;
-  const _PostsGrid({required this.onPostsLoaded});
+  final void Function(int count)? onPostsLoaded;
+  // true면 내가 쓴 글 대신 내가 북마크한 게시물을 보여준다.
+  final bool bookmarked;
+  const _PostsGrid({this.onPostsLoaded, this.bookmarked = false});
 
   @override
   State<_PostsGrid> createState() => _PostsGridState();
@@ -376,17 +378,23 @@ class _PostsGridState extends State<_PostsGrid> {
   Future<void> _fetchPosts() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('user_id');
+    final token = prefs.getString('auth_token');
     if (userId == null) {
       if (mounted) setState(() => _isLoading = false);
       return;
     }
     try {
-      final response = await http.get(Uri.parse('${ApiConstants.baseUrl}/post/user/$userId?viewer_id=$userId'));
+      final response = widget.bookmarked
+          ? await http.get(
+              Uri.parse('${ApiConstants.baseUrl}/post/bookmarks/me'),
+              headers: {'Authorization': 'Bearer $token'},
+            )
+          : await http.get(Uri.parse('${ApiConstants.baseUrl}/post/user/$userId?viewer_id=$userId'));
       if (response.statusCode == 200 && mounted) {
         final data = jsonDecode(response.body);
         final posts = List<Map<String, dynamic>>.from(data['posts']);
         setState(() => _posts = posts);
-        widget.onPostsLoaded(posts.length);
+        widget.onPostsLoaded?.call(posts.length);
       }
     } catch (_) {}
     if (mounted) setState(() => _isLoading = false);
@@ -398,8 +406,11 @@ class _PostsGridState extends State<_PostsGrid> {
       return const Center(child: CircularProgressIndicator(color: HurColors.accent));
     }
     if (_posts.isEmpty) {
-      return const Center(
-        child: Text('게시물 없음', style: TextStyle(fontSize: 15, color: HurColors.muted)),
+      return Center(
+        child: Text(
+          widget.bookmarked ? '저장한 게시물 없음' : '게시물 없음',
+          style: const TextStyle(fontSize: 15, color: HurColors.muted),
+        ),
       );
     }
     return GridView.builder(
@@ -415,17 +426,21 @@ class _PostsGridState extends State<_PostsGrid> {
         final post = _posts[index];
         final imageUrl = ApiConstants.imageUrl(post['post_image']);
         return GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => DetailHomePage(
-                imageUrl: imageUrl,
-                nickname: post['nickname'] ?? '',
-                title: post['title'] ?? '',
-                postId: post['post_id'] as int,
+          onTap: () async {
+            final deleted = await Navigator.push<bool>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DetailHomePage(
+                  imageUrl: imageUrl,
+                  nickname: post['nickname'] ?? '',
+                  title: post['title'] ?? '',
+                  postId: post['post_id'] as int,
+                ),
               ),
-            ),
-          ),
+            );
+            // 삭제했거나(내 글), 상세에서 북마크를 풀었을 수 있으니(북마크 탭) 목록을 다시 불러온다.
+            if ((deleted == true || widget.bookmarked) && mounted) _fetchPosts();
+          },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image.network(

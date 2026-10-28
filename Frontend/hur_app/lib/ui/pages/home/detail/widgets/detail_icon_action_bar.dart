@@ -73,7 +73,7 @@ class DetailIconActionBar extends StatelessWidget {
               color: HurColors.text,
               size: 26,
               weight: 400,
-              fill: isBookmark ? 0 : 1,
+              fill: isBookmark ? 1 : 0,
             ),
           ),
           const SizedBox(width: 3),

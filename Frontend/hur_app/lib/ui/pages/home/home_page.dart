@@ -101,6 +101,24 @@ class _HomePageState extends State<HomePage> {
     if (mounted) setState(() => _isFetchingMore = false);
   }
 
+  Future<void> _refresh() => _fetchFeed(page: 0);
+
+  // 상세에서 게시물을 삭제하고 돌아오면(true) 피드를 다시 불러온다.
+  Future<void> _openDetail(Map<String, dynamic> post, String imageUrl) async {
+    final deleted = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DetailHomePage(
+          imageUrl: imageUrl,
+          nickname: post['nickname'] ?? '',
+          title: post['title'] ?? '',
+          postId: post['post_id'] as int,
+        ),
+      ),
+    );
+    if (deleted == true && mounted) await _refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     final leftItems = <Map<String, dynamic>>[];
@@ -144,13 +162,24 @@ class _HomePageState extends State<HomePage> {
                             ),
                           )
                         : _posts.isEmpty
-                        ? const Center(
-                            child: Text(
-                              '게시물이 없습니다.',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: HurColors.muted,
-                              ),
+                        ? RefreshIndicator(
+                            color: HurColors.accent,
+                            backgroundColor: HurColors.panel,
+                            onRefresh: _refresh,
+                            child: ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: const [
+                                SizedBox(height: 240),
+                                Center(
+                                  child: Text(
+                                    '게시물이 없습니다.',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: HurColors.muted,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           )
                         : Padding(
@@ -158,7 +187,12 @@ class _HomePageState extends State<HomePage> {
                               horizontal: 10,
                               vertical: 12,
                             ),
-                            child: SingleChildScrollView(
+                            child: RefreshIndicator(
+                              color: HurColors.accent,
+                              backgroundColor: HurColors.panel,
+                              onRefresh: _refresh,
+                              child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
                               controller: _scrollController,
                               child: Column(
                                 children: [
@@ -171,19 +205,7 @@ class _HomePageState extends State<HomePage> {
                                             final imageUrl =
                                                 ApiConstants.imageUrl(post['post_image']);
                                             return GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) => DetailHomePage(
-                                                      imageUrl: imageUrl,
-                                                      nickname: post['nickname'] ?? '',
-                                                      title: post['title'] ?? '',
-                                                      postId: post['post_id'] as int,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
+                                              onTap: () => _openDetail(post, imageUrl),
                                               child: _ImageCard(
                                                 imageUrl: imageUrl,
                                                 label: post['nickname'],
@@ -201,19 +223,7 @@ class _HomePageState extends State<HomePage> {
                                             final imageUrl =
                                                 ApiConstants.imageUrl(post['post_image']);
                                             return GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) => DetailHomePage(
-                                                      imageUrl: imageUrl,
-                                                      nickname: post['nickname'] ?? '',
-                                                      title: post['title'] ?? '',
-                                                      postId: post['post_id'] as int,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
+                                              onTap: () => _openDetail(post, imageUrl),
                                               child: _ImageCard(
                                                 imageUrl: imageUrl,
                                                 label: post['nickname'],
@@ -231,6 +241,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                 ],
                               ),
+                            ),
                             ),
                           )
                   : const Center(
