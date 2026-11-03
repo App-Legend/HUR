@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:hur_app/core/product_buy_link.dart';
 import 'package:hur_app/app/auth_utils.dart';
 import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/app/theme.dart';
+import 'package:hur_app/ui/common/widget/buy_link_notice.dart';
 import 'package:hur_app/ui/pages/library/product_list_page.dart';
 
 /// 제품 `...` 메뉴: 내 화장품 / 찜하기 / 유사한 화장품 더 보기 / 덜 보기.
@@ -113,7 +113,6 @@ class _ProductMorePopupState extends State<ProductMorePopup> {
   }
 
   Future<void> _chooseBuyStore() async {
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final store = await showModalBottomSheet<BuyStore>(
       context: context,
@@ -143,12 +142,8 @@ class _ProductMorePopupState extends State<ProductMorePopup> {
       onBuyLink(uri);
       return;
     }
-    try {
-      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      if (!ok) throw Exception('launch failed');
-    } catch (_) {
-      messenger.showSnackBar(const SnackBar(content: Text('구매 링크를 열지 못했어요.')));
-    }
+    if (!mounted) return;
+    await openBuyLink(context, uri);
   }
 
   @override
