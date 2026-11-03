@@ -84,9 +84,14 @@ class _LoginInfoPageState extends State<LoginInfoPage> {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('user_id');
+    final token = prefs.getString('auth_token');
     if (userId != null) {
       try {
-        final res = await http.get(Uri.parse('${ApiConstants.baseUrl}/user/$userId'));
+        // 이메일/생년월일은 본인 토큰으로 요청해야 내려온다.
+        final res = await http.get(
+          Uri.parse('${ApiConstants.baseUrl}/user/$userId'),
+          headers: token != null ? {'Authorization': 'Bearer $token'} : null,
+        );
         if (res.statusCode == 200 && mounted) {
           setState(() => _user = jsonDecode(res.body));
         }

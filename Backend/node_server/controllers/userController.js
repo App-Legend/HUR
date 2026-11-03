@@ -8,6 +8,8 @@ const searchUsers = async (req, res) => {
     try {
         const { q, me } = req.query;
         if (!q || q.trim() === "") return res.json([]);
+        // me가 숫자가 아니면 0으로 본다. (잘못된 값이 DB 오류로 이어지지 않게)
+        const meId = parseInt(me) || 0;
 
         const { rows } = await pool.query(
             `SELECT u.user_id AS id, u.nickname, u.profile_image,
@@ -25,7 +27,7 @@ const searchUsers = async (req, res) => {
                      OR (ub.blocker_id = u.user_id AND ub.blocked_id = $3))
                )
              LIMIT 20`,
-            [me ?? 0, `%${q}%`, me ?? 0]
+            [meId, `%${q}%`, meId]
         );
         res.json(rows);
     } catch (err) {
@@ -54,7 +56,17 @@ const getProfile = async (req, res) => {
         if (rows.length === 0) {
             return res.status(404).json({ message: "유저를 찾을 수 없습니다" });
         }
-        res.json(rows[0]);
+
+        // 이메일/이름/성별/생년월일은 본인에게만 내려준다. (프로필은 로그인 없이도 볼 수 있는 공개 API)
+        const profile = rows[0];
+        const isSelf = req.user && Number(req.user.id) === Number(profile.id);
+        if (!isSelf) {
+            delete profile.email;
+            delete profile.name;
+            delete profile.gender;
+            delete profile.birth_date;
+        }
+        res.json(profile);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

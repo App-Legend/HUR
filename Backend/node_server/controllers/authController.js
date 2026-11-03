@@ -9,15 +9,18 @@ const login = async (req, res) => {
     try {
         const { email, password, keep_logged_in } = req.body;
 
+        // 가입 여부를 추측할 수 없게, 이메일이 없을 때와 비밀번호가 틀릴 때 같은 문구를 돌려준다.
+        const LOGIN_FAILED = { message: '이메일 또는 비밀번호가 맞지 않습니다' };
+
         const { rows } = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
         if (rows.length === 0) {
-            return res.status(401).json({ message: '가입되지 않은 이메일입니다' });
+            return res.status(401).json(LOGIN_FAILED);
         }
 
         const user = rows[0];
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
-            return res.status(401).json({ message: '비밀번호가 맞지 않습니다' });
+            return res.status(401).json(LOGIN_FAILED);
         }
 
         const token = jwt.sign(
