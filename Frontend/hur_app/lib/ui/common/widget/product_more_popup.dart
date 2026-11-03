@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:hur_app/core/product_buy_link.dart';
 import 'package:hur_app/app/auth_utils.dart';
 import 'package:hur_app/app/constants.dart';
 import 'package:hur_app/app/theme.dart';
@@ -17,12 +19,16 @@ class ProductMorePopup extends StatefulWidget {
   final String name;
   final int? productId;
 
+  /// 구매처를 고른 뒤 호출된다. 없으면 외부 브라우저로 검색 주소를 연다.
+  final void Function(Uri uri)? onBuyLink;
+
   const ProductMorePopup({
     super.key,
     required this.imagePath,
     required this.brand,
     required this.name,
     this.productId,
+    this.onBuyLink,
   });
 
   @override
@@ -106,11 +112,50 @@ class _ProductMorePopupState extends State<ProductMorePopup> {
     ));
   }
 
+  Future<void> _chooseBuyStore() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final store = await showModalBottomSheet<BuyStore>(
+      context: context,
+      backgroundColor: HurColors.panel,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final s in BuyStore.values)
+              ListTile(
+                title: Text(
+                  s.label,
+                  style: const TextStyle(color: HurColors.text, fontWeight: FontWeight.w600),
+                ),
+                onTap: () => Navigator.pop(sheetContext, s),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (store == null) return;
+
+    final uri = productBuyUri(store, brand: widget.brand, name: widget.name);
+    navigator.pop();
+    final onBuyLink = widget.onBuyLink;
+    if (onBuyLink != null) {
+      onBuyLink(uri);
+      return;
+    }
+    try {
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok) throw Exception('launch failed');
+    } catch (_) {
+      messenger.showSnackBar(const SnackBar(content: Text('구매 링크를 열지 못했어요.')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final imagePath = widget.imagePath;
     return Container(
-      height: 350,
+      height: 390,
       padding: const EdgeInsets.fromLTRB(22, 14, 22, 22),
       decoration: const BoxDecoration(
         color: HurColors.panel,
@@ -218,6 +263,11 @@ class _ProductMorePopupState extends State<ProductMorePopup> {
                     onMessage: '이 화장품을 숨겼어요. 랭킹과 비슷한 화장품 목록에서 보이지 않아요.',
                     offMessage: '이 화장품이 다시 보이도록 했어요.',
                   ),
+                ),
+                _MoreMenuItem(
+                  icon: Symbols.shopping_bag,
+                  text: '구매 링크 (네이버·쿠팡)',
+                  onTap: _chooseBuyStore,
                 ),
               ],
             ),
