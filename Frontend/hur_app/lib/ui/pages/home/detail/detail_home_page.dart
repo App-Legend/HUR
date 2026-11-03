@@ -11,7 +11,6 @@ import 'package:hur_app/ui/common/headers/main_header.dart';
 import 'package:hur_app/ui/common/widget/category_chip.dart';
 import 'package:hur_app/ui/common/widget/home_post_more_popup.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/comment_popup.dart';
-import 'package:hur_app/ui/pages/home/detail/popup/purchase_popup.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/detail_icon_action_bar.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/detail_profile_header.dart';
 import 'package:hur_app/ui/pages/home/detail/widgets/image_tag_section.dart';
@@ -291,16 +290,6 @@ class _DetailHomePage extends State<DetailHomePage> {
     );
   }
 
-  void _showPurchasePopup() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withValues(alpha: 0.35),
-      isScrollControlled: true,
-      builder: (context) => const PurchasePopup(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     // 퍼스널컬러 AI 분류는 정확도가 낮아(약 30%) 화면에는 보여주지 않는다. DB에는 그대로 저장된다.
@@ -452,7 +441,6 @@ class _DetailHomePage extends State<DetailHomePage> {
                             UsedProductHeader(count: stickers.length),
                             const SizedBox(height: 14),
                             UsedProductList(
-                              onOpenTap: _showPurchasePopup,
                               stickers: stickers,
                             ),
                           ],

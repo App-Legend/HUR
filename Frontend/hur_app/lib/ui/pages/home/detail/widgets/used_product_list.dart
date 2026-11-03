@@ -4,17 +4,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
+import 'package:hur_app/ui/common/widget/product_more_popup.dart';
 import 'package:hur_app/ui/pages/ranking/detail_ranking_page.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hur_app/app/theme.dart';
 
 class UsedProductList extends StatelessWidget {
-  final VoidCallback onOpenTap;
   final List<Map<String, dynamic>> stickers;
 
   const UsedProductList({
     super.key,
-    required this.onOpenTap,
     required this.stickers,
   });
 
@@ -42,7 +41,18 @@ class UsedProductList extends StatelessWidget {
           brandName: s['brand_name'] ?? '',
           productName: s['product_name'] ?? '',
           price: '',
-          onOpenTap: onOpenTap,
+          onOpenTap: () => showModalBottomSheet<bool>(
+            context: context,
+            backgroundColor: Colors.transparent,
+            barrierColor: Colors.black.withValues(alpha: 0.25),
+            isScrollControlled: true,
+            builder: (_) => ProductMorePopup(
+              imagePath: s['image'] as String? ?? '',
+              brand: s['brand_name'] as String? ?? '',
+              name: s['product_name'] as String? ?? '',
+              productId: s['product_id'] as int?,
+            ),
+          ),
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
