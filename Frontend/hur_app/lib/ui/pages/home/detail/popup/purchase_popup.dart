@@ -4,9 +4,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:hur_app/app/theme.dart';
+import 'package:hur_app/core/product_buy_link.dart';
+import 'package:hur_app/ui/common/widget/buy_link_notice.dart';
 
 class PurchasePopup extends StatelessWidget {
-  const PurchasePopup({super.key});
+  final String brand;
+  final String name;
+
+  const PurchasePopup({super.key, required this.brand, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +68,10 @@ class PurchasePopup extends StatelessWidget {
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () => openBuyLink(
+                      context,
+                      productBuyUri(BuyStore.naver, brand: brand, name: name),
+                    ),
                     child: Container(
                       height: 58,
                       decoration: BoxDecoration(
@@ -89,7 +97,10 @@ class PurchasePopup extends StatelessWidget {
 
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () => openBuyLink(
+                      context,
+                      productBuyUri(BuyStore.coupang, brand: brand, name: name),
+                    ),
                     child: Container(
                       height: 58,
                       decoration: BoxDecoration(

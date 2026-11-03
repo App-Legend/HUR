@@ -46,7 +46,8 @@ class _DetailRankingPageState extends State<DetailRankingPage> {
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withValues(alpha: 0.35),
       isScrollControlled: true,
-      builder: (context) => const PurchasePopup(),
+      builder: (context) =>
+          PurchasePopup(brand: widget.brand, name: widget.name),
     );
   }
 
