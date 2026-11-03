@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/common/widget/product_item_container.dart';
+import 'package:hur_app/ui/pages/ranking/detail_ranking_page.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hur_app/app/theme.dart';
 
@@ -42,6 +43,18 @@ class UsedProductList extends StatelessWidget {
           productName: s['product_name'] ?? '',
           price: '',
           onOpenTap: onOpenTap,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DetailRankingPage(
+                rank: '-',
+                imagePath: s['image'] as String? ?? '',
+                brand: s['brand_name'] as String? ?? '',
+                name: s['product_name'] as String? ?? '',
+                productId: s['product_id'] as int?,
+              ),
+            ),
+          ),
           trailingIcon: Symbols.more_horiz,
         );
       },

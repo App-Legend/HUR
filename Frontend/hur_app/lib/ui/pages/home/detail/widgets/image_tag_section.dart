@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hur_app/ui/pages/home/detail/popup/product_tag_popup.dart';
+import 'package:hur_app/ui/pages/ranking/detail_ranking_page.dart';
 import 'package:hur_app/app/theme.dart';
 
 class ImageTagSection extends StatefulWidget {
@@ -37,6 +38,21 @@ class _ImageTagSectionState extends State<ImageTagSection> {
     if (box != null && mounted) {
       setState(() => _containerSize = box.size);
     }
+  }
+
+  void _openProduct(Map<String, dynamic> s) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DetailRankingPage(
+          rank: '-',
+          imagePath: s['image'] as String? ?? '',
+          brand: s['brand_name'] as String? ?? '',
+          name: s['product_name'] as String? ?? '',
+          productId: s['product_id'] as int?,
+        ),
+      ),
+    );
   }
 
   @override
@@ -115,6 +131,7 @@ class _ImageTagSectionState extends State<ImageTagSection> {
                       brandName: s['brand_name'] ?? '',
                       productName: s['product_name'] ?? '',
                       imageUrl: s['image'] as String? ?? '',
+                      onTap: () => _openProduct(s),
                     ),
                   ),
               ];

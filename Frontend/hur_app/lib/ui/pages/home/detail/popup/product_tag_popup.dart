@@ -9,16 +9,25 @@ class ProductTagPopup extends StatelessWidget {
   final String brandName;
   final String productName;
   final String imageUrl;
+  final VoidCallback? onTap;
 
   const ProductTagPopup({
     super.key,
     required this.brandName,
     required this.productName,
     this.imageUrl = '',
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
     return Container(
       width: 185,
       height: 54,
