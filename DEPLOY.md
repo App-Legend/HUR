@@ -130,6 +130,26 @@ git pull origin feature
 docker compose up -d --build
 ```
 
+### 자동 배포 (GitHub Actions)
+
+`feature` 브랜치에 `Backend/`, `nginx/`, `docker-compose.yml` 변경이 푸시되면 `.github/workflows/deploy.yml` 이
+EC2에 SSH로 접속해 위 두 명령을 대신 실행하고, 끝나면 `/products/ranking` 응답까지 확인한다.
+앱(Frontend)만 바뀐 푸시는 서버 반영이 필요 없어 돌지 않는다.
+
+- **수동 실행**: GitHub 저장소 → Actions → "Deploy to EC2" → Run workflow
+- **결과 확인**: Actions 탭에서 초록 체크면 성공, 빨간 X면 실패 (로그에서 단계별 원인 확인)
+- **필요한 시크릿** (Settings → Secrets and variables → Actions → Repository secrets)
+
+  | Name | 값 |
+  |---|---|
+  | `EC2_HOST` | EC2 공인 IP |
+  | `EC2_USER` | EC2 접속 계정 (`ubuntu`) |
+  | `EC2_SSH_KEY` | EC2 접속용 `.pem` 파일 전체 내용 |
+
+- 서버의 프로젝트 경로는 `/home/ubuntu/HUR` 로 가정한다 (다르면 `deploy.yml` 의 `APP_DIR` 수정).
+- EC2 보안 그룹에서 22번 포트(SSH)가 GitHub 서버에서 접속 가능해야 한다.
+- 서버 폴더에서 직접 파일을 고치면 `git pull --ff-only` 가 막힐 수 있으니, 서버에서는 코드를 직접 수정하지 않는다.
+
 ## 문제 생겼을 때
 
 ```bash

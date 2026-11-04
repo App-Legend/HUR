@@ -1,0 +1,46 @@
+name: Deploy to EC2
+
+# feature 브랜치에 서버 관련 파일이 푸시되면 EC2에 접속해 최신 코드로 다시 띄운다.
+# Actions 탭의 "Run workflow" 버튼으로 수동 실행도 가능하다.
+on:
+  push:
+    branches: [feature]
+    paths:
+      - "Backend/**"
+      - "nginx/**"
+      - "docker-compose.yml"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+# 배포가 겹쳐서 돌지 않게 한 줄로 세운다 (진행 중인 배포는 끊지 않는다)
+concurrency:
+  group: deploy-ec2
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_USER: ${{ secrets.EC2_USER }}
+      EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+      APP_DIR: /home/ubuntu/HUR
+    steps:
+      - name: SSH 키 준비
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+
+      - name: EC2에서 최신 코드 받고 다시 띄우기
+        run: |
+          ssh -i ~/.ssh/id_deploy -o ServerAliveInterval=30 "$EC2_USER@$EC2_HOST" \
+            "cd $APP_DIR && git pull --ff-only origin feature && docker compose up -d --build && docker compose ps"
+
+      - name: 서버 응답 확인
+        run: |
+          curl -fsS --retry 12 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w 'HTTP %{http_code}\n' \
+            "http://$EC2_HOST/products/ranking"
